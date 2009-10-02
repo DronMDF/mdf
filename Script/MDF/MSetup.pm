@@ -64,30 +64,4 @@ sub FindRule {
 	return ($nm, $version, $rules);
 }
 
-sub FindRuleTest {
-	my @Test = FindRule (undef, 'Test', undef);
-	return 0 unless (
-		defined $Test[0] and $Test[0] eq 'Test/Test' and
-		defined $Test[1] and $Test[1] eq '1.1.1' and
-		defined $Test[2] and $Test[2] =~ /^\s*Test;\s*$/);
-
-	@Test = FindRule (undef, 'Test', '1.1.0');
-	return 0 unless (
-		defined $Test[0] and $Test[0] eq 'Test/Test' and
-		defined $Test[1] and $Test[1] eq '1.1.1' and
-		defined $Test[2] and $Test[2] =~ /^\s*Test;\s*$/);
-
-	@Test = FindRule (undef, 'Test', '1.1.1');
-	return 0 unless (
-		defined $Test[0] and $Test[0] eq 'Test/Test' and
-		defined $Test[1] and $Test[1] eq '1.1.1' and
-		defined $Test[2] and $Test[2] =~ /^\s*Test;\s*$/);
-
-	return 1;
-}
-
-unless (&FindRuleTest) {
-	die "MDF::MSetup: Failed!\n";
-}
-
 1;

@@ -1,0 +1,4 @@
+syntax: glob
+Images/mdf-*
+Images/grub2
+Images/MDF.Root
