@@ -1,0 +1,11 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 11/12/06 14:45:16
+//
+
+#pragma once
+
+typedef struct {
+} *jmp_buf;

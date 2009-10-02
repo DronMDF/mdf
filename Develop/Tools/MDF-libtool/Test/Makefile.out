@@ -1,0 +1,6 @@
+# This file automatically generated
+# Copyright (c) by dron (dron@infosec.ru)
+
+include $(MDF_TEMP)/Makefile.testunit
+include $(MDF_TEMP)/Makefile.test2
+include $(MDF_TEMP)/Makefile.test3

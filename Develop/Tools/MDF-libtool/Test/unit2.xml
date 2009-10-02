@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 12:13:03'/>
+	<mdf:unit name='test3' type='function' lang='c'>
+		<mdf:include prefix='$(MDF_TEMP)' file='test.h' protopub='yes'/>
+		<mdf:prototype type='void'>
+			<mdf:arg name='argc' type='int'/>
+			<mdf:arg name='argv' type='void *'/>
+		</mdf:prototype>
+		<mdf:body>
+			return;
+		</mdf:body>
+	</mdf:unit>
+</mdf:unitset>

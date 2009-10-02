@@ -1,0 +1,12 @@
+
+Description "Драйвер текстового вывода"
+
+Release 0.0.26.6 {
+	Depend NamerLib-0.0.4.1;
+	Depend MDF-Env-0.0.4.1;
+	Depend Kernel-IA32-0.1.4;
+	Depend KernelLib-0.0.8;
+	Depend MDF-libc-0.0.2.2;
+
+	Source Repository System/Devices/Console;
+}

@@ -1,0 +1,18 @@
+
+timeout 30
+default 0
+root	(cd0)
+
+title MDF Schedule Test (64 MiB min)
+kernel	/MDF.Root/System/Core/Kernel-IA32 console=serial
+module  /MDF.Root/System/Core/KernelInfo
+module  /MDF.Root/System/Test/SchedulerTest
+
+title MDF Hello Test (new kernel with info)
+kernel	/MDF.Root/System/Core/Kernel-IA32 console=xga
+module  /MDF.Root/System/Core/KernelInfo
+module  /MDF.Root/System/Test/Hello
+
+title MDF Hello Test (old kernel)
+kernel	/MDF.Root/System/Core/Kernel
+module  /MDF.Root/System/Test/Hello

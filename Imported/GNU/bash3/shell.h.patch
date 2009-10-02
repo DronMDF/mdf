@@ -1,0 +1,11 @@
+--- shell.h.old	2006-12-11 16:39:50.000000000 +0300
++++ shell.h	2006-12-11 16:40:36.000000000 +0300
+@@ -22,6 +22,8 @@
+ #include "config.h"
+ #endif
+ 
++#include <pwd.h>
++
+ #include "bashjmp.h"
+ 
+ #include "command.h"

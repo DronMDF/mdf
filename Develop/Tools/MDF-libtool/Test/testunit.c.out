@@ -1,0 +1,11 @@
+// This file automatically generated
+// Copyright (c) by dron (dron@infosec.ru)
+
+#include <test.h>
+
+void testunit (int arg1, char * arg2)
+{
+	// Здесь размещается тело функции
+	// Для этого места можно использовать конструкцю CDATA
+	// Чтобы не парится на тему специальных символов xml.
+}

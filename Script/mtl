@@ -1,0 +1,215 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2000-2007 Андрей Валяев (dron@infosec.ru)
+# All rights reserved.
+#
+# Created: 06/09/07 23:03:05
+#
+
+use warnings;
+use strict;
+
+use XML::SAX::ParserFactory;
+
+package MDF::TaskList;
+use base qw(XML::SAX::Base);
+
+# Списки тасков
+my @taskstack = ();
+
+my @taskparent;
+my @taskname;
+my @tasktitle;
+my @tasklevel;
+my @taskdep;
+my @taskdeps;	# Количество блокирующих
+my @taskfinished; # задача завершена
+my @taskchild;	# Количество потомков у задачи
+my @taskcomp;	# Уровень готовности задачи
+
+my @taskrate;	# Рейтинг задачи
+my @taskcount;	# Общее количество конкретных задача
+my @tasksuccess; # Завершенное количество конкретных задач.
+
+
+my $handler = new MDF::TaskList;
+
+# собираем информацию из файлов...
+foreach my $file (@ARGV) {
+	my $parser = XML::SAX::ParserFactory->parser ( Handler => $handler );
+	$parser->parse_file ($file);
+}
+
+# Анализируем информацию
+my $taskno = $#taskname;
+
+# Сперва четко выделить родительские и хвостовые узлы.
+# Количество потомков можно трактовать как bool!
+foreach my $tid (0..$taskno) {
+	$taskchild[$tid] = 0;
+
+	foreach (0..$taskno) {
+		++$taskchild[$tid] if ($taskparent[$_] == $tid);
+	}
+
+#	print "Task$tid: child count is = ${taskchild[$tid]}.\n"
+}
+
+# Посчтать процентность выполненности заданий.
+# Считать проценты надо рекурсивно
+sub CompleteLevel
+{
+	my ($id) = @_;
+
+	if ($taskchild[$id]) {
+		$taskcomp[$id] = 0;
+		foreach my $tid (0..$taskno) {
+			# Цикл по всем детям
+			if ($taskparent[$tid] == $id) {
+				CompleteLevel ($tid);
+				$taskcomp[$id] += $taskcomp[$tid] / $taskchild[$id];
+			}
+		}
+	} else {
+		$taskcomp[$id] = $taskfinished[$id] ? 1 : 0;
+	}
+}
+
+sub CompleteCount
+{
+	my ($id, $gid) = @_;
+
+	if ($taskchild[$id]) {
+		foreach my $tid (0..$taskno) {
+			CompleteCount ($tid, $gid) if ($taskparent[$tid] == $id);
+		}
+	} else {
+		$taskcount[$gid]++;
+		$tasksuccess[$gid] += $taskcomp[$id];
+	}
+}
+
+foreach my $tid (0..$taskno) {
+	CompleteLevel ($tid, $tid) if ($taskparent[$tid] == -1);
+}
+
+# Посмотрим на результат
+print "Progress:\n";
+foreach my $tid (0..$taskno) {
+	next unless ($taskchild[$tid]);
+
+	CompleteCount ($tid, $tid);
+	printf "$tasktitle[$tid]:\t%3u%% [$tasksuccess[$tid]/$taskcount[$tid]].\n", $taskcomp[$tid] * 100;
+}
+print "\n";
+
+# Теперь посчитаем важность заданий
+sub TaskBlok
+{
+	my ($id, $rd) = @_;
+
+	if ($taskchild[$id]) {
+		foreach my $tid (0..$taskno) {
+			# Цикл по всем детям
+			if ($taskparent[$tid] == $id) {
+				&TaskBlok ($tid, $rd);
+			}
+		}
+	} else {
+		# Ранжируем только хвостовые... потому что они определяют работы
+		$taskrate[$id] += $rd;
+	}
+}
+
+foreach my $tid (0..$taskno) {
+	next if (not defined $taskdep[$tid]);
+
+	foreach my $dep (split / /, $taskdep[$tid]) {
+		foreach my $id (0..$taskno) {
+			next if ($taskfinished[$id]);
+			next if ($taskname[$id] ne $dep);
+
+			$taskdeps[$tid]++;
+
+			TaskBlok($id, 1);
+			TaskBlok($tid, -1);
+		}
+	}
+}
+
+# Теперь надо вывести список по рангу...
+my %rate;
+foreach my $tid (0..$taskno) {
+	next if ($taskchild[$tid]);
+	next if ($taskfinished[$tid]);
+	next if ($taskdeps[$tid]);	# С зависимостями - не показываем!
+
+	if (defined $rate{$taskrate[$tid]}) {
+		$rate{$taskrate[$tid]} .= "}{" . $tasktitle[$tid];
+	} else {
+		$rate{$taskrate[$tid]} = $tasktitle[$tid];
+	}
+}
+
+print "TODO list:\n";
+foreach my $r (reverse sort keys %rate) {
+	foreach (split /}{/, $rate{$r}) {
+		print "$r $_\n";
+	}
+}
+print "\n";
+
+
+# Реализация SAX парсера
+sub start_element
+{
+	my ($self, $params) = @_;
+	my $name = $params->{Name};
+
+	if ($name eq 'mdf:task') {
+		my $id = $params->{Attributes}->{'{}id'}->{Value};
+		my $title = $params->{Attributes}->{'{}title'}->{Value};
+		my $finished = $params->{Attributes}->{'{}finished'}->{Value};
+
+		my $taskid = $#taskname + 1;
+		$title = $id if (not defined $title);
+
+		$taskname[$taskid] = $id;
+		$tasktitle[$taskid] = $title;
+		$tasklevel[$taskid] = $#taskstack + 1;
+		$taskfinished[$taskid] = (defined $finished and $finished eq 'true') ? 1 : 0;
+		$taskparent[$taskid] = $#taskstack < 0 ? -1 : $taskstack[0];
+
+		unshift (@taskstack, $taskid);
+
+		#print "Task#$taskid: $id '$title', ".
+		#	"level ", $tasklevel[$taskid],
+		#	", parent: ", $taskparent[$taskid], "\n";
+
+		return;
+	}
+
+	if ($name eq 'mdf:taskdep') {
+		# Таскдепы пока загоним в строку...
+		# всеравно на этапе разбора они могут еще не иметь идов
+
+		die "mdf:taskdep without mdf:task!" if ($#taskstack < 0);
+
+		my $dep = $params->{Attributes}->{'{}id'}->{Value};
+		die "mdf:taskdep without task id!" if (not defined $dep);
+
+		if (not defined $taskdep[$taskstack[0]]) {
+			$taskdep[$taskstack[0]] = $dep;
+		} else {
+			$taskdep[$taskstack[0]] .= " ", $dep;
+		}
+	}
+}
+
+sub end_element
+{
+	my ($self, $params) = @_;
+	my $name = $params->{Name};
+
+	shift (@taskstack) if ($name eq 'mdf:task');
+}

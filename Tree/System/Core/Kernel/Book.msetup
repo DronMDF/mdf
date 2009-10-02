@@ -1,0 +1,6 @@
+
+Description "Документация на ядро и стабы";
+
+Release 0.0.28.2 {
+	Source Repository System/Core/Kernel/Book;
+}

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mdf:unit [ <!ENTITY unit "UTF8CodeLength"> ]>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 13:18:36'/>
+	<mdf:unit name='&unit;'>
+		<mdf:include prefix='$(MDF_IMAGE)/Develop/Include'
+			     file='MDF/Unicode.h' protopub='yes'/>
+		<mdf:prototype type='size_t'>
+			<mdf:arg name='utf8' type='utf8_t *'/>
+		</mdf:prototype>
+		<mdf:body>
+			<![CDATA[
+			if ((utf8[0] & 0x80) == 0)
+				return 1;
+
+			if ((utf8[0] & 0xe0) == 0xc0 &&
+				(utf8[1] & 0xc0) == 0x80)
+				return 2;
+
+			if ((utf8[0] & 0xf0) == 0xe0 &&
+				(utf8[1] & 0xc0) == 0x80 &&
+				(utf8[2] & 0xc0) == 0x80)
+				return 3;
+
+			if ((utf8[0] & 0xf8) == 0xf0 &&
+				(utf8[1] & 0xc0) == 0x80 &&
+				(utf8[2] & 0xc0) == 0x80 &&
+				(utf8[3] & 0xc0) == 0x80)
+				return 4;
+
+			return 0;
+			]]>
+		</mdf:body>
+		<mdf:test name='main'>
+			// Значения взяты из стандарта юникода-4.0 раздел 2.5
+			<mdf:testexp op='eq' value='1' id='len1'>
+				&unit;((utf8_t *)"\x41Тест")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='2' id='len2'>
+				&unit;((utf8_t *)"\xce\xa9Тест")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='3' id='len3'>
+				&unit;((utf8_t *)"\xe8\xaa\x9eТест")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='4' id='len4'>
+				&unit;((utf8_t *)"\xf0\x90\x8e\x84Тест")
+			</mdf:testexp>
+		</mdf:test>
+	</mdf:unit>
+</mdf:unitset>

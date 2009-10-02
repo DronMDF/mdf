@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2000-2008 Валяев Андрей (dron@infosec.ru)
+# All rights reserved.
+#
+# Created: 14/08/08 13:34:06
+#
+
+use warnings;
+use strict;
+
+use FileHandle;
+use Getopt::Long;
+
+use lib $ENV{'MDF_REPOS'} . '/Script';
+
+use MDF::MSetup;
+use MDF::Version;
+use MDF::File;
+
+my $up = 'patch';
+
+sub UpdateVersion
+{
+	my ($name) = @_;
+	my ($nm, $msetup) = MDF::MSetup->FindMSetup ($name);
+
+	die "vmersion: Illegal package name '$name'\n" unless (defined $msetup);
+
+	open MS, "+< $ENV{'MDF_TREE'}/$msetup" or
+		die "mversion: Unable to open msetup '$msetup'\n";
+
+	my $msc = join '', (<MS>);
+
+	$msc =~ /.*Release[ \t\n\r]+([\d\.]+)[ \t\n\r]+{.*?}[ \t\n\r]*$/is
+		or die "mversion: Invalid msetup format";
+	my ($oldver, $tmpver, $newver) = ($1, $1, undef);
+
+	# Подгоним формат версии под валидный (если вдруг больше 4 цифр.
+	$tmpver =~ s/(\d+\.\d+\.\d+\.\d+).*/$1/s;
+
+	# добъем номер версии до 4 знаков, это унифицирует дальнейшую обработку.
+	$tmpver .= '.0' while (not $tmpver =~ /(\d+\.){3}\d+/);
+
+	# Обновляется только последняя запись
+	if ($up eq 'patch') {
+		$tmpver =~ /(\d+\.\d+\.\d+)\.(\d+)/;
+		my ($vp, $ov, $nv) = ($1, $2, $2 + 1);
+
+		$newver = $tmpver;
+		$newver =~ s/$vp.$ov/$vp.$nv/;
+	} elsif ($up eq 'alpha') {
+		$tmpver =~ /(\d+\.\d+)\.(\d+)\.\d+/;
+		my ($vp, $ov, $nv) = ($1, $2, $2 + 1);
+		$newver = $tmpver;
+		$newver =~ s/$vp.$ov\.\d+/$vp.$nv/;
+	} elsif ($up eq 'beta') {
+		$tmpver =~ /(\d+)\.(\d+)\.\d+\.\d+/;
+		my ($vp, $ov, $nv) = ($1, $2, $2 + 1);
+		$newver = $tmpver;
+		$newver =~ s/$vp.$ov\.\d+\.\d+/$vp.$nv.0/;
+	} elsif ($up eq 'release') {
+		$tmpver =~ /(\d+)\.\d+\.\d+\.\d+/;
+		my ($ov, $nv) = ($1, $1 + 1);
+		$newver = $tmpver;
+		$newver =~ s/$ov\.\d+\.\d+\.\d+/$nv.0.0/;
+	} else {
+		die "mversion: unknovn version level";
+	}
+
+	$msc =~ s/(.*)[ \t\n\r]+$oldver[ \t\n\r]+{(.*?)}[ \t\n\r]*$/$1 $newver\n{$2}\n/s;
+
+	print "$nm: $oldver -> $newver\n";
+
+	seek (MS, 0, 0);
+	truncate MS, 0;
+	print MS $msc;
+	close MS;
+}
+
+# Сперва выделить опции.
+# По умолчанию повышается патчлевел.
+# -a --alpha
+# -b --beta
+# -r --release
+
+GetOptions (	'a|alpha' => sub { $up = 'alpha' },
+		'b|beta' => sub { $up = 'beta' },
+		'r|release' => sub { $up = 'release' });
+
+&UpdateVersion ($_) foreach (@ARGV);

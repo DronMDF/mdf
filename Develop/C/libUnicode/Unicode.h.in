@@ -1,0 +1,18 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 19/09/06 20:57:59
+//
+
+#pragma once
+
+#include <stdio.h>
+
+#include <MDF/U0000.h>
+#include <MDF/U0400.h>
+
+typedef unsigned long unicode_t;
+typedef unsigned char utf8_t;
+
+#pragma prototypes

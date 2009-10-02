@@ -1,0 +1,9 @@
+
+Description "Консоль, пока никакая...";
+
+Release 0.0.4 {
+	Depend MDF-libc-0.0.4.1;
+	Depend NamerLib-0.0.4.1;
+
+	Source Repository System/Core/Shell;
+}

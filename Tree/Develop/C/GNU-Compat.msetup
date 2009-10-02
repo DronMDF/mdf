@@ -1,0 +1,9 @@
+Description "C99 library for MDF";
+License "GPL2";
+
+Release 0.0.1.43 {
+	Depend	MDF-libtool;
+	Depend	MDF-libc;
+
+	Source Repository Develop/C/GNU-Compat;
+}

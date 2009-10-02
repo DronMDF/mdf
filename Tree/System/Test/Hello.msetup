@@ -1,0 +1,10 @@
+
+Description "Первый тест ядра";
+
+Release 0.0.5.2
+{
+	Depend KernelLib;
+	Depend Stub-$(ARCH);
+
+	Source Repository System/Test/Hello;
+}

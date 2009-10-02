@@ -1,0 +1,10 @@
+
+Description "Тестовый набор для ядра";
+
+Release 0.0.1.6 {
+	Depend System-Core/Kernel-IA32;
+	Depend System-Core/KernelLib;
+	Depend Develop-C/MDF-libc;
+
+	Source Repository System/Core/Kernel/TestSuit;
+}

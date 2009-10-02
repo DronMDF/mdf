@@ -1,0 +1,159 @@
+Howto. Как собрать и запустить свежий MDF.
+
+
+	1. Получение исходных текстов.
+
+
+	1.1 Копирование с компакт диска.
+
+Самый простой способ, не требующий лишних телодвижений, это скопировать исходные
+тексты со свежего CD диска.
+
+$ wget http://dronix.sourceforge.net/files/mdf-current.iso.bz2
+
+Записываем, или к виртуальной тачке цепляем, или через эмулятор, короче,
+получаем доступ к файлам. Каталоги MDF и MDF.iso могут быть использованы
+непосредственно с диска или переписаны на жесткий диск.
+
+Примечание: Но поскольку диск давно не обновлялся этот метод не стоит считать
+	достойным внимания
+
+
+	1.2 Получение через Subversion.
+
+Для получения самых свежих исходных текстов нам понадобиться установленный
+клиент subversion.
+
+$ svn co https://dronix.svn.sourceforge.net/svnroot/dronix/MDF
+$ svn co https://dronix.svn.sourceforge.net/svnroot/dronix/MDF.iso
+
+В текущей директории появятся два каталога MDF и MDF.iso
+Для актуализации исходных текстов достаточно зайти в один из каталогов и дать
+команду
+$ svn update
+
+
+	1.3 CVS
+
+Больше не используется. если кто-то не займется синхронизацией. (что вряд ли).
+
+
+	2. Настройка окружения
+
+Этот текст нужно включить в профиль пользователя:
+
+export MDF_REPOS=~/MDF
+export MDF_ROOT=~/MDF.Root
+export MDF_FILES=~/MDF.Files
+export MDF_TEMP=~/MDF.Temp
+
+export PATH=$PATH:$MDF_REPOS/Script
+
+FreeBSD: Фря в скриптах не разворачивает ~, Лучше использовать переменную $HOME
+
+
+	3. Сборка iso.
+
+Для сборки нам понадобятся.
+nasm
+cdrtools
+perl > 5.8.0	(На сколько больше - точно пока не установлено, берите свежий,
+		не ошибетесь)
+Digest::SHA1	(модуль для перл)
+gcc
+binutils	(Поддержка формата ELF обязательна)
+gmake		(В linux обычно всегда есть)
+
+Ну и практически все. Теперь можно приступать к сборке iso.
+$ cd ~/MDF.iso
+$ ./mkiso
+
+Если вы все сделаете как я написал, то проблем возникнуть не должно.
+
+
+	4. Запуск в эмуляторе.
+
+Неплохо было бы убедиться что имидж действительно собрался.
+Файл имиджа называется ~/MDF.iso/mdf-current.iso
+
+	4.1 Bochs
+
+Нам для этого понадобиться Bochs. (хотя не понятно почему...)
+
+$ cd ~/MDF.iso
+$ bochs
+
+И наслаждаемся...
+
+	4.1.1 Если кто-то захочет насладиться видом SheduleTest,
+
+Через конфигурационное меню или редактируя файл .bochsrc
+измените объем памяти для bochs хотя бы до 32 мегабайт.
+(опция megs: )
+
+	4.2 qemu
+
+$ cd ~/MDF.iso
+$ ./qemu
+
+	4.2.1 Если кто-то захочет насладиться видом SheduleTest,
+
+Редактируя файл ./qemu увеличиваем объем памяти хотя бы до 32 мегабайт.
+(опция -m)
+
+
+	5 Запуск с жесткого диска
+
+	5.1 Сборка модулей
+
+Для начала нужно собрать все необходимые приложения.
+Список приложений может варьироваться в зависимости от вашего желания.
+
+для SheduleTest:
+$ msetup SheduleTest KernelInfo
+
+для TPCTest
+$ msetup TPCTest KernelInfo
+
+для Keyboard
+$ msetup Console Keyboard
+
+	5.2 Конфигурация GRuB
+
+Дальше в существующий конфиг GRuB (обычно находится в файле /boot/grub/menu.lst)
+Необходимо добавить соответствующие правила загрузки.
+
+Для SheduleTest:
+title   MDF with SheduleTest
+kernel  /home/dron/MDF.Root/System/Core/Kernel
+module  /home/dron/MDF.Root/System/Core/KernelInfo
+module  /home/dron/MDF.Root/System/Test/SheduleTest
+
+Для TPCTest:
+title   MDF with TPCTest
+kernel  /home/dron/MDF.Root/System/Core/Kernel
+module  /home/dron/MDF.Root/System/Core/KernelInfo
+module  /home/dron/MDF.Root/System/Test/TPCTest
+
+для теста клавиатуры:
+title   MDF with Keyboard
+kernel  /home/dron/MDF.Root/System/Core/Kernel
+module  /home/dron/MDF.Root/System/Core/Namer
+module  /home/dron/MDF.Root/System/Device/Console
+module  /home/dron/MDF.Root/System/Device/Keyboard
+
+Естественно пути должны соответствовать переменной $MDF_ROOT
+Для упрощения конфигурации GRuB можно указать переменную root.
+Переменные окружения, определенные ранее, конечно же не будут работать!
+
+	5.3 Если у вас нету GRuB
+
+Читайте пункт 3 и 4.
+Никакие другие бутменеджеры на данный момент не поддерживаются.
+
+	6. Если что-то не получается.
+
+Обращайтесь ко мне.
+
+Андрей Валяев (dron@infosec.ru)
+(c) 2007

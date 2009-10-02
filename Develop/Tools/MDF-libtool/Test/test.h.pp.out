@@ -1,0 +1,23 @@
+//
+// Copyright (c) 2000-2006 Andrey Valyaev (dron@infosec.ru)
+// All rights reserved.
+//
+
+#ifndef	__TEST_H__
+#define	__TEST_H__
+
+extern int errno;
+
+#define NULL ((void *)0)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void testunit (int arg1, char * arg2);
+int test2 (int argc, char * argv);
+void test3 (int argc, void * argv);
+#ifdef __cplusplus
+}
+#endif
+
+#endif	// __TEST_H__

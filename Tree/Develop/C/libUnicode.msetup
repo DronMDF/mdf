@@ -1,0 +1,10 @@
+Description "unicode library for MDF";
+License "GPL2";
+
+Release 0.0.5.15 {
+	Depend	MDF-Env-0.0.3;
+	Depend	MDF-libtool-0.0.12;
+	Depend	MDF-libc;
+
+	Source Repository Develop/C/libUnicode;
+}

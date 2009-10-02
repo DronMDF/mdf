@@ -1,0 +1,3 @@
+#!/bin/sh
+# Загрузка флешки... (TODO) хотя ее стоит переименовать в img
+qemu -boot c -hda mdf-current.flash -m 64 -serial stdio

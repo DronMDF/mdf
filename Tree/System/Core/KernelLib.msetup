@@ -1,0 +1,10 @@
+
+Description "Библиотека взаимодействия с ядром";
+
+Release 0.0.10.2
+{
+	Depend MDF-Env-0.0.4.1;
+	Depend System-Core-Kernel/Core;
+
+	Source Repository System/Core/KernelLib;
+}

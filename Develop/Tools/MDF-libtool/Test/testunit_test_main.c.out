@@ -1,0 +1,66 @@
+// This file automatically generated
+// Copyright (c) by dron (dron@infosec.ru)
+
+#include <test.h>
+
+static inline void testerror (char *str)
+{
+	for (int i = 0; str[i] != 0; i++)
+	{
+		__asm__ __volatile__ ( "int $0x80"
+			: : "a" (4), "b" (2), "c" (str + i), "d" (1));
+	}
+}
+
+int test_main (void)
+{
+	// Тестовый код для юнита.
+	// eq - Это целочисленное равенство.
+
+	if (1 != (
+		1
+	)) { testerror ("expression 'eq' in test 'main' in unit 'testunit' has failed!\n"); return -1; }
+
+	// ne - Это целочисленное неравенство
+
+	if (1 == (
+		3
+	)) { testerror ("expression 'ne' in test 'main' in unit 'testunit' has failed!\n"); return -1; }
+
+	// streq - Это полное совпадение строк
+
+	{	const char *value = "тест";
+		const char *exp = (char *)(
+			"тест"
+		);
+
+		for (int p = 0; ; p++) {
+			if (exp[p] != value[p]) { testerror ("expression 'streq' in test 'main' in unit 'testunit' has failed!\n"); return -1; }
+			if (value[p] == 0) break; } }
+
+	// memeq - Это полное совпадение памяти
+	// длина сравнения определяется по длинне поля value
+
+	{	const char value[] = "test";
+		const char *exp = (char *)(
+			"test"
+		);
+
+		for (int p = 0; p < (sizeof(value) - 1); p++) {
+			if (exp[p] != value[p]) { testerror ("expression 'memeq1' in test 'main' in unit 'testunit' has failed!\n"); return -1; } } }
+
+	{	const char value[] = { 0x20, 0x31, 0x32, 0x33 };
+		const char *exp = (char *)(
+			" 123"
+		);
+
+		for (int p = 0; p < (sizeof(value)); p++) {
+			if (exp[p] != value[p]) { testerror ("expression 'memeq2' in test 'main' in unit 'testunit' has failed!\n"); return -1; } } }
+
+	return 0;
+}
+
+int main (int argc, char **argv)
+{
+	return test_main();
+}

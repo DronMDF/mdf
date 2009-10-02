@@ -1,0 +1,12 @@
+
+Description "Сервер имен по идее ND";
+
+Release 0.0.13.1 {
+	Depend MDF-Env-0.0.4.1;
+	Depend Kernel-IA32-0.0.35.9;
+	Depend KernelLib-0.0.8;
+	Depend MDF-libc-0.0.1.15;
+	Depend NamerLib-0.0.4.1;
+
+	Source Repository System/Core/Namer;
+}

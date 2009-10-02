@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mdf:unit [ <!ENTITY unit "UTF8StringCharLength"> ]>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 12:54:31'/>
+	<mdf:unit name='&unit;'>
+		<mdf:include prefix='$(MDF_IMAGE)/Develop/Include'
+			     file='MDF/Unicode.h' protopub='yes'/>
+		<mdf:prototype type='size_t'>
+			<mdf:arg name='utf8' type='utf8_t *'/>
+		</mdf:prototype>
+		<mdf:body>
+			<mdf:depend unit='UTF8ToUnicode' link='yes'/>
+			<mdf:depend unit='UTF8CodeLength' link='yes'/>
+			<![CDATA[
+			int sl = 0;
+
+			for (; UTF8ToUnicode(utf8) != 0;
+				sl++, utf8 += UTF8CodeLength(utf8));
+
+			return sl;
+			]]>
+		</mdf:body>
+		<mdf:test name='main'>
+			<mdf:testexp op='eq' value='11' id='clen1'>
+				&unit;((utf8_t *)"test string")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='15' id='clen2'>
+				&unit;((utf8_t *)"Тестовая строка")
+			</mdf:testexp>
+		</mdf:test>
+	</mdf:unit>
+</mdf:unitset>

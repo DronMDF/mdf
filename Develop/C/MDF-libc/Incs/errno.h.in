@@ -1,0 +1,29 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 30/11/06 15:55:39
+//
+
+#pragma once
+
+#define ERANGE		34
+
+// Это не входит в стандарт. POSIX ерроры
+#define ENOENT		2
+#define EINTR		4
+#define E2BIG		7
+#define ENOEXEC		8
+#define	EBADF		9
+#define	ECHILD		10
+#define ENOMEM		12
+#define	EACCES		13
+#define	EEXIST		17
+#define	ENOTDIR		20
+#define	EINVAL		22
+#define	ENOSPC		28
+#define	ESPIPE		29
+#define	ENAMETOOLONG	36
+
+// Это надо в юниты.
+static int errno;

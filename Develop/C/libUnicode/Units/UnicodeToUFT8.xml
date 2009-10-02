@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mdf:unit [ <!ENTITY unit "UnicodeToUTF8"> ]>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 12:13:03'/>
+	<mdf:unit name='&unit;'>
+		<mdf:include prefix='$(MDF_IMAGE)/Develop/Include'
+			     file='MDF/Unicode.h' protopub='yes'/>
+		<mdf:prototype type='size_t'>
+			<mdf:arg name='unicode' type='unicode_t'/>
+			<mdf:arg name='utf8' type='utf8_t *'/>
+			<mdf:arg name='utf8_size' type='size_t'/>
+		</mdf:prototype>
+		<mdf:body>
+			<![CDATA[
+			if (unicode < 0x80 && utf8_size >= 1) {
+				utf8[0] = unicode;
+				return 1;
+			}
+
+			if (unicode < 0x800 && utf8_size >= 2) {
+				utf8[0] = ((unicode >> 6) & 0x1f) | 0xc0;
+				utf8[1] = (unicode & 0x3f) | 0x80;
+				return 2;
+			}
+
+			if (unicode < 0x10000 && utf8_size >= 3) {
+				utf8[0] = ((unicode >> 12) & 0x0f) | 0xe0;
+				utf8[1] = ((unicode >> 6) & 0x3f) | 0x80;
+				utf8[2] = (unicode & 0x3f) | 0x80;
+				return 3;
+			}
+
+			if (unicode < 0x200000 && utf8_size >= 4) {
+				utf8[0] = ((unicode >> 18) & 0x07) | 0xf0;
+				utf8[1] = ((unicode >> 12) & 0x3f) | 0x80;
+				utf8[2] = ((unicode >> 6) & 0x3f) | 0x80;
+				utf8[3] = (unicode & 0x3f) | 0x80;
+				return 4;
+			}
+
+			return 0;
+			]]>
+		</mdf:body>
+		<mdf:test name='main'>
+			utf8_t buf[32];
+			// Значения взяты из стандарта юникода-4.0 раздел 2.5
+			<mdf:testexp op='eq' value='1' id='len1'>
+				&unit;(0x41, buf, 32)
+			</mdf:testexp>
+			<mdf:testexp op='memeq' value='0x41' id='val1'>
+				buf
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='2' id='len2'>
+				&unit;(0x3a9, buf, 32)
+			</mdf:testexp>
+			<mdf:testexp op='memeq' value='0xce, 0xa9' id='val2'>
+				buf
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='3' id='len3'>
+				&unit;(0x8a9e, buf, 32)
+			</mdf:testexp>
+			<mdf:testexp op='memeq' value='0xe8, 0xaa, 0x9e' id='val3'>
+				buf
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='4' id='len4'>
+				&unit;(0x10384, buf, 32)
+			</mdf:testexp>
+			<mdf:testexp op='memeq' value='0xf0, 0x90, 0x8e, 0x84' id='val4'>
+				buf
+			</mdf:testexp>
+			// И еще проверить на сбои
+			<mdf:testexp op='eq' value='0' id='fault1'>
+				&unit;(0x200030, buf, 32)
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault2'>
+				&unit;(0x100030, buf, 3)
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault3'>
+				&unit;(0x8a9e, buf, 2)
+			</mdf:testexp>
+		</mdf:test>
+	</mdf:unit>
+</mdf:unitset>

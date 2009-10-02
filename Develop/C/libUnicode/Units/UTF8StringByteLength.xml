@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mdf:unit [ <!ENTITY unit "UTF8StringByteLength"> ]>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 13:33:34'/>
+	<mdf:unit name='&unit;'>
+		<mdf:include prefix='$(MDF_IMAGE)/Develop/Include'
+			     file='MDF/Unicode.h' protopub='yes'/>
+		<mdf:prototype type='size_t'>
+			<mdf:arg name='utf8' type='utf8_t *'/>
+		</mdf:prototype>
+		<mdf:body>
+			<mdf:include file='string.h'/>
+			return strlen((const char *)utf8);
+		</mdf:body>
+		<mdf:test name='main'>
+			<mdf:testexp op='eq' value='11' id='len1'>
+				&unit;((utf8_t *)"test string")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='29' id='len2'>
+				&unit;((utf8_t *)"Тестовая строка")
+			</mdf:testexp>
+		</mdf:test>
+	</mdf:unit>
+</mdf:unitset>

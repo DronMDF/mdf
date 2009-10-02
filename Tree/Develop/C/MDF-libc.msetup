@@ -1,0 +1,8 @@
+Description "C99 library for MDF";
+License "GPL2";
+
+Release 0.0.10.3
+{
+	Depend	MDF-Env-0.0.3;
+	Source Repository Develop/C/MDF-libc;
+}

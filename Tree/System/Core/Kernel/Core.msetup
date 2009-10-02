@@ -1,0 +1,10 @@
+
+Description "Переносимое ядро";
+
+Release 0.0.121.2
+{
+	Depend System-Core/MDF-Env-0.0.16;
+	Depend System-Core-Kernel/Stub-$(ARCH)-Types;
+
+	Source Repository System/Core/Kernel/Core;
+}

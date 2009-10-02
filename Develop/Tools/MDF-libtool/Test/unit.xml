@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 12:13:03'/>
+	<mdf:unit name='testunit' type='function' lang='c'>
+		<mdf:include prefix='$(MDF_TEMP)' file='test.h' protopub='yes'/>
+		<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru'
+			       license='gpl2'/>
+		<mdf:prototype type='void'>
+			<mdf:arg name='arg1' type='int'/>
+			<mdf:arg name='arg2' type='char *'/>
+		</mdf:prototype>
+		<mdf:body>
+			<mdf:depend unit='test2' link='yes'/>
+			// Здесь размещается тело функции
+			// Для этого места можно использовать конструкцю CDATA
+			// Чтобы не парится на тему специальных символов xml.
+		</mdf:body>
+		<!-- Если хотя бы один тест не проходит - юнит считается плохим. -->
+		<mdf:test name='main'>
+			<mdf:depend unit='test3' link='yes'/>
+
+			// Тестовый код для юнита.
+			// eq - Это целочисленное равенство.
+			<mdf:testexp op='eq' value='1' id='eq'>
+				1
+			</mdf:testexp>
+
+			// ne - Это целочисленное неравенство
+			<mdf:testexp op='ne' value='1' id='ne'>
+				3
+			</mdf:testexp>
+
+			// streq - Это полное совпадение строк
+			<mdf:testexp op='streq' value='тест' id='streq'>
+				"тест"
+			</mdf:testexp>
+
+			// memeq - Это полное совпадение памяти
+			// длина сравнения определяется по длинне поля value
+			<mdf:testexp op='memeq' value='test' id='memeq1'>
+				"test"
+			</mdf:testexp>
+
+			<mdf:testexp op='memeq' value='0x20, 0x31, 0x32, 0x33' id='memeq2'>
+				" 123"
+			</mdf:testexp>
+		</mdf:test>
+		<mdf:test name='extra'>
+			// Дополнительный тестовый код для юнита.
+		</mdf:test>
+	</mdf:unit>
+	<!-- Для полноты тестирования - еще один юнит. -->
+	<mdf:unit name='test2' type='function' lang='c'>
+		<mdf:include prefix='$(MDF_TEMP)' file='test.h' protopub='yes'/>
+		<mdf:prototype type='int'>
+			<mdf:arg name='argc' type='int'/>
+			<mdf:arg name='argv' type='char *'/>
+		</mdf:prototype>
+		<mdf:body>
+			return -1;
+		</mdf:body>
+	</mdf:unit>
+</mdf:unitset>

@@ -1,0 +1,9 @@
+# This file automatically generated
+# Copyright (c) by dron (dron@infosec.ru)
+
+test3_test.o : test3.c
+	$(TEST_CC) -std=c99 -nostdinc -I$(MDF_TEMP) $(TEST_CFLAGS) -c -o $@ $<
+
+test3.o : test3.c
+	$(ECHO) Compile $@...
+	$(CC) -std=c99 -I$(MDF_TEMP) $(CFLAGS) -c -o $@ $<

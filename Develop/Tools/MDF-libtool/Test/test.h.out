@@ -1,0 +1,20 @@
+//
+// Copyright (c) 2000-2006 Andrey Valyaev (dron@infosec.ru)
+// All rights reserved.
+//
+
+#ifndef __TEST_H__
+#define __TEST_H__
+
+extern int errno;
+
+#define NULL ((void *)0)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+#endif // __TEST_H__

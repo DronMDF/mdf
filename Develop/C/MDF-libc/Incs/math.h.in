@@ -1,0 +1,13 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 11/12/06 19:56:37
+//
+
+#pragma once
+
+// В стандарте нет HUGE, есть HUGE_VAL
+#define HUGE		3.40282347e+38F
+
+

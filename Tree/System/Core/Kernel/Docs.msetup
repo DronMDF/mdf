@@ -1,0 +1,6 @@
+
+Description "Документация на ядро и стабы";
+
+Release 0.0.21 {
+	Source Repository System/Core/Kernel/Docs;
+}

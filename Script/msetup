@@ -1,0 +1,283 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
+# All rights reserved.
+#
+
+use lib $ENV{'MDF_REPOS'} . '/Script';
+
+use strict;
+
+use MDF::Config;
+use MDF::Version;
+use MDF::MSetup;
+use MDF::MPackage;
+
+use File::Basename;
+
+my %project_version;
+my %project_rule;
+my %project_depend;
+my %project_state;
+
+# Здесь надо значит функцию, которая будет добавлять файлы в инсталл лист
+# мы ее накачаем из ARGV, но и она сама будет подкачиваться из депендов
+sub AddProject {
+	my ($name, $version) = @_;
+
+	my ($nm, $ver, $rules) = MDF::MSetup->FindRule ($name, $version);
+
+	die "msetup: Unknown project '$name'.\n"
+		unless (defined $nm);
+
+	$project_version{$nm} = $ver;
+	$project_state{$nm} = 'Add';
+	$project_depend{$nm} = '';
+
+	#  Прокачиваем из депендов
+	while ($rules =~ s/depends?\s(.*?);//is) {
+		# Формат депенда такой: [group/]name[-version]
+		my ($dep_name, $dep_ver) = ($1, undef);
+		($dep_name, $dep_ver) = ($`, $1) if $dep_name =~ /-([\d\.]*)$/;
+
+		# Допустимо использование переменных окружения $(www)
+		while ($dep_name =~ s/\$\((\w+)\)/$ENV{$1}/) {};
+
+		($dep_name, $dep_ver, undef) = MDF::MSetup->FindRule ($dep_name, $dep_ver);
+
+		$project_depend{$nm} .= ' ' . $dep_name . '-' . $dep_ver;
+
+		# Проверим, может уже указан
+		next if (defined $project_version{$dep_name});
+
+		&AddProject ($dep_name, $dep_ver);
+	}
+
+	$project_rule{$nm} = $rules;
+}
+
+# А здесь будет сборочные рутины
+sub SetupProject {
+	my ($nm) = @_;
+
+	if ($project_state{$nm} eq 'Ok') {
+		return 1;
+	}
+
+	# Проверяем депенды
+	foreach (split ' ',$project_depend{$nm}) {
+		my ($dep_name, $dep_ver) = $_;
+
+		($dep_name, $dep_ver) = ($`, $1)
+			if $dep_name =~ /-([\d\.]*)$/;
+
+		die "msetup: $_: Can't install.\n"
+			unless (MDF::Version->Valid
+				($project_version{$dep_name}, $dep_ver));
+
+#		print "msetup: $dep_name-$dep_ver...\n";
+
+		return 0
+			unless ($project_state{$dep_name} eq 'Ok');
+	}
+
+	# Проверяем установленность текущего
+	if (MDF::MPackage->CheckInstalled ($nm, $project_version{$nm})) {
+		# TODO: Надо будет опции ввести, дабы пересобирать
+		# уже установленные пакеты
+		print "msetup: $nm-$project_version{$nm}: Already installed.\n";
+		$project_state{$nm} = 'Ok';
+		return 1;
+	}
+
+	print "\nmsetup: $nm-$project_version{$nm}: Do install.\n";
+
+	&InstallProject ($nm);
+
+	$project_state{$nm} = 'Ok';
+	return 1;
+}
+
+
+sub InstallProject {
+	my ($nm) = @_;
+
+	MDF::Config->Refresh();
+
+	# Чистка!
+	`rm -rf $ENV{'MDF_TEMP'}/*`;
+
+	# Cоздать временный каталог - имидж ну где нибудь в районе темпа
+	$ENV{'MDF_IMAGE'} = $ENV{'MDF_TEMP'} . '/' . 'image' . rand();
+	mkdir $ENV{'MDF_IMAGE'};
+
+	# Файлы раскручиваем в темп!
+	while ( $project_rule{$nm} =~ s/Source\s+File\s+(.*?);//is ) {
+		my $cf = $1;
+		my ($name) = split /:/, $cf;
+
+		unless ( -e "$ENV{'MDF_FILES'}/$name") {
+			# Файла вообще не наблюбается.
+			die "msetup: $nm-$project_version{$nm}: No file `$name`.\n";
+		}
+
+		if (MDF::Hash->File($ENV{'MDF_FILES'}, $name) ne $cf) {
+			# Делаем wget чтоль.
+			die "msetup: $nm-$project_version{$nm}: Bad file `$name`.\n";
+		}
+
+		print "msetup: $nm-$project_version{$nm}: Unpacking $name...\n";
+
+		my $pwd = `pwd`;
+		my $opt = undef;
+
+		$opt = '-xjf' if ($name =~ /\.bz2$/);
+		$opt = '-xzf' if ($name =~ /\.gz$/);
+		unless (defined $opt) {
+			die "msetup: $nm-$project_version{$nm}: " .
+				"Unknown archive type.\n";
+		}
+
+		chdir ($ENV{'MDF_TEMP'});
+		if (system ('tar', $opt, "$ENV{'MDF_FILES'}/$name") != 0) {
+			die "msetup: $nm-$project_version{$nm}: Failed.\n";
+		}
+		chdir ($pwd);
+	}
+
+	if ( $project_rule{$nm} =~ s/Source\s+Repository\s+(.*?)\s*;//is ) {
+		# Пока все собирается по типу MDF и только из репозитория
+		if (system ($ENV{'MAKE'}, split (/\s+/, $ENV{'MAKEFLAGS'}),
+				'-C', "$ENV{'MDF_REPOS'}/$1",
+				"VERSION=$project_version{$nm}") != 0) {
+			die "msetup: $nm-$project_version{$nm}: Failed.\n";
+		}
+	} elsif ( $project_rule{$nm} =~ s/Source\s*MDFMake\s*(.*?);//is ) {
+		# Это сборка проектов из файлов. (раскручиваются командой Source File)
+		if (system ($ENV{'MAKE'}, split (/\s+/, $ENV{'MAKEFLAGS'}),
+				'-C', "$ENV{'MDF_TEMP'}/$1",
+				"VERSION=$project_version{$nm}") != 0) {
+			die "msetup: $nm-$project_version{$nm}: Failed.\n";
+		}
+	} else {
+		# Или не собирается вообще
+		print "msetup: $nm-$project_version{$nm}: Nothing to do.\n";
+		return;
+	}
+
+	# В имидж уже все залито
+	my @newfilelist = MDF::MPackage->GetFileList ($ENV{'MDF_IMAGE'});
+	my %filestatus;
+	my %fileid;
+	my @fileold;
+
+	# Вносим новые файлы
+	foreach (@newfilelist) {
+		$_ =~ /(.*?):/;
+		$fileid{$1} = $_;
+		$filestatus{$1} = 'New';
+	}
+
+	# Здесь надо прокоординировать старые версии пакетов
+
+	# Файлы, которые есть только в старых версиях помечаем как Deleted
+	# Файлы, которые есть и там и там, но отличаются - как Replaced
+	# Файлы которые не отличаются - ставим в состояние Actual
+	# Остальные - которые есть только в новом билде - в состояние New
+	my @oldfiles;
+	while ((@oldfiles = MDF::MPackage->GetProject($nm, undef, 1))) {
+		foreach my $cf (@oldfiles) {
+			chomp ($cf);
+			$cf =~ /(.*?):/;
+			my $fn = $1;
+			unless ( -e "$ENV{'MDF_ROOT'}/$fn" ) {
+				# Файла нету - игнорируем
+				next;
+			}
+
+			my $id = MDF::Hash->File ($ENV{'MDF_ROOT'}, $fn);
+			if ( $cf eq  $id ) {
+				# файл не изменен юзером
+				if (defined $fileid{$fn}) {
+					if ($cf eq $fileid{$fn}) {
+						# Актуален
+						$filestatus{$fn} = 'Actual';
+					} else {
+						# Обновился
+						$filestatus{$fn} = 'Changed';
+					}
+				} else {
+					# В новом пакете нету - На удаление
+					push @fileold, $fn;
+				}
+			} else {
+				# Файл изменен юзером - протекшин
+				if (defined $fileid{$fn}) {
+					# Новый заливаем на протекцию.
+					# Возможно добавить его в иды, дабы зафиксировать.
+					$filestatus{$fn} = 'Version';
+				} else {
+					# В новом проекте нету, но и удалять нельзя
+					# Дык ничего и не делаем.
+					print "msetup: !!! $fn changed by user.\n";
+				}
+			}
+		}
+	}
+
+	# Еще меня очень волнует вопрос с симлинками, благо таких пока нету.
+
+	foreach (keys %fileid) {
+		if ($filestatus{$_} eq 'Actual') {
+			printf "msetup: --- $_\n";
+			next;
+		}
+
+		my ($src, $dst) = ("$ENV{'MDF_IMAGE'}/$_", "$ENV{'MDF_ROOT'}/$_");
+
+		if ($filestatus{$_} eq 'Version') {
+			printf "msetup: !!! $_ Protection.\n";
+			$dst .= '-' . $project_version{$nm};
+		}
+
+		# с правами еще надо проконтролировать
+		system ('mkdir', '-p', dirname $dst);
+		printf "msetup: >>> $_\n";
+		system ('cp', '-pfd', $src, $dst);
+	}
+
+	# Создаем новый дескриптор пакета
+	MDF::MPackage->SetProject ($nm, $project_version{$nm}, values %fileid);
+
+	# После чего можно убивать файлы старых проектов (если их вдруг несколько)
+	foreach my $fo (@fileold) {
+		print "msetup: <<< $fo...\n";
+		unlink "$ENV{'MDF_ROOT'}/$fo"
+			or print "msetup: ERROR $!\n";
+
+		# Подчищаем директории
+		while ( $fo =~ s#/[^/]*?$## ) {
+			rmdir "$ENV{'MDF_ROOT'}/$fo"
+				or last;
+			print "msetup: <<< $fo\n";
+		}
+	}
+
+	`rm -rf $ENV{'MDF_IMAGE'}`;
+
+	print "msetup: $nm-$project_version{$nm}: Installed.\n";
+}
+
+# Главная рутина
+
+# Сперва все файлы со всеми депендами накопить.
+&AddProject ($_) foreach (@ARGV);
+
+# А потом все забилдить.
+my $done = 1;
+while ($done) {
+	$done = 0;
+	while (my ($k, undef) = each %project_version) {
+		$done = 1 unless &SetupProject ($k);
+	}
+};	# пока хоть один элемент останется не собранным

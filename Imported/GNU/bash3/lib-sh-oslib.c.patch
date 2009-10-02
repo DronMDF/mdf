@@ -1,0 +1,12 @@
+--- oslib.c.old	2006-12-12 23:36:55.000000000 +0300
++++ oslib.c	2006-12-12 23:37:41.000000000 +0300
+@@ -209,7 +209,8 @@
+ #  else /* !HAVE_UNAME */
+ int
+ gethostname (name, namelen)
+-     int name, namelen;
++     char *name;
++     int namelen;
+ {
+   strncpy (name, "unknown", namelen);
+   name[namelen] = '\0';

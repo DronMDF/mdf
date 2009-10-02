@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
+# All rights reserved.
+#
+
+use lib $ENV{'MDF_REPOS'} . '/Script';
+
+use strict;
+
+use MDF::Config;
+use MDF::MSetup;
+use MDF::Hash;
+
+foreach my $name (@ARGV) {
+
+	my $version = undef;
+	my $rule = undef;
+	if ($name =~ s/-([\d\.]+)$//) {
+		$version = $1;
+	}
+
+	($name, $version, $rule) = MDF::MSetup->FindRule ($name, $version);
+
+	unless (defined $name) {
+		print "march: $name is bad project!\n";
+		next;
+	}
+
+	$name =~ /^(.*)\/(.*?)$/;
+	my ($group, $file) = ($1, $2);
+
+	# $dir надо извлеч из Source Repository
+	$rule =~ /Source\s+Repository\s+(.*?)\s*;/is;
+	my $dir = $1;
+
+	unless (defined $dir) {
+		print "march: $name-$version is no repository project!\n";
+		next;
+	}
+
+	$dir =~ s/\/$file$//;	# отрезаем имя проекта.
+
+	my $pwd = `pwd`;
+	chdir $ENV{'MDF_REPOS'};
+	if (defined $dir) {
+		chdir $dir;
+	}
+
+	my $pname = $file . '-' . $version . '.tar.bz2';
+
+	system ('tar', '-cj',
+		'--exclude', '.svn',
+		'-f', $ENV{'MDF_FILES'} . '/' . $pname, $file)
+		and die "Problem with tar";
+
+	chdir $pwd;
+
+	print "march: ", MDF::Hash->File ($ENV{'MDF_FILES'}, $pname), "\n";
+}

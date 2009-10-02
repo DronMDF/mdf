@@ -1,0 +1,11 @@
+// This file automatically generated
+// Copyright (c) by dron (dron@infosec.ru)
+
+#include <test.h>
+
+int test2 (int argc, char * argv)
+{
+
+			return -1;
+
+}

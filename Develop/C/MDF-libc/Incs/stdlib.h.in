@@ -1,0 +1,12 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 29/11/06 22:54:20
+//
+
+#pragma once
+
+#include "stddef.h"
+
+#pragma prototypes

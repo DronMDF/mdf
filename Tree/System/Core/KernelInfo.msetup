@@ -1,0 +1,12 @@
+
+Description "Информация о состоянии памяти для ядра"
+
+Release 0.0.6.5
+{
+	Depend MDF-Env-0.0.4.1;
+	Depend Stub-$(ARCH);
+	Depend MDF-libc-0.0.2;
+	Depend KernelLib;	// Ради startup.o
+
+	Source Repository System/Core/KernelInfo;
+}

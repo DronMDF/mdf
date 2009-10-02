@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mdf:unit [ <!ENTITY unit "UTF8ToUnicode"> ]>
+<mdf:unitset xmlns:mdf=''>
+	<mdf:copyright author='Андрей Валяев' email='dron@infosec.ru' license='gpl2'
+		copyright='(c) 2000-2006' created='25/09/06 12:38:03'/>
+	<mdf:unit name='&unit;'>
+		<mdf:include prefix='$(MDF_IMAGE)/Develop/Include'
+			     file='MDF/Unicode.h' protopub='yes'/>
+		<mdf:prototype type='unicode_t'>
+			<mdf:arg name='utf8' type='utf8_t *'/>
+		</mdf:prototype>
+		<mdf:body>
+			<![CDATA[
+			if ((utf8[0] & 0x80) == 0)
+			{
+				return utf8[0];
+			}
+
+			if ((utf8[0] & 0xe0) == 0xc0 &&
+				(utf8[1] & 0xc0) == 0x80)
+			{
+				return	((utf8[0] & 0x1f) << 6) |
+					(utf8[1] & 0x3f);
+			}
+
+			if ((utf8[0] & 0xf0) == 0xe0 &&
+				(utf8[1] & 0xc0) == 0x80 &&
+				(utf8[2] & 0xc0) == 0x80)
+			{
+				return	((utf8[0] & 0x0f) << 12) |
+					((utf8[1] & 0x3f) << 6) |
+					(utf8[2] & 0x3f);
+			}
+
+			if ((utf8[0] & 0xf8) == 0xf0 &&
+				(utf8[1] & 0xc0) == 0x80 &&
+				(utf8[2] & 0xc0) == 0x80 &&
+				(utf8[3] & 0xc0) == 0x80)
+			{
+				return	((utf8[0] & 0x07) << 18) |
+					((utf8[1] & 0x3f) << 12) |
+					((utf8[2] & 0x3f) << 6) |
+					(utf8[3] & 0x3f);
+			}
+
+			return 0;
+			]]>
+		</mdf:body>
+		<mdf:test name='main'>
+			// Значения взяты из стандарта юникода-4.0 раздел 2.5
+			<mdf:testexp op='eq' value='0x41' id='code1'>
+				&unit;((utf8_t *)"\x41")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0x3a9' id='code2'>
+				&unit;((utf8_t *)"\xce\xa9")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0x8a9e' id='code3'>
+				&unit;((utf8_t *)"\xe8\xaa\x9e")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0x10384' id='code4'>
+				&unit;((utf8_t *)"\xf0\x90\x8e\x84")
+			</mdf:testexp>
+			// Кривости еще почекать
+			<mdf:testexp op='eq' value='0' id='fault1'>
+				&unit;((utf8_t *)"\xff")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault2'>
+				&unit;((utf8_t *)"\xce\xff")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault2z'>
+				&unit;((utf8_t *)"\xce\x00")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault3'>
+				&unit;((utf8_t *)"\xe8\xaa\xff")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault3z'>
+				&unit;((utf8_t *)"\xe8\xaa\x00")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault4'>
+				&unit;((utf8_t *)"\xf0\x90\x8e\xff")
+			</mdf:testexp>
+			<mdf:testexp op='eq' value='0' id='fault4z'>
+				&unit;((utf8_t *)"\xf0\x90\x8e\x00")
+			</mdf:testexp>
+		</mdf:test>
+	</mdf:unit>
+</mdf:unitset>

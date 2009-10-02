@@ -1,0 +1,57 @@
+\documentclass[draft]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{fancyhdr}
+\usepackage{footnpag}
+
+\def\author{Андрей Валяев <dron@infosec.ru>}
+\def\title{Ядро MDF}
+\def\version{Version \input{version.tex}}
+
+\setlength{\hoffset}{0cm}
+\setlength{\voffset}{-1.54cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\topmargin}{0cm}
+\setlength{\marginparsep}{0cm}
+\setlength{\marginparwidth}{0cm}
+\setlength{\marginparpush}{0cm}
+\setlength{\textwidth}{17.46cm}
+\setlength{\textheight}{25.51cm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\bf \title}
+\fancyhead[R]{\bf \version}
+\fancyfoot[R]{\bf \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\addtolength{\headheight}{0.5pt}
+\addtolength{\textheight}{-0.5pt}
+
+\parindent 0mm
+
+\begin{document}
+
+\hbox{}\vfill
+\centerline{\textbf{\Huge\title}}
+\centerline{\textbf{\Large\version}}
+\vfill
+
+Copyright \copyright\  2007-2008 \author.
+
+{\small Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, Front-Cover Texts, and no Back-Cover Texts. A copy of the license can be found on \texttt{http://www.gnu.org/licenses/\#FDL}}
+
+\newpage
+\tableofcontents
+
+\newpage
+\parskip 3mm
+
+\include{Intro}
+\include{Stub-Types}
+\include{Core}
+\include{Stub}
+\include{API}
+
+\end{document}

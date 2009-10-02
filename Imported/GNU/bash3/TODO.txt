@@ -1,0 +1,119 @@
+
+ Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+ All rights reserved.
+
+ Created: 30/11/06 15:51:02
+
+
+Четверг 13 декабря 2006
+
+libKernel (или как я ее назову - не знаю пока)
+	Стандартный, общесистемный хип менеджер.
+	MDFAlloc/MDFFree/MDFReAlloc
+
+	Кстати прикольно получится... можно будет через free() освобождать память, выделенную через new... :)
+
+MDF-libc:
+	stdio:
+	undefined reference to `fprintf'
+	undefined reference to `fputs'
+	undefined reference to `printf'
+	undefined reference to `fflush'
+	undefined reference to `fopen'
+	undefined reference to `feof'
+	undefined reference to `clearerr'
+	undefined reference to `ferror'
+	undefined reference to `puts'
+	undefined reference to `putchar'
+	undefined reference to `putc'
+	undefined reference to `fclose'
+
+	// Для переменных необходимо доработать libtool.
+	undefined reference to `stdin'
+	undefined reference to `stderr'
+	undefined reference to `stdout'
+
+	setjmp:
+	undefined reference to `setjmp'
+	undefined reference to `longjmp'
+
+	stdlib:
+	undefined reference to `exit'
+	undefined reference to `atoi'
+	undefined reference to `abort'
+	undefined reference to `qsort'
+	undefined reference to `bsearch'
+	malloc/free на основе MDFAlloc/MDFFree
+
+	time:
+	undefined reference to `time'
+
+	signal:
+	undefined reference to `signal'
+
+	ctype:
+	undefined reference to `isalpha'
+	undefined reference to `isalnum'
+	undefined reference to `ispunct'
+	undefined reference to `islower'
+	undefined reference to `toupper'
+	undefined reference to `isupper'
+	undefined reference to `tolower'
+	undefined reference to `iscntrl'
+
+	locale:
+	undefined reference to `localeconv'
+
+	math:
+	undefined reference to `pow'
+
+	Всего 36(37) undefined.
+
+GNU-Compat:
+	undefined reference to `getpwuid'
+	undefined reference to `setuid'
+	undefined reference to `open'
+	undefined reference to `isatty'
+	undefined reference to `lseek'
+	undefined reference to `read'
+	undefined reference to `fstat'
+	undefined reference to `fcntl'
+	undefined reference to `close'
+	undefined reference to `fileno'
+	undefined reference to `sleep'
+	undefined reference to `getuid'
+	undefined reference to `getgid'
+	undefined reference to `geteuid'
+	undefined reference to `getegid'
+	undefined reference to `endpwent'
+	undefined reference to `alarm'
+	undefined reference to `stat'
+	undefined reference to `ttyname'
+	undefined reference to `execve'
+	undefined reference to `pipe'
+	undefined reference to `environ'
+	undefined reference to `getpid'
+	undefined reference to `getppid'
+	undefined reference to `wait'
+	undefined reference to `fork'
+	undefined reference to `kill'
+	undefined reference to `S_ISCHR'
+	undefined reference to `S_ISBLK'
+	undefined reference to `write'
+	undefined reference to `dup'
+	undefined reference to `fdopen'
+	undefined reference to `unlink'
+	undefined reference to `chdir'
+	undefined reference to `umask'
+	undefined reference to `ioctl'
+	undefined reference to `access'
+	undefined reference to `opendir'
+	undefined reference to `readdir'
+	undefined reference to `closedir'
+
+	Вместо этого лучше сделать свой malloc
+	undefined reference to `sbrk'
+
+	Всего 40(41) undefined;
+
+Другое:

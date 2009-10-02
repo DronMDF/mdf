@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
+# All rights reserved.
+#
+
+use lib $ENV{'MDF_REPOS'} . '/Script';
+
+use strict;
+
+use MDF::Config;
+use MDF::MPackage;
+
+sub RemoveProject {
+	my ($nm) = @_;
+	my ($pn, $pv) = MDF::MPackage->FindProject ($nm);
+
+	unless (defined $pn) {
+		print "mremove: $nm: Unknown...\n";
+		return;
+	}
+
+	print "mremove: $pn-$pv: Removing...\n";
+
+	my @oldfiles = MDF::MPackage->GetProject($pn, $pv, 1);
+	foreach my $cf (@oldfiles) {
+		chomp ($cf);
+		$cf =~ /(.*?):/;
+		my $fn = $1;
+		unless ( -e "$ENV{'MDF_ROOT'}/$fn" ) {
+			# Файла нету
+			print "mremove: ??? $fn missing.\n";
+			next;
+		}
+
+		my $id = MDF::Hash->File ($ENV{'MDF_ROOT'}, $fn);
+
+		if ( $cf ne $id ) {
+			# Файл изменен юзером - протекшин
+			# Дык ничего и не делаем.
+			print "mremove: !!! $fn changed by user.\n";
+			next;
+		}
+
+		# файл не изменен юзером
+		print "mremove: <<< $fn\n";
+		unlink "$ENV{'MDF_ROOT'}/$fn"
+			or print "mremove: ERROR $!";
+
+		while ( $fn =~ s#/[^/]*?$## ) {
+			rmdir "$ENV{'MDF_ROOT'}/$fn"
+				or last;
+			print "mremove: <<< $fn\n";
+		}
+	}
+
+	print "mremove: $pn-$pv: Removed.\n";
+}
+
+&RemoveProject ($_) foreach (@ARGV);

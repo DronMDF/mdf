@@ -1,0 +1,9 @@
+
+Description "Стаб для Linux";
+
+Release 0.0.2.4 {
+	Depend System-Core/MDF-Env-0.0.7;
+	Depend System-Core-Kernel/Core-0.0.5;
+
+	Source Repository System/Core/Kernel/Stub-Linux;
+}

@@ -1,0 +1,10 @@
+Description "Инструментарий для сборки и тестирования библиотек";
+License "GPL2";
+
+Release 0.0.15.12
+{
+	Depend	System-Core/MDF-Env-0.0.5.1;
+	Depend	Develop-Tools/MDF-perl-modules-0.0.1.1;
+
+	Source Repository Develop/Tools/MDF-libtool;
+}

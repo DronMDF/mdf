@@ -1,0 +1,11 @@
+
+Description "bash3";
+
+Release 0.0.1 {
+	Depend System-Core/KernelLib;
+	Depend MDF-libc;
+	Depend GNU-Compat;
+
+	Source File bash-3.2.tar.gz:size=2529838:sha1=/mRmx+6YBh4ETa4DR8pdGo6rSg0;
+	Source Repository Imported/GNU/bash3;
+}

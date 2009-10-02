@@ -1,0 +1,9 @@
+// This file automatically generated
+// Copyright (c) by dron (dron@infosec.ru)
+
+#include <test.h>
+
+void test3 (int argc, void * argv)
+{
+	return;
+}

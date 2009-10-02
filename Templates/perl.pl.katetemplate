@@ -1,0 +1,10 @@
+katetemplate: Template=Perl скрипт Group=MDF Highlight=&Perl
+katetemplate: Author=Andrey Valyaev (dron@infosec.ru)
+#!/usr/bin/perl
+#
+# Copyright (c) 2000-%{year} %{fullname} <%{email}>
+# This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
+#
+
+use strict;
+use warnings;

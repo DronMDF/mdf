@@ -1,0 +1,12 @@
+
+Description "Тестирование планировщика";
+
+Release 0.0.9.5
+{
+	Depend MDF-Env-0.0.4.1;
+	Depend KernelLib;
+	Depend MDF-libc;
+	Depend Stub-IA32;
+
+	Source Repository System/Test/SchedulerTest;
+}

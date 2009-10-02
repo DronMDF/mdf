@@ -1,0 +1,25 @@
+//
+// Copyright (c) 2000-2006 Андрей Валяев (dron@infosec.ru)
+// All rights reserved.
+//
+// Created: 30/11/06 16:52:19
+//
+
+#pragma once
+
+#define SIGINT		2
+#define SIGFPE		8
+#define SIGTERM		15
+
+// Макросы, не совсем понимаю что должны делать.
+#define SIG_IGN		1
+#define SIG_DFL		0
+
+// TODO: Этот сигнал из POSIX...
+#define SIGQUIT		3
+#define SIGPIPE		13
+#define SIGALRM		14
+#define SIGCHLD		17
+
+// Это тоже нестандарт
+typedef unsigned long sigset_t;

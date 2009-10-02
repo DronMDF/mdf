@@ -1,0 +1,18 @@
+# This file automatically generated
+# Copyright (c) by dron (dron@infosec.ru)
+
+testunit_test.o : testunit.c test2_test.o
+	$(TEST_CC) -std=c99 -nostdinc -I$(MDF_TEMP) $(TEST_CFLAGS) -c -o $@ $<
+
+testunit_test_extra : testunit_test_extra.c testunit_test.o
+	$(TEST_CC) -std=c99 -nostdinc -I$(MDF_TEMP) $(TEST_CFLAGS) -o $@ $< testunit_test.o test2_test.o
+	./$@
+
+testunit_test_main : testunit_test_main.c testunit_test.o test3_test.o
+	$(TEST_CC) -std=c99 -nostdinc -I$(MDF_TEMP) $(TEST_CFLAGS) -o $@ $< testunit_test.o test3_test.o test2_test.o
+	./$@
+
+testunit.o : testunit.c testunit_test_extra testunit_test_main
+	$(ECHO) Compile $@...
+	$(CC) -std=c99 -I$(MDF_TEMP) $(CFLAGS) -c -o $@ $<
+
