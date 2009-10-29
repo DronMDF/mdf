@@ -55,9 +55,9 @@ BOOST_AUTO_TEST_CASE(lifo)
 	scheduler.addThread(&thread1);
 	scheduler.addThread(&thread2);
 
-	BOOST_CHECK(scheduler.getThread() == &thread2);
-	BOOST_CHECK(scheduler.getThread() == &thread1);
-	BOOST_CHECK(scheduler.getThread() == 0);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread2));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread1));
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(fifo)
@@ -76,9 +76,9 @@ BOOST_AUTO_TEST_CASE(fifo)
 	scheduler.addThread(&thread1);
 	scheduler.addThread(&thread2);
 
-	BOOST_CHECK(scheduler.getThread() == &thread1);
-	BOOST_CHECK(scheduler.getThread() == &thread2);
-	BOOST_CHECK(scheduler.getThread() == 0);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread1));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread2));
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

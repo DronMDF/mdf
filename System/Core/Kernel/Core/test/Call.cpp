@@ -32,12 +32,13 @@ BOOST_AUTO_TEST_CASE(creation)
 
 	struct KernelCreateCallParam cp = { 0x1000 };
 	id_t cid = INVALID_ID;
-	BOOST_CHECK(CoreCreate(reinterpret_cast<Task *>(&thread),
-		RESOURCE_TYPE_CALL, &cp, sizeof(cp), &cid) == SUCCESS);
+	int rv = CoreCreate(reinterpret_cast<Task *>(&thread),
+			RESOURCE_TYPE_CALL, &cp, sizeof(cp), &cid);
+	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 
 	Resource *resource = Core::FindResource(cid);
 	BOOST_REQUIRE(resource != 0);
-	BOOST_CHECK(resource->asCall() != 0);
+	BOOST_REQUIRE(resource->asCall() != 0);
 }
 
 BOOST_AUTO_TEST_CASE(static_creator)
@@ -47,15 +48,15 @@ BOOST_AUTO_TEST_CASE(static_creator)
 	testProcess process;
 
 	// Контроль параметров
-	BOOST_CHECK(ResourceCall::Create(0, &cp, sizeof(cp)) == 0);
-	BOOST_CHECK(ResourceCall::Create(&process, 0, sizeof(cp)) == 0);
-	BOOST_CHECK(ResourceCall::Create(&process, &cp, sizeof(cp) + 1) == 0);
+	BOOST_REQUIRE(ResourceCall::Create(0, &cp, sizeof(cp)) == 0);
+	BOOST_REQUIRE(ResourceCall::Create(&process, 0, sizeof(cp)) == 0);
+	BOOST_REQUIRE(ResourceCall::Create(&process, &cp, sizeof(cp) + 1) == 0);
 
 	scoped_ptr<Resource> resource(ResourceCall::Create(&process, &cp, sizeof(cp)));
 	ResourceCall *call = resource->asCall();
 	BOOST_REQUIRE(call != 0);
 
-	BOOST_CHECK_EQUAL(call->getEntry(), 0x1000);
+	BOOST_REQUIRE_EQUAL(call->getEntry(), 0x1000);
 }
 
 BOOST_AUTO_TEST_CASE(call)
@@ -68,7 +69,7 @@ BOOST_AUTO_TEST_CASE(call)
 
 	ResourceThread *thread = call->Call();
 	BOOST_REQUIRE(thread != 0);
-	BOOST_CHECK_EQUAL(thread->getEntry(), 0x1000);
+	BOOST_REQUIRE_EQUAL(thread->getEntry(), 0x1000);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

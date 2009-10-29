@@ -36,17 +36,17 @@ BOOST_AUTO_TEST_CASE(thread_index)
 	} scheduler;
 
 	testThread thread(StubGetCurrentClock(), 0);
-	BOOST_CHECK(scheduler.getThreadIndex(&thread) == 0);
+	BOOST_REQUIRE_EQUAL(scheduler.getThreadIndex(&thread), 0);
 
 	thread.setPriority(1);
-	BOOST_CHECK(scheduler.getThreadIndex(&thread) == 1);
+	BOOST_REQUIRE_EQUAL(scheduler.getThreadIndex(&thread), 1);
 
 	thread.setTimestamp(StubGetCurrentClock() - 5);
 	thread.setPriority(0);
-	BOOST_CHECK(scheduler.getThreadIndex(&thread) == 5);
+	BOOST_REQUIRE_EQUAL(scheduler.getThreadIndex(&thread), 5);
 
 	thread.setPriority(1);
-	BOOST_CHECK(scheduler.getThreadIndex(&thread) == 6);
+	BOOST_REQUIRE_EQUAL(scheduler.getThreadIndex(&thread), 6);
 }
 
 BOOST_AUTO_TEST_CASE(thread_order_function)
@@ -57,18 +57,18 @@ BOOST_AUTO_TEST_CASE(thread_order_function)
 
 	testThread thread1(StubGetCurrentClock(), 0);
 	testThread thread2(StubGetCurrentClock(), 1);
-	BOOST_CHECK(!scheduler.checkThreadUrgency(&thread1, &thread2));
-	BOOST_CHECK(scheduler.checkThreadUrgency(&thread2, &thread1));
+	BOOST_REQUIRE(!scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(scheduler.checkThreadUrgency(&thread2, &thread1));
 
 	// При полном равенстве (индекс и приоритет)
 	// входящий (первый) тред считается менее приоритетным.
 	thread2.setPriority(0);
-	BOOST_CHECK(!scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(!scheduler.checkThreadUrgency(&thread1, &thread2));
 
 	// При равенстве индексов приоритетный считается важнее.
 	thread1.setTimestamp(StubGetCurrentClock() - 5);
 	thread2.setPriority(5);
-	BOOST_CHECK(!scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(!scheduler.checkThreadUrgency(&thread1, &thread2));
 }
 
 BOOST_AUTO_TEST_CASE(normal_priority)
@@ -76,28 +76,28 @@ BOOST_AUTO_TEST_CASE(normal_priority)
 	ActiveScheduler scheduler;
 
 	// Пустой планировщик естественно ничего не возвращает.
-	BOOST_CHECK(scheduler.getThread() == 0);	
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 
 	testThread thread1(StubGetCurrentClock(), 10);
 	scheduler.addThread(&thread1);
 	// Должен залинковаться в список.
-	BOOST_CHECK(thread1.ScheduleLink.isLinked()); 
+	BOOST_REQUIRE(thread1.ScheduleLink.isLinked());
 
 	testThread thread2(StubGetCurrentClock(), 5);
 	scheduler.addThread(&thread2);
-	BOOST_CHECK(thread2.ScheduleLink.isLinked());
+	BOOST_REQUIRE(thread2.ScheduleLink.isLinked());
 
 	// Должен вернуть сперва thread1;
-	BOOST_CHECK(scheduler.getThread() == &thread1); 
-	BOOST_CHECK(!thread1.ScheduleLink.isLinked());
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
+	BOOST_REQUIRE(!thread1.ScheduleLink.isLinked());
 
-	BOOST_CHECK(scheduler.getThread() == &thread2);
-	BOOST_CHECK(!thread2.ScheduleLink.isLinked());
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread2);
+	BOOST_REQUIRE(!thread2.ScheduleLink.isLinked());
 
 	scheduler.addThread(&thread2);
 	scheduler.addThread(&thread1);
-	BOOST_CHECK(scheduler.getThread() == &thread1);
-	BOOST_CHECK(scheduler.getThread() == &thread2);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

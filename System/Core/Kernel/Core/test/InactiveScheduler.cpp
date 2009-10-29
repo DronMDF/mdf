@@ -43,15 +43,15 @@ BOOST_AUTO_TEST_CASE(thread_compare_function)
 
 	testThread thread1(5);
 	testThread thread2(10);
-	BOOST_CHECK(scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(scheduler.checkThreadUrgency(&thread1, &thread2));
 
 	thread1.Sleep(15);
-	BOOST_CHECK(!scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(!scheduler.checkThreadUrgency(&thread1, &thread2));
 
 	// При равенстве первый считается более приоритетным
 	// Ибо извлекаться из очереди они будут одновременно
 	thread1.Sleep(10);
-	BOOST_CHECK(scheduler.checkThreadUrgency(&thread1, &thread2));
+	BOOST_REQUIRE(scheduler.checkThreadUrgency(&thread1, &thread2));
 }
 
 BOOST_AUTO_TEST_CASE(order)
@@ -61,41 +61,41 @@ BOOST_AUTO_TEST_CASE(order)
 	testInactiveScheduler scheduler;
 
 	// Пустой планировщик естественно ничего не возвращает.
-	BOOST_CHECK(scheduler.getThread() == 0);
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 
 	scheduler.addThread(&thread1);
 	// Должен залинковаться в список.
-	BOOST_CHECK(thread1.ScheduleLink.isLinked());
+	BOOST_REQUIRE(thread1.ScheduleLink.isLinked());
 
 	scheduler.addThread(&thread2);
-	BOOST_CHECK(thread2.ScheduleLink.isLinked());
+	BOOST_REQUIRE(thread2.ScheduleLink.isLinked());
 
 	TestIncrementCurrentClock(15);
 
 	// Первым возвращается самый ранний.
-	BOOST_CHECK(scheduler.getThread() == &thread1);
-	BOOST_CHECK(!thread1.ScheduleLink.isLinked());
-	BOOST_CHECK(scheduler.getThread() == &thread2);
-	BOOST_CHECK(!thread2.ScheduleLink.isLinked());
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
+	BOOST_REQUIRE(!thread1.ScheduleLink.isLinked());
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread2);
+	BOOST_REQUIRE(!thread2.ScheduleLink.isLinked());
 
 	// Не зависимо от порядка запихивания
 	scheduler.addThread(&thread2);
 	scheduler.addThread(&thread1);
-	BOOST_CHECK(scheduler.getThread() == &thread1);
-	BOOST_CHECK(scheduler.getThread() == &thread2);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread2);
 
 	// Нити из будующего - ждут.
 	thread1.Sleep(5);
 	scheduler.addThread(&thread1);
-	BOOST_CHECK(scheduler.getThread() == 0);
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 
 	TestIncrementCurrentClock(10);
-	BOOST_CHECK(scheduler.getThread() == &thread1);
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
 
 	// Но если время ожидания бесконечно - не возвращается вообще.
 	thread1.Sleep(CLOCK_MAX);
 	scheduler.addThread(&thread1);
-	BOOST_CHECK(scheduler.getThread() == 0);
+	BOOST_REQUIRE(scheduler.getThread() == 0);
 
 	thread1.ScheduleLink.Unlink(&thread1);
 }

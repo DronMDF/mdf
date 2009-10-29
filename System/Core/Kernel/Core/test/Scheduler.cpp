@@ -76,39 +76,39 @@ public:
 BOOST_FIXTURE_TEST_CASE(add_active, sched_fixture)
 {
 	sched.addActiveThread(&thread);
-	BOOST_CHECK(active->thread == &thread);
-	BOOST_CHECK(active->add_visited);
+	BOOST_REQUIRE_EQUAL(active->thread, &thread);
+	BOOST_REQUIRE(active->add_visited);
 }
 
 BOOST_FIXTURE_TEST_CASE(add_inactive, sched_fixture)
 {
 	sched.addInactiveThread(&thread);
-	BOOST_CHECK(inactive->thread == &thread);
-	BOOST_CHECK(inactive->add_visited);
+	BOOST_REQUIRE_EQUAL(inactive->thread, &thread);
+	BOOST_REQUIRE(inactive->add_visited);
 }
 
 BOOST_FIXTURE_TEST_CASE(add_killed, sched_fixture)
 {
 	sched.addKillThread(&thread);
-	BOOST_CHECK(killed->thread == &thread);
-	BOOST_CHECK(killed->add_visited);
+	BOOST_REQUIRE_EQUAL(killed->thread, &thread);
+	BOOST_REQUIRE(killed->add_visited);
 }
 
 BOOST_FIXTURE_TEST_CASE(get_empty, sched_fixture)
 {
-	BOOST_CHECK(sched.getThread() == 0);
-	BOOST_CHECK(killed->get_visited);
-	BOOST_CHECK(inactive->get_visited);
-	BOOST_CHECK(active->get_visited);
+	BOOST_REQUIRE(sched.getThread() == 0);
+	BOOST_REQUIRE(killed->get_visited);
+	BOOST_REQUIRE(inactive->get_visited);
+	BOOST_REQUIRE(active->get_visited);
 }
 
 BOOST_FIXTURE_TEST_CASE(get_full, sched_fixture)
 {
 	sched.addInactiveThread(&thread);
-	BOOST_CHECK(sched.getThread() == &thread);
-	BOOST_CHECK(inactive->thread == 0);
-	BOOST_CHECK(active->add_visited);
-	BOOST_CHECK(active->thread == 0);
+	BOOST_REQUIRE_EQUAL(sched.getThread(), &thread);
+	BOOST_REQUIRE(inactive->thread == 0);
+	BOOST_REQUIRE(active->add_visited);
+	BOOST_REQUIRE(active->thread == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

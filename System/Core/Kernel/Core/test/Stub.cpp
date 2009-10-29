@@ -73,7 +73,7 @@ void *StubMemoryAlloc (const size_t size)
 void StubMemoryFree (void * const ptr)
 {
 	struct mcb *mcb = (struct mcb *)ptr - 1;
-	BOOST_CHECK(memory < mcb->size);
+	BOOST_ASSERT(memory < mcb->size);
 	memory -= mcb->size;
 	free(mcb);
 }

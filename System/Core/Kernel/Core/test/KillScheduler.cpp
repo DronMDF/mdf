@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_CASE(enqueue)
 	} thread;
 
 	scheduler.addThread(&thread);
-	BOOST_CHECK(thread.ScheduleLink.isLinked());
+	BOOST_REQUIRE(thread.ScheduleLink.isLinked());
 
 	// Шедулер не возвращает нитей, вместо этого он вызывает для каждой
 	// имеющейся нити метод Detach? Deactivate? и если тот возвращает true,
 	// то нить уничтожается.
-	BOOST_CHECK(scheduler.getThread() == 0);
-	BOOST_CHECK(thread.visited);
+	BOOST_REQUIRE(scheduler.getThread() == 0);
+	BOOST_REQUIRE(thread.visited);
 
 	thread.ScheduleLink.Unlink(&thread);
 }
@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_CASE(destroy)
 	} *thread = new testThread(&process, &deleted);
 
 	scheduler.addThread(thread);
-	BOOST_CHECK(scheduler.getThread() == 0);
-	BOOST_CHECK(deleted);
-	BOOST_CHECK(scheduler.m_queue.getFirst() == 0);
+	BOOST_REQUIRE(scheduler.getThread() == 0);
+	BOOST_REQUIRE(deleted);
+	BOOST_REQUIRE(scheduler.m_queue.getFirst() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

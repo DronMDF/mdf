@@ -56,8 +56,9 @@ public:
 		process.Register();
 
 		struct KernelCreateThreadParam param = { 0 };
-
-		BOOST_CHECK(CoreCreate(task, RESOURCE_TYPE_THREAD, &param, sizeof(param), &id) == SUCCESS);
+		const int rv = CoreCreate(task, RESOURCE_TYPE_THREAD,
+					  &param, sizeof(param), &id);
+		BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 	}
 
 	virtual ~create_fixture() {};
@@ -66,19 +67,19 @@ public:
 BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 {
 	ResourceInstance *instance = process.FindInstance(id);
-	BOOST_CHECK(instance != 0);
+	BOOST_REQUIRE(instance != 0);
 
 	Resource *resource = instance->getResource();
-	BOOST_CHECK(resource != 0);
-	BOOST_CHECK(resource->getId() == id);
+	BOOST_REQUIRE(resource != 0);
+	BOOST_REQUIRE_EQUAL(resource->getId(), id);
 
 	ResourceThread *thread = resource->asThread();
-	BOOST_CHECK(thread != 0);
+	BOOST_REQUIRE(thread != 0);
 }
 
 BOOST_FIXTURE_TEST_CASE(call, create_fixture)
 {
-	BOOST_CHECK(current_thread.Call() == &current_thread);
+	BOOST_REQUIRE_EQUAL(current_thread.Call(), &current_thread);
 
 	// Этот метод проходит, но после того происходит попытка удаления непустого списка.
 	// Видимо новая нить подвисает?
@@ -99,16 +100,16 @@ BOOST_AUTO_TEST_CASE(timestamp)
 	class TestThread : public ResourceThread {} thread;
 
 	thread.setTimestamp(10);
-	BOOST_CHECK(thread.getTimestamp() == 10);
+	BOOST_REQUIRE_EQUAL(thread.getTimestamp(), 10);
 
 	thread.Sleep(5);
 	// Таймстамп не должен меняться - таймстамп показывает время последнего вызова.
-	BOOST_CHECK(thread.getTimestamp() == 10);
-	BOOST_CHECK(thread.getWakeupstamp() > StubGetCurrentClock());
-	BOOST_CHECK(thread.getWakeupstamp() != CLOCK_MAX);
+	BOOST_REQUIRE_EQUAL(thread.getTimestamp(), 10);
+	BOOST_REQUIRE_GT(thread.getWakeupstamp(), StubGetCurrentClock());
+	BOOST_REQUIRE_NE(thread.getWakeupstamp(), CLOCK_MAX);
 
 	thread.Sleep(CLOCK_MAX);
-	BOOST_CHECK(thread.getWakeupstamp() == CLOCK_MAX);
+	BOOST_REQUIRE_EQUAL(thread.getWakeupstamp(), CLOCK_MAX);
 }
 
 BOOST_AUTO_TEST_CASE(info_current)
@@ -118,16 +119,17 @@ BOOST_AUTO_TEST_CASE(info_current)
 	id_t id = INVALID_ID;
 	size_t id_size = sizeof(id_t);
 
-	BOOST_CHECK(thread.Info(RESOURCE_INFO_THREAD_CURRENT, &id, &id_size) == SUCCESS);
-
-	BOOST_CHECK(id_size == sizeof(id_t));
-	BOOST_CHECK(id == thread.getId());
+	const int rv = thread.Info(RESOURCE_INFO_THREAD_CURRENT, &id, &id_size);
+	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
+	BOOST_REQUIRE_EQUAL(id_size, sizeof(id_t));
+	BOOST_REQUIRE_EQUAL(id, thread.getId());
 
 	id = INVALID_ID;
-	BOOST_CHECK(CoreInfo(reinterpret_cast<Task *>(&thread),
-		0, RESOURCE_INFO_THREAD_CURRENT, &id, &id_size) == SUCCESS);
-	BOOST_CHECK(id_size == sizeof(id_t));
-	BOOST_CHECK(id == thread.getId());
+	const int rv2 = CoreInfo(reinterpret_cast<Task *>(&thread),
+		0, RESOURCE_INFO_THREAD_CURRENT, &id, &id_size);
+	BOOST_REQUIRE_EQUAL(rv2, SUCCESS);
+	BOOST_REQUIRE_EQUAL(id_size, sizeof(id_t));
+	BOOST_REQUIRE_EQUAL(id, thread.getId());
 }
 
 BOOST_AUTO_TEST_CASE(modify_priority)
@@ -135,8 +137,10 @@ BOOST_AUTO_TEST_CASE(modify_priority)
 	class TestThread : public ResourceThread {} thread;
 	const uint32_t priority = 666;
 
-	BOOST_CHECK(thread.Modify(RESOURCE_MODIFY_THREAD_PRIORITY, &priority, sizeof(uint32_t)) == SUCCESS);
-	BOOST_CHECK(thread.getPriority() == priority);
+	const int rv = thread.Modify(RESOURCE_MODIFY_THREAD_PRIORITY,
+				     &priority, sizeof(uint32_t));
+	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
+	BOOST_REQUIRE_EQUAL(thread.getPriority(), priority);
 
 	// TODO: приоритетный класс можно передать вторым словом...
 
@@ -155,7 +159,7 @@ BOOST_AUTO_TEST_CASE(kill)
 		}
 	} thread;
 
-	BOOST_CHECK_THROW(thread.PageFault(USER_MEMORY_BASE + RETMAGIC, 0),
+	BOOST_REQUIRE_THROW(thread.PageFault(USER_MEMORY_BASE + RETMAGIC, 0),
 		runtime_error);
 
 	// По команде Kill процесс должен:
@@ -177,13 +181,13 @@ BOOST_AUTO_TEST_CASE(deactivate)
 	// И если тот вернул true, то поле m_task необходимо занулить.
 	TestSetStubTaskDestroyReaction(1);
 	thread.m_task = reinterpret_cast<Task *>(1);
-	BOOST_CHECK(thread.Deactivate());
-	BOOST_CHECK(thread.m_task == 0);
+	BOOST_REQUIRE(thread.Deactivate());
+	BOOST_REQUIRE(thread.m_task == 0);
 
 	TestSetStubTaskDestroyReaction(0);
 	thread.m_task = reinterpret_cast<Task *>(1);
-	BOOST_CHECK(!thread.Deactivate());
-	BOOST_CHECK(thread.m_task != 0);
+	BOOST_REQUIRE(!thread.Deactivate());
+	BOOST_REQUIRE(thread.m_task != 0);
 }
 
 BOOST_AUTO_TEST_CASE(activate)

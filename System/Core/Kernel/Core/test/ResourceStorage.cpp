@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(resource_storage)
 
 BOOST_AUTO_TEST_CASE(id_generator)
 {
-	BOOST_CHECK(CoreRandom() != CoreRandom());
+	BOOST_REQUIRE_NE(CoreRandom(), CoreRandom());
 }
 
 class TestResource : public ResourceId
@@ -47,11 +47,11 @@ BOOST_AUTO_TEST_CASE(finding)
 		TestResource resource;
 		resource.Register();
 		id = resource.getId();
-		BOOST_CHECK(id != 0);
-		BOOST_CHECK(FindResource(id) == static_cast<void *>(&resource));
+		BOOST_REQUIRE_NE(id, 0);
+		BOOST_REQUIRE_EQUAL(FindResource(id), reinterpret_cast<Resource *>(&resource));
 	}
 
-	BOOST_CHECK(FindResource(id) == 0);
+	BOOST_REQUIRE(FindResource(id) == 0);
 }
 
 BOOST_AUTO_TEST_CASE(finding2)
@@ -61,15 +61,15 @@ BOOST_AUTO_TEST_CASE(finding2)
 
 	{
 		TestResource resource;
-		BOOST_CHECK(resource.m_id == 0);
+		BOOST_REQUIRE_EQUAL(resource.m_id, 0);
 
 		resource.Register();
 		id = resource.getId();
-		BOOST_CHECK(id != 0);
-		BOOST_CHECK(storage.Find(id) == static_cast<void *>(&resource));
+		BOOST_REQUIRE_NE(id, 0);
+		BOOST_REQUIRE_EQUAL(FindResource(id), reinterpret_cast<Resource *>(&resource));
 	}
 
-	BOOST_CHECK(storage.Find(id) == 0);
+	BOOST_REQUIRE(storage.Find(id) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

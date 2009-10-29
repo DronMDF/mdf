@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(detach)
 	resource->Register();
 	process.Attach(resource, 0, 0);
 	process.Detach(resource);
-	BOOST_CHECK(deleted);
+	BOOST_REQUIRE(deleted);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
