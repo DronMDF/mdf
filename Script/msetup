@@ -31,7 +31,7 @@ sub AddProject {
 		unless (defined $nm);
 
 	$project_version{$nm} = $ver;
-	$project_state{$nm} = 'Add';
+	$project_state{$nm} = 'Wait';
 	$project_depend{$nm} = '';
 
 	#  Прокачиваем из депендов
@@ -60,9 +60,10 @@ sub AddProject {
 sub SetupProject {
 	my ($nm) = @_;
 
-	if ($project_state{$nm} eq 'Ok') {
-		return 1;
-	}
+	return 1 if ($project_state{$nm} eq 'Installed');
+	return 1 if ($project_state{$nm} eq 'Actual');
+
+	my $need_rebuild = 0;
 
 	# Проверяем депенды
 	foreach (split ' ',$project_depend{$nm}) {
@@ -75,26 +76,29 @@ sub SetupProject {
 			unless (MDF::Version->Valid
 				($project_version{$dep_name}, $dep_ver));
 
-#		print "msetup: $dep_name-$dep_ver...\n";
-
-		return 0
-			unless ($project_state{$dep_name} eq 'Ok');
+		# Зависимость еще не проставилась...
+		return 0 if ($project_state{$dep_name} eq 'Wait');
+		$need_rebuild = 1 if ($project_state{$dep_name} eq 'Installed');
 	}
 
 	# Проверяем установленность текущего
-	if (MDF::MPackage->CheckInstalled ($nm, $project_version{$nm})) {
-		# TODO: Надо будет опции ввести, дабы пересобирать
-		# уже установленные пакеты
-		print "msetup: $nm-$project_version{$nm}: Already installed.\n";
-		$project_state{$nm} = 'Ok';
-		return 1;
+	my $ver = $project_version{$nm};
+
+	unless ($need_rebuild) {
+		unless (MDF::MPackage->CheckInstalled($nm, $ver)) {
+			$need_rebuild = 1;
+		}
 	}
 
-	print "\nmsetup: $nm-$project_version{$nm}: Do install.\n";
+	if ($need_rebuild) {
+		print "\nmsetup: $nm-$ver: Do install.\n";
+		&InstallProject($nm);
+		$project_state{$nm} = 'Installed';
+	} else {
+		print "msetup: $nm-$ver: Already installed.\n";
+		$project_state{$nm} = 'Actual';
+	}
 
-	&InstallProject ($nm);
-
-	$project_state{$nm} = 'Ok';
 	return 1;
 }
 
