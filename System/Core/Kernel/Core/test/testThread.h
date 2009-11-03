@@ -13,5 +13,6 @@ public:
 	explicit testThread(Core::ResourceProcess *process = 0)
 		: Core::ResourceThread(process)
 	{
+		Register();
 	}
 };

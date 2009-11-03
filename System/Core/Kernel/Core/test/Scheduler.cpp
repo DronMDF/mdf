@@ -23,12 +23,7 @@ using namespace Core;
 // Новая реализация планировщика.
 BOOST_AUTO_TEST_SUITE(scheduler_new)
 
-class testSubScheduler : public SubScheduler {
-private:
-	testSubScheduler(const testSubScheduler &);
-	testSubScheduler &operator=(const testSubScheduler &);
-
-public:
+struct testSubScheduler : public SubScheduler {
 	ResourceThread *thread;
 
 	bool add_visited;
@@ -50,65 +45,64 @@ public:
 	}
 };
 
-struct sched_fixture {
-private:
-	sched_fixture(const sched_fixture&);
-	sched_fixture &operator = (const sched_fixture&);
-public:
-	testScheduler sched;
+struct sched_fixture : public testScheduler {
 	testThread thread;
 
-	testSubScheduler *active;
-	testSubScheduler *inactive;
-	testSubScheduler *killed;
-
-	sched_fixture() : sched(), thread(), active(new testSubScheduler),
-		inactive(new testSubScheduler), killed(new testSubScheduler)
-	{
-		sched.m_actives = active;
-		sched.m_inactives = inactive;
-		sched.m_killed = killed;
+	sched_fixture() : thread() {
+		m_actives = new testSubScheduler;
+		m_inactives = new testSubScheduler;
+		m_killed = new testSubScheduler;
 	}
-
-	virtual ~sched_fixture() {};
+	void CUSTOM_REQUIRE_ADD_VISITED(const SubScheduler *ss) const {
+		BOOST_REQUIRE(dynamic_cast<const testSubScheduler *>(ss)->add_visited);
+	}
+	void CUSTOM_REQUIRE_GET_VISITED(const SubScheduler *ss) const {
+		BOOST_REQUIRE(dynamic_cast<const testSubScheduler *>(ss)->get_visited);
+	}
+	void CUSTOM_REQUIRE_THREAD_PRESENT(const SubScheduler *ss) const {
+		BOOST_REQUIRE_EQUAL(dynamic_cast<const testSubScheduler *>(ss)->thread, &thread);
+	}
+	void CUSTOM_REQUIRE_NO_THREAD(const SubScheduler *ss) const {
+		BOOST_REQUIRE(dynamic_cast<const testSubScheduler *>(ss)->thread == 0);
+	}
 };
 
 BOOST_FIXTURE_TEST_CASE(add_active, sched_fixture)
 {
-	sched.addActiveThread(&thread);
-	BOOST_REQUIRE_EQUAL(active->thread, &thread);
-	BOOST_REQUIRE(active->add_visited);
+	addActiveThread(&thread);
+	CUSTOM_REQUIRE_THREAD_PRESENT(m_actives);
+	CUSTOM_REQUIRE_ADD_VISITED(m_actives);
 }
 
 BOOST_FIXTURE_TEST_CASE(add_inactive, sched_fixture)
 {
-	sched.addInactiveThread(&thread);
-	BOOST_REQUIRE_EQUAL(inactive->thread, &thread);
-	BOOST_REQUIRE(inactive->add_visited);
+	addInactiveThread(&thread);
+	CUSTOM_REQUIRE_THREAD_PRESENT(m_inactives);
+	CUSTOM_REQUIRE_ADD_VISITED(m_inactives);
 }
 
 BOOST_FIXTURE_TEST_CASE(add_killed, sched_fixture)
 {
-	sched.addKillThread(&thread);
-	BOOST_REQUIRE_EQUAL(killed->thread, &thread);
-	BOOST_REQUIRE(killed->add_visited);
+	addKillThread(&thread);
+	CUSTOM_REQUIRE_THREAD_PRESENT(m_killed);
+	CUSTOM_REQUIRE_ADD_VISITED(m_killed);
 }
 
 BOOST_FIXTURE_TEST_CASE(get_empty, sched_fixture)
 {
-	BOOST_REQUIRE(sched.getThread() == 0);
-	BOOST_REQUIRE(killed->get_visited);
-	BOOST_REQUIRE(inactive->get_visited);
-	BOOST_REQUIRE(active->get_visited);
+	BOOST_REQUIRE(getThread() == 0);
+	CUSTOM_REQUIRE_GET_VISITED(m_actives);
+	CUSTOM_REQUIRE_GET_VISITED(m_inactives);
+	CUSTOM_REQUIRE_GET_VISITED(m_killed);
 }
 
 BOOST_FIXTURE_TEST_CASE(get_full, sched_fixture)
 {
-	sched.addInactiveThread(&thread);
-	BOOST_REQUIRE_EQUAL(sched.getThread(), &thread);
-	BOOST_REQUIRE(inactive->thread == 0);
-	BOOST_REQUIRE(active->add_visited);
-	BOOST_REQUIRE(active->thread == 0);
+	addInactiveThread(&thread);
+	BOOST_REQUIRE_EQUAL(getThread(), &thread);
+	CUSTOM_REQUIRE_NO_THREAD(m_inactives);
+	CUSTOM_REQUIRE_ADD_VISITED(m_actives);
+	CUSTOM_REQUIRE_NO_THREAD(m_actives);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -19,6 +19,7 @@
 #include "../Kernel.h"
 
 #include "testThread.h"
+#include "testProcess.h"
 #include "testScheduler.h"
 
 using namespace std;
@@ -26,23 +27,9 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(thread)
 
-class create_fixture {
-private:
-	create_fixture(const create_fixture &);
-	create_fixture &operator = (const create_fixture &);
-
-public:
-	class testProcess : public ResourceProcess {
-	public:
-		testProcess() : ResourceProcess(0) {}
-	} process;
-
-	class testThread : public ResourceThread {
-	public:
-		explicit testThread(ResourceProcess *process)
-			: ResourceThread(process, 0)
-		{}
-	} current_thread;
+struct create_fixture {
+	testProcess process;
+	testThread current_thread;
 
 	id_t id;
 	const Task *task;
@@ -53,8 +40,6 @@ public:
 		  id(INVALID_ID),
 		  task(reinterpret_cast<Task *>(&current_thread))
 	{
-		process.Register();
-
 		struct KernelCreateThreadParam param = { 0 };
 		const int rv = CoreCreate(task, RESOURCE_TYPE_THREAD,
 					  &param, sizeof(param), &id);
@@ -97,7 +82,7 @@ BOOST_FIXTURE_TEST_CASE(call, create_fixture)
 
 BOOST_AUTO_TEST_CASE(timestamp)
 {
-	class TestThread : public ResourceThread {} thread;
+	testThread thread;
 
 	thread.setTimestamp(10);
 	BOOST_REQUIRE_EQUAL(thread.getTimestamp(), 10);
@@ -114,8 +99,7 @@ BOOST_AUTO_TEST_CASE(timestamp)
 
 BOOST_AUTO_TEST_CASE(info_current)
 {
-	class TestThread : public ResourceThread {} thread;
-	thread.Register();
+	testThread thread;
 	id_t id = INVALID_ID;
 	size_t id_size = sizeof(id_t);
 
@@ -134,7 +118,7 @@ BOOST_AUTO_TEST_CASE(info_current)
 
 BOOST_AUTO_TEST_CASE(modify_priority)
 {
-	class TestThread : public ResourceThread {} thread;
+	testThread thread;
 	const uint32_t priority = 666;
 
 	const int rv = thread.Modify(RESOURCE_MODIFY_THREAD_PRIORITY,
@@ -152,11 +136,8 @@ BOOST_AUTO_TEST_CASE(modify_priority)
 BOOST_AUTO_TEST_CASE(kill)
 {
 	// Для начала проверим что Kill вызывается.
-	class testThread : public ResourceThread {
-	public:
-		virtual void Kill() {
-			throw runtime_error("killed");
-		}
+	struct inThread : public testThread {
+		virtual void Kill() { throw runtime_error("killed"); }
 	} thread;
 
 	BOOST_REQUIRE_THROW(thread.PageFault(USER_MEMORY_BASE + RETMAGIC, 0),
@@ -172,8 +153,7 @@ BOOST_AUTO_TEST_CASE(kill)
 
 BOOST_AUTO_TEST_CASE(deactivate)
 {
-	class testThread : public ResourceThread {
-	public:
+	struct inThread : public testThread {
 		using ResourceThread::m_task;
 	} thread;
 
@@ -195,6 +175,10 @@ BOOST_AUTO_TEST_CASE(activate)
 	testThread thread;
 	testScheduler scheduler;
 
+	BOOST_REQUIRE(scheduler.m_actives == 0);
+	BOOST_REQUIRE(scheduler.m_inactives == 0);
+	BOOST_REQUIRE(scheduler.m_killed == 0);
+	
 	thread.Sleep(CLOCK_MAX);
 	scheduler.addInactiveThread(&thread);
 

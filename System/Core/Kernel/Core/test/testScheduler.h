@@ -17,7 +17,10 @@ public:
 
 	virtual ~testScheduler() {
 		delete m_actives;
+		m_actives = 0;
 		delete m_inactives;
+		m_inactives = 0;
 		delete m_killed;
+		m_killed = 0;
 	}
 };

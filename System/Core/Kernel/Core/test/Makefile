@@ -14,7 +14,7 @@ OBJECTS=$(addprefix $(MDF_TEMP)/, $(addsuffix .o, $(CORE_OBJECTS) $(UT_OBJECTS))
 .PHONY: test
 test: $(MDF_TEMP)/Runner
 	$(ECHO) Testing Core
-	$< --log_level=warning
+	$< --log_level=warning --random=1
 
 $(MDF_TEMP)/Runner: $(OBJECTS)
 	$(ECHO) Linking for localhost $@...
@@ -23,7 +23,7 @@ $(MDF_TEMP)/Runner: $(OBJECTS)
 
 $(MDF_TEMP)/test_%.o : %.cpp $(wildcard *.h) $(wildcard ../*.h)
 	$(ECHO) Compile for localhost test/$<...
-	$(HOST_CXX) $(HOST_CXXFLAGS) -c -o $@ $<
+	$(HOST_CXX) $(HOST_CXXFLAGS) -Wno-effc++ -c -o $@ $<
 
 $(MDF_TEMP)/test_core_%.o : ../%.cpp  $(wildcard ../*.h)
 	$(ECHO) Compile for localhost $(notdir $<)...

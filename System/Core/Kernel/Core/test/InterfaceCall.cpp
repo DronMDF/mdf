@@ -10,9 +10,9 @@
 #include "../Kernel.h"
 #include "../Core.h"
 #include "../Scheduler.h"
-#include "../Thread.h"
 
 #include "testProcess.h"
+#include "testThread.h"
 
 using namespace boost;
 using namespace Core;
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(testInvalidId)
 }
 
 // Этот тест ведет себя нестабильно... не могу понять в чем проблема.
-// BOOST_AUTO_TEST_CASE(testAsyncWithoutCaller)
+// BOOST_AUTO_TEST_CASE(testCallProcessAsyncWithoutCaller)
 // {
 // 	const laddr_t entry = 6666;
 // 	testProcess process(entry);
@@ -38,6 +38,13 @@ BOOST_AUTO_TEST_CASE(testInvalidId)
 // 
 // 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 // 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+// }
+
+// BOOST_AUTO_TEST_CASE(testCallThreadAsyncWithoutCaller)
+// {
+// 	testThread thread;
+// 	BOOST_REQUIRE_EQUAL(CoreCall(0, thread.getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+// 	BOOST_REQUIRE(Scheduler().getThread() != &thread);
 // }
 
 BOOST_AUTO_TEST_SUITE_END()
