@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "../Process.h"
+
 class testProcess : public Core::ResourceProcess
 {
 public:
-	testProcess()
-		: Core::ResourceProcess(0)
+	testProcess(laddr_t entry = 0)
+		: Core::ResourceProcess(entry)
 	{
 		Register();
 	}

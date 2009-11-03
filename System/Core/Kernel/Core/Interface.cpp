@@ -198,7 +198,7 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
 		Scheduler().addActiveThread(calledthread);
 	} else {
-		STUB_ASSERT(thread == 0, "Async call without thread");
+		STUB_ASSERT(thread == 0, "Sync call without thread");
 
 		// Текущая нить ждет вечно
 		thread->Sleep(CLOCK_MAX);

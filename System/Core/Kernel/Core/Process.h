@@ -5,9 +5,15 @@
 
 #pragma once
 
+#include "List.h"
+#include "Resource.h"
+#include "Memory.h"
+
 namespace Core {
 
 class ResourceRegion;
+class ResourceInstance;
+class ResourceThread;
 
 class ResourceProcess : public Resource
 {

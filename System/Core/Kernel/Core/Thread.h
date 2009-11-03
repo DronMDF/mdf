@@ -50,14 +50,12 @@ protected:
 
 	virtual void Kill();
 
-	// Удалять объекты можно только через удаление инстанций.
-	virtual ~ResourceThread();
-
 public:
 	Link<ResourceThread> ScheduleLink;
 	Link<ResourceThread> EventLink;
 
 	ResourceThread (ResourceProcess *process, laddr_t entry);
+	virtual ~ResourceThread();
 
 	virtual ResourceThread *asThread ();
 
