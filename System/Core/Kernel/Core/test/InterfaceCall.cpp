@@ -23,25 +23,38 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteInterfaceCall)
 
-BOOST_AUTO_TEST_CASE(testInvalidId)
-{
-	const id_t invalid_id = 0xDEAD001D;
-	BOOST_REQUIRE_EQUAL(CoreCall(0, invalid_id, 0, 0, 0), ERROR_INVALIDID);
-}
-
+// Таким образом поступает ядро при создании новых процессов из модулей.
 BOOST_AUTO_TEST_CASE(testCallProcessAsyncWithoutCaller)
 {
+	testScheduler scheduler;
+	
 	const laddr_t entry = 6666;
 	testProcess process(entry);
 	
 	BOOST_REQUIRE_EQUAL(CoreCall(0, process.getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	testScheduler scheduler;
 	ResourceThread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+}
+
+// Приложения обязаны указывать Task, и могут обращаться только к инстанциям
+// процесса или к глобальным инстанциям (TODO)
+BOOST_AUTO_TEST_CASE(testCallThreadByProcessInstance)
+{
+	testScheduler scheduler;
+	
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
+
+	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(thread),
+			thread->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+
+	ResourceThread *st = scheduler.getThread();
+	BOOST_REQUIRE_EQUAL(st, thread);
 }
 
 // Два следующих теста немного неправдоподобны.
@@ -71,6 +84,12 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncWithoutCaller)
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+}
+
+BOOST_AUTO_TEST_CASE(testInvalidId)
+{
+	const id_t invalid_id = 0xDEAD001D;
+	BOOST_REQUIRE_EQUAL(CoreCall(0, invalid_id, 0, 0, 0), ERROR_INVALIDID);
 }
 
 // Проверить неколлируемый ресурс
