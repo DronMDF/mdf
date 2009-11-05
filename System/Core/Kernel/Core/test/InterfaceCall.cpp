@@ -80,7 +80,27 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncByProcessInstance)
 
 BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 {
-	// TODO
+	testScheduler scheduler;
+
+	const laddr_t entry = 6666;
+
+	testProcess process;
+	ResourceProcess *calledprocess = new testProcess(entry);
+	process.Attach(calledprocess, RESOURCE_ACCESS_CALL, 0);
+	
+	testThread task(&process);
+	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
+			calledprocess->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+
+	ResourceThread *thread = scheduler.getThread();
+	BOOST_REQUIRE(thread != 0);
+	BOOST_REQUIRE_EQUAL(thread->getProcess(), calledprocess);
+	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+
+	// TODO: Процессы имеют свою инстанцию и поэтому не удаляются при
+	//	удалении внешней инстанции - пока удалим ручками.
+	process.Detach(calledprocess);
+	delete calledprocess;
 }
 
 // Два следующих теста немного неправдоподобны.

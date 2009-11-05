@@ -21,16 +21,14 @@ private:
 	laddr_t m_entry;
 	List<ResourceInstance> m_instance_list;
 
-	Memory 	m_pagetable;
+	Memory m_pagetable;
 
 	bool CheckRegionPlace (const ResourceRegion *region, laddr_t base) const;
 	laddr_t selectRegionBase (const ResourceRegion *region, uint32_t ubase) const;
 
-protected:
-	virtual ~ResourceProcess ();
-
 public:
 	explicit ResourceProcess (laddr_t entry);
+	virtual ~ResourceProcess ();
 
 	virtual ResourceProcess *asProcess ();
 

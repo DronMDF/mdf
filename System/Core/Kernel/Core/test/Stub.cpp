@@ -112,7 +112,7 @@ void StubPageInstanceDelete(const PageInstance *instance)
 	for (list<PageInfo *>::iterator it = pages.begin(); it != pages.end(); ++it)
 	{
 		if (*it == page) {
-// 			cout << "Free page " << page << endl;
+//			cout << "Free page " << page << endl;
 			delete page;
 			pages.erase(it);
 			break;
