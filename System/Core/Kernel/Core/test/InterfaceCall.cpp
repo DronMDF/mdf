@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncWithoutCaller)
 
 // Приложения обязаны указывать Task, и могут обращаться только к инстанциям
 // процесса или к глобальным инстанциям (TODO)
-BOOST_AUTO_TEST_CASE(testCallThreadByProcessInstance)
+BOOST_AUTO_TEST_CASE(testCallThreadAsyncByProcessInstance)
 {
 	testScheduler scheduler;
 	
@@ -55,6 +55,32 @@ BOOST_AUTO_TEST_CASE(testCallThreadByProcessInstance)
 
 	ResourceThread *st = scheduler.getThread();
 	BOOST_REQUIRE_EQUAL(st, thread);
+}
+
+BOOST_AUTO_TEST_CASE(testCallCallAsyncByProcessInstance)
+{
+	testScheduler scheduler;
+
+	const laddr_t entry = 6666;
+
+	testProcess process;
+	Resource *call = ResourceCall::Create(&process, &entry, sizeof(laddr_t));
+	call->Register();
+	process.Attach(call, RESOURCE_ACCESS_CALL, 0);
+
+	testThread task(&process);
+	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
+			call->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+
+	ResourceThread *thread = scheduler.getThread();
+	BOOST_REQUIRE(thread != 0);
+	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
+	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+}
+
+BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
+{
+	// TODO
 }
 
 // Два следующих теста немного неправдоподобны.
