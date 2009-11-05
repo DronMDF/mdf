@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "Resource.h"
+
 namespace Core {
 
 class ResourceThread;
