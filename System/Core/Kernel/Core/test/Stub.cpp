@@ -38,15 +38,7 @@ public:
 
 list<PageInfo *> pages;
 
-size_t memory = 0;
-
-struct mcb {
-	size_t size;
-	uint8_t block[0];
-};
-
 check::check() {
-	memory = 0;
 }
 
 check::~check() {
@@ -57,26 +49,9 @@ check::~check() {
 	}
 
 	BOOST_ASSERT(pages.empty());
-	BOOST_ASSERT(memory == 0);
 }
 
 extern "C" {
-
-void *StubMemoryAlloc (const size_t size)
-{
-	struct mcb *mcb = (struct mcb *)malloc(sizeof(size_t) + size);
-	mcb->size = size;
-	memory += size;
-	return mcb->block;
-}
-
-void StubMemoryFree (void * const ptr)
-{
-	struct mcb *mcb = (struct mcb *)ptr - 1;
-	BOOST_ASSERT(memory < mcb->size);
-	memory -= mcb->size;
-	free(mcb);
-}
 
 void StubMemoryCopy (void *dst, const void *src, size_t count)
 {
@@ -270,5 +245,3 @@ void TestSetStubTaskDestroyReaction(int react)
 {
 	task_destroy_reaction = react;
 }
-
-
