@@ -103,6 +103,46 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 	delete calledprocess;
 }
 
+BOOST_AUTO_TEST_CASE(testCallParametersDeliver)
+{
+	testScheduler scheduler;
+	testProcess process(0);
+	
+	string test_msg = "test";
+	BOOST_REQUIRE_EQUAL(CoreCall(0, process.getId(), 
+		test_msg.c_str(), test_msg.size(), 
+		RESOURCE_CALL_ASYNC | RESOURCE_CALL_COPY), SUCCESS);
+
+	ResourceThread *thread = scheduler.getThread();
+	BOOST_REQUIRE(thread != 0);
+
+	uint32_t access = RESOURCE_ACCESS_READ;
+	const PageInstance *pinst = thread->PageFault(USER_TXA_BASE, &access);
+	PageInfo *page = StubGetPageByInstance(pinst);
+	BOOST_REQUIRE(page != 0);
+	
+	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(test_msg.begin(), test_msg.end(),
+		m, m + test_msg.size());
+}
+
+// -----------------------------------------------------------------------------
+// Несчастливые маршруты (ошибки)
+
+BOOST_AUTO_TEST_CASE(testInvalidId)
+{
+	const id_t invalid_id = 0xDEAD001D;
+	BOOST_REQUIRE_EQUAL(CoreCall(0, invalid_id, 0, 0, 0), ERROR_INVALIDID);
+}
+
+// Проверить неколлируемый ресурс
+BOOST_AUTO_TEST_CASE(testCallUncallable)
+{
+	testResource uncallable;
+	uncallable.Register();
+	BOOST_REQUIRE_EQUAL(CoreCall(0, uncallable.getId(), 0, 0, RESOURCE_CALL_ASYNC), ERROR_INVALIDID);
+}
+
 // Два следующих теста немного неправдоподобны.
 // Клиенты так делать не могут, а ядру это не за чем.
 
@@ -130,20 +170,6 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncWithoutCaller)
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
-}
-
-BOOST_AUTO_TEST_CASE(testInvalidId)
-{
-	const id_t invalid_id = 0xDEAD001D;
-	BOOST_REQUIRE_EQUAL(CoreCall(0, invalid_id, 0, 0, 0), ERROR_INVALIDID);
-}
-
-// Проверить неколлируемый ресурс
-BOOST_AUTO_TEST_CASE(testCallUncallable)
-{
-	testResource uncallable;
-	uncallable.Register();
-	BOOST_REQUIRE_EQUAL(CoreCall(0, uncallable.getId(), 0, 0, RESOURCE_CALL_ASYNC), ERROR_INVALIDID);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

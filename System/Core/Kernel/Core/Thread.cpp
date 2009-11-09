@@ -63,6 +63,7 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 
 ResourceThread::~ResourceThread()
 {
+	delete m_txa;
 }
 
 ResourceThread *ResourceThread::asThread ()
