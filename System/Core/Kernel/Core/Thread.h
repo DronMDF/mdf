@@ -70,6 +70,7 @@ public:
 
 	laddr_t getEntry() const;
 
+	void setProcess(ResourceProcess *process);
 	ResourceProcess *getProcess() const;
 
 	void Sleep (timeout_t timeout);

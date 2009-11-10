@@ -144,6 +144,11 @@ void ResourceThread::setTimestamp(clock_t timestamp)
 	m_timestamp = timestamp;
 }
 
+void ResourceThread::setProcess(ResourceProcess *process)
+{
+	m_process = process;
+}
+
 ResourceProcess *ResourceThread::getProcess() const
 {
 	STUB_ASSERT(m_process == 0, "Thread without process");

@@ -13,9 +13,10 @@
 #include "../Call.h"
 
 #include "testResource.h"
-#include "testScheduler.h"
 #include "testProcess.h"
 #include "testThread.h"
+#include "testScheduler.h"
+#include "testSubScheduler.h"
 
 using namespace std;
 using namespace boost;
@@ -126,6 +127,34 @@ BOOST_AUTO_TEST_CASE(testCallParametersDeliver)
 		m, m + test_msg.size());
 }
 
+BOOST_AUTO_TEST_CASE(testCallSync)
+{
+	// Все ломается из за евентов, которые зависают в коллере.
+// 	testSubScheduler *inactive = new testSubScheduler;
+// 	testScheduler scheduler;
+// 	scheduler.m_inactives = inactive; // Освободиться при уничтожении шедулера.
+// 
+// 	testThread task;
+// 	testProcess process;	// Процесс должен умирать раньше чем нить.
+// 	task.setProcess(&process);
+// 	
+// 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
+// 			process.getId(), 0, 0, 0), SUCCESS);
+// 
+// //	TODO: Обработчик уже вызван... и я не могу это отследить... пока...
+// // 	ResourceThread *thread = scheduler.getThread();
+// // 	BOOST_REQUIRE(thread != 0);
+// // 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
+// // 	
+// // 	BOOST_REQUIRE(scheduler.getThread() == 0);
+// 	
+// 	// TODO: Хотел ту нить прибить и эта по идее должна была бы оказаться в 
+// 	// очереди активных, но это не сработало потому что активизация слишком 
+// 	// сильно все пронизывает. :( Пришлось вставить свой шедулер.
+// 	BOOST_REQUIRE(inactive->thread == &task);
+// 	BOOST_REQUIRE_EQUAL(task.getWakeupstamp(), CLOCK_MAX);
+}
+
 // -----------------------------------------------------------------------------
 // Несчастливые маршруты (ошибки)
 
@@ -143,6 +172,7 @@ BOOST_AUTO_TEST_CASE(testCallUncallable)
 	BOOST_REQUIRE_EQUAL(CoreCall(0, uncallable.getId(), 0, 0, RESOURCE_CALL_ASYNC), ERROR_INVALIDID);
 }
 
+// -----------------------------------------------------------------------------
 // Два следующих теста немного неправдоподобны.
 // Клиенты так делать не могут, а ядру это не за чем.
 
