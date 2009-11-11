@@ -48,38 +48,8 @@ int CallHelper::execute()
 {
 	ResourceThread *thread = 0;
 
-	// Которую потом коллить через полноценный метод Call.
-	ResourceThread *calledthread = 0;
-
-	// Поиск ресурса
-	if (task != 0) {
-		// Либо через таск
-		void *thread_ptr = StubTaskGetThread(task);
-		STUB_ASSERT (thread_ptr == 0, "No thread");
-		thread = reinterpret_cast<ResourceThread *>(thread_ptr);
-
-		ResourceProcess *process = thread->getProcess();
-		STUB_ASSERT(process == 0, "no current process");
-
-		ResourceInstance *instance = process->FindInstance(id);
-		if (instance == 0) {
-			// TODO: поискать среди глобальных инстанций
-			// Не всех, а только доступных публично.
-			return ERROR_INVALIDID;
-		}
-
-		calledthread = instance->Call();
-	} else {
-		// Либо глобально (ядерный режим)
-		Core::Resource *resource = Core::FindResource (id);
-		if (resource == 0)
-			return ERROR_INVALIDID;
-
-		calledthread = resource->Call();
-	}
-
-	if (calledthread == 0)
-		return ERROR_INVALIDID;
+	ResourceThread *calledthread = createCalledThread(task, id);
+	if (calledthread == 0) return ERROR_INVALIDID;
 
 	// При указании буффера необходимо оставить ссылку на вызвавший процесс...
 	// вызвавший идентификатор кстати будет размещен в стеке.
