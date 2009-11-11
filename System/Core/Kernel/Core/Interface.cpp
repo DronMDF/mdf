@@ -11,6 +11,7 @@
 #include "Thread.h"
 #include "Call.h"
 #include "Scheduler.h"
+#include "InterfaceCallHelper.h"
 
 using namespace Core;
 
@@ -158,60 +159,8 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 extern "C"
 int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, int flags)
 {
-	ResourceThread *thread = 0;
-
-	// Которую потом коллить через полноценный метод Call.
-	ResourceThread *calledthread = 0;
-
-	if (task != 0) {
-		void *thread_ptr = StubTaskGetThread(task);
-		STUB_ASSERT (thread_ptr == 0, "No thread");
-		thread = reinterpret_cast<ResourceThread *>(thread_ptr);
-
-		ResourceProcess *process = thread->getProcess();
-		STUB_ASSERT(process == 0, "no current process");
-
-		ResourceInstance *instance = process->FindInstance(id);
-		if (instance == 0) {
-			// TODO: поискать среди глобальных инстанций
-			return ERROR_INVALIDID;
-		}
-
-		calledthread = instance->Call();
-	} else {
-		Core::Resource *resource = Core::FindResource (id);
-		if (resource == 0)
-			return ERROR_INVALIDID;
-
-		calledthread = resource->Call();
-	}
-
-	if (calledthread == 0)
-		return ERROR_INVALIDID;
-
-	// При указании буффера необходимо оставить ссылку на вызвавший процесс...
-	// вызвавший идентификатор кстати будет размещен в стеке.
-	if (buffer != 0 && buffer_size != 0) {
-		calledthread->setRequest (buffer, buffer_size, flags);
-	}
-
-	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
-		Scheduler().addActiveThread(calledthread);
-	} else {
-		STUB_ASSERT(thread == 0, "Sync call without thread");
-
-		// Текущая нить ждет вечно
-		thread->Sleep(CLOCK_MAX);
-		Scheduler().addInactiveThread(thread);
-
-		// Новая нить уведомит когда завершится
-		calledthread->addObserver(thread, RESOURCE_EVENT_DESTROY);
-
-		// Новую нить запускаем.
-		calledthread->Run();
-	}
-
-	return SUCCESS;
+	InterfaceCallHelper helper(task, id, buffer, buffer_size, flags);
+	return helper.execute();
 }
 
 extern "C"
