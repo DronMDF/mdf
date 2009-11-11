@@ -3,7 +3,7 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "InterfaceCallHelper.h"
+#include "CallHelper.h"
 
 #include "Kernel.h"
 #include "Resources.h"
@@ -14,13 +14,13 @@
 
 namespace Core {
 
-InterfaceCallHelper::InterfaceCallHelper(const Task *task, id_t id,
-	const void *buffer, size_t buffer_size, int flags)
-		: task(task), id(id), buffer(buffer), buffer_size(buffer_size), flags(flags)
+CallHelper::CallHelper(const Task *task, id_t id, 
+		       const void *buffer, size_t buffer_size, int flags)
+	: task(task), id(id), buffer(buffer), buffer_size(buffer_size), flags(flags)
 {
 }
 
-int InterfaceCallHelper::execute()
+int CallHelper::execute()
 {
 	ResourceThread *thread = 0;
 

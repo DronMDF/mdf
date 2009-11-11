@@ -9,7 +9,7 @@ typedef struct _Task Task;
 
 namespace Core {
 
-class InterfaceCallHelper {
+class CallHelper {
 private:
 	const Task *task;
 	id_t id;
@@ -18,7 +18,9 @@ private:
 	int flags;
 	
 public:
-	InterfaceCallHelper(const Task *task, id_t id, const void *buffer, size_t buffer_size, int flags);
+	CallHelper(const Task *task, id_t id, 
+		   const void *buffer, size_t buffer_size, int flags);
+		   
 	int execute();
 };
 
