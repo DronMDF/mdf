@@ -20,6 +20,16 @@ CallHelper::CallHelper(const Task *task, id_t id,
 {
 }
 
+ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id) const
+{
+	if (task == 0) {
+		Core::Resource *resource = Core::FindResource(id);
+		return resource != 0 ? resource->Call() : 0;
+	}
+	
+	return 0;
+}
+
 int CallHelper::execute()
 {
 	ResourceThread *thread = 0;
@@ -27,7 +37,9 @@ int CallHelper::execute()
 	// Которую потом коллить через полноценный метод Call.
 	ResourceThread *calledthread = 0;
 
+	// Поиск ресурса
 	if (task != 0) {
+		// Либо через таск
 		void *thread_ptr = StubTaskGetThread(task);
 		STUB_ASSERT (thread_ptr == 0, "No thread");
 		thread = reinterpret_cast<ResourceThread *>(thread_ptr);
@@ -38,11 +50,13 @@ int CallHelper::execute()
 		ResourceInstance *instance = process->FindInstance(id);
 		if (instance == 0) {
 			// TODO: поискать среди глобальных инстанций
+			// Не всех, а только доступных публично.
 			return ERROR_INVALIDID;
 		}
 
 		calledthread = instance->Call();
 	} else {
+		// Либо глобально (ядерный режим)
 		Core::Resource *resource = Core::FindResource (id);
 		if (resource == 0)
 			return ERROR_INVALIDID;
@@ -55,13 +69,18 @@ int CallHelper::execute()
 
 	// При указании буффера необходимо оставить ссылку на вызвавший процесс...
 	// вызвавший идентификатор кстати будет размещен в стеке.
+	
+	// Передаем буфер (возврат кстати настраиваем отдельно, если нет флага ридонли)
 	if (buffer != 0 && buffer_size != 0) {
 		calledthread->setRequest (buffer, buffer_size, flags);
 	}
 
 	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
+		// вызываемый просто ставится в очередь - управление не передается.
 		Scheduler().addActiveThread(calledthread);
 	} else {
+		// Синхронный вызов - вызывающий отправляется спать до завершения 
+		// работы вызываемого.
 		STUB_ASSERT(thread == 0, "Sync call without thread");
 
 		// Текущая нить ждет вечно

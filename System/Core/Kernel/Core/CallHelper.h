@@ -9,6 +9,8 @@ typedef struct _Task Task;
 
 namespace Core {
 
+class ResourceThread;
+	
 class CallHelper {
 private:
 	const Task *task;
@@ -16,6 +18,9 @@ private:
 	const void *buffer;
 	size_t buffer_size;
 	int flags;
+
+protected:
+	ResourceThread *createCalledThread(const Task *task, id_t id) const;
 	
 public:
 	CallHelper(const Task *task, id_t id, 
