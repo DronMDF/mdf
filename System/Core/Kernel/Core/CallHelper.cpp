@@ -23,10 +23,24 @@ CallHelper::CallHelper(const Task *task, id_t id,
 ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id) const
 {
 	if (task == 0) {
+		// Режим ядра - поиск ресурсов осуществляется глобально.
 		Core::Resource *resource = Core::FindResource(id);
 		return resource != 0 ? resource->Call() : 0;
 	}
 	
+	// Режим пользователя - поиск осуществляется от процесса.
+	ResourceThread *thread = 
+		reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
+	STUB_ASSERT(thread == 0, "No current thread");
+
+	ResourceProcess *process = thread->getProcess();
+	STUB_ASSERT(process == 0, "no current process");
+
+	ResourceInstance *instance = process->FindInstance(id);
+	if (instance != 0) return instance->Call();
+	
+	// TODO: поискать среди глобальных инстанций
+	// Не всех, а только доступных публично.
 	return 0;
 }
 

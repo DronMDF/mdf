@@ -6,16 +6,17 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
+#include "../Kernel.h"
 #include "../CallHelper.h"
-#include "../Thread.h"
 
+#include "testThread.h"
 #include "testProcess.h"
 
 using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteCallHelper)
 
-BOOST_AUTO_TEST_CASE(testFindResourceInKernelMode)
+BOOST_AUTO_TEST_CASE(testCreateCalledProcessInKernelMode)
 {
 	struct testCallHelper : public CallHelper {
 		testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
@@ -31,6 +32,21 @@ BOOST_AUTO_TEST_CASE(testFindResourceInKernelMode)
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateCalledThreadInUserMode)
+{
+	struct testCallHelper : public CallHelper {
+		testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
+		using CallHelper::createCalledThread;
+	} helper;
+	
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
+
+	const Task *task = reinterpret_cast<Task *>(thread);
+	BOOST_REQUIRE_EQUAL(helper.createCalledThread(task, thread->getId()), thread);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
