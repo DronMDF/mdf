@@ -23,13 +23,13 @@ void *operator new[](unsigned int size)
 
 void operator delete(void *ptr) throw()
 {
-	STUB_ASSERT (ptr == 0, "delete null pointer");
+	if (ptr == 0) return;	// Допустимо по стандарту.
 	StubMemoryFree (ptr);
 }
 
 void operator delete[](void *ptr) throw()
 {
-	STUB_ASSERT (ptr == 0, "delete null pointer");
+	if (ptr == 0) return;	// Допустимо по стандарту.
 	StubMemoryFree (ptr);
 }
 

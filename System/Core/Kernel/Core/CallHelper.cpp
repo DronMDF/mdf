@@ -46,8 +46,6 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id) const
 
 int CallHelper::execute()
 {
-	ResourceThread *thread = 0;
-
 	ResourceThread *calledthread = createCalledThread(task, id);
 	if (calledthread == 0) return ERROR_INVALIDID;
 
@@ -65,6 +63,8 @@ int CallHelper::execute()
 	} else {
 		// Синхронный вызов - вызывающий отправляется спать до завершения 
 		// работы вызываемого.
+		ResourceThread *thread = 
+			reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
 		STUB_ASSERT(thread == 0, "Sync call without thread");
 
 		// Текущая нить ждет вечно
