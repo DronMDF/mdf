@@ -16,30 +16,27 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteCallHelper)
 
+struct testCallHelper : public CallHelper {
+	testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
+	using CallHelper::createCalledThread;
+};
+	
 BOOST_AUTO_TEST_CASE(testCreateCalledProcessInKernelMode)
 {
-	struct testCallHelper : public CallHelper {
-		testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
-		using CallHelper::createCalledThread;
-	} helper;
+	testCallHelper helper;
 	
-	// Тестировано стоит через процесс, потому что это единственно верный 
-	// вариант в режиме ядра
-	const laddr_t entry = 6666;
-	testProcess process(entry);
+	// Тестирование стоит делать через процесс, потому что это единственно 
+	// верный вариант в режиме ядра
+	testProcess process;
 	ResourceThread *thread = helper.createCalledThread(0, process.getId());
 	
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
-	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadInUserMode)
 {
-	struct testCallHelper : public CallHelper {
-		testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
-		using CallHelper::createCalledThread;
-	} helper;
+	testCallHelper helper;
 	
 	testProcess process;
 	ResourceThread *thread = new testThread(&process);
