@@ -21,7 +21,7 @@ struct testCallHelper : public CallHelper {
 	using CallHelper::createCalledThread;
 };
 	
-BOOST_AUTO_TEST_CASE(testCreateCalledProcessInKernelMode)
+BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
 {
 	testCallHelper helper;
 	
@@ -44,6 +44,13 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadInUserMode)
 
 	const Task *task = reinterpret_cast<Task *>(thread);
 	BOOST_REQUIRE_EQUAL(helper.createCalledThread(task, thread->getId()), thread);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateCalledThreadInvalidId)
+{
+	testCallHelper helper;
+	const id_t invalid_id = 0xDEAD001D;
+	BOOST_REQUIRE(helper.createCalledThread(0, invalid_id) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
