@@ -9,6 +9,7 @@
 #include "../Kernel.h"
 #include "../CallHelper.h"
 
+#include "testResource.h"
 #include "testThread.h"
 #include "testProcess.h"
 
@@ -51,6 +52,14 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadInvalidId)
 	testCallHelper helper;
 	const id_t invalid_id = 0xDEAD001D;
 	BOOST_REQUIRE(helper.createCalledThread(0, invalid_id) == 0);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateCalledThreadUncallable)
+{
+	testCallHelper helper;
+	testResource uncallable;
+	uncallable.Register();
+	BOOST_REQUIRE(helper.createCalledThread(0, uncallable.getId()) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
