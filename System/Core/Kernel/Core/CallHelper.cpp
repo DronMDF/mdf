@@ -76,9 +76,18 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	return 0;
 }
 
-void CallHelper::copyOutRequest(ResourceThread *thread, laddr_t base,
-	const void *request, size_t request_size) const
+void CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
+				size_t request_size, uint32_t access) const
 {
+	if (request == 0) return;
+	if (request_size == 0) return;
+
+	if (request_size > USER_TXA_SIZE) return; // ERROR_INVALIDPARAM
+
+	STUB_ASSERT(!thread->createRequestArea(0, request_size, access),
+		    "Unable to create thread request area");
+	STUB_ASSERT(!thread->copyIn(USER_TXA_BASE, request, request_size),
+		    "Unable to copy txa content");
 }
 
 int CallHelper::execute()

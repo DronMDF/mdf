@@ -27,8 +27,8 @@ protected:
 	int getStatus() const;
 	
 	ResourceThread *createCalledThread(const Task *task, id_t id);
-	void copyOutRequest(ResourceThread *thread, laddr_t base,
-			    const void *request, size_t request_size) const;
+	void copyOutRequest(ResourceThread *thread, const void *request,
+			    size_t request_size, uint32_t access) const;
 
 public:
 	CallHelper(const Task *task, id_t id, 

@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 	testThread thread(&process);
 
 	char request[] = "request";
-	helper.copyOutRequest(&thread, USER_TXA_BASE, request, strlen(request));
+	helper.copyOutRequest(&thread, request, strlen(request), RESOURCE_ACCESS_READ);
 
 	uint32_t access = RESOURCE_ACCESS_READ;
 	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);

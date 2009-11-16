@@ -187,4 +187,21 @@ BOOST_AUTO_TEST_CASE(activate)
 	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread);
 }
 
+BOOST_AUTO_TEST_CASE(testCopyIn)
+{
+	testThread thread;
+
+	char request[] = "request";
+	thread.copyIn(USER_STACK_BASE, request, strlen(request));
+
+	uint32_t access = RESOURCE_ACCESS_READ;
+	const PageInstance *pinst = thread.PageFault(USER_STACK_BASE, &access);
+	PageInfo *page = StubGetPageByInstance(pinst);
+	BOOST_REQUIRE(page != 0);
+
+	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(request, request + strlen(request),
+		m, m + strlen(request));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

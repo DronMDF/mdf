@@ -92,6 +92,9 @@ public:
 
 	void setEvent(uint32_t event);
 	uint32_t getEvent() const;
+
+	bool createRequestArea(laddr_t offset, laddr_t size, uint32_t access);
+	bool copyIn(laddr_t dst, const void *src, size_t size);
 };
 
 } // namespace Core
