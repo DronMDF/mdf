@@ -24,9 +24,12 @@ private:
 	void setStatus(int status);
 
 protected:
-	ResourceThread *createCalledThread(const Task *task, id_t id);
-
 	int getStatus() const;
+	
+	ResourceThread *createCalledThread(const Task *task, id_t id);
+	void copyOutRequest(ResourceThread *thread, laddr_t base,
+			    const void *request, size_t request_size) const;
+
 public:
 	CallHelper(const Task *task, id_t id, 
 		   const void *buffer, size_t buffer_size, int flags);

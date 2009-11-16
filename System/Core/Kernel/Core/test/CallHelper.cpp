@@ -22,6 +22,7 @@ struct testCallHelper : public CallHelper {
 
 	using CallHelper::getStatus;
 	using CallHelper::createCalledThread;
+	using CallHelper::copyOutRequest;
 };
 	
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
@@ -82,5 +83,23 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadWithoutCallAccess)
 	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_ACCESS);
 }
 
+BOOST_AUTO_TEST_CASE(testCopyOutRequest)
+{
+	testCallHelper helper;
+	testProcess process;
+	testThread thread(&process);
+
+	char request[] = "request";
+	helper.copyOutRequest(&thread, USER_TXA_BASE, request, strlen(request));
+
+	uint32_t access = RESOURCE_ACCESS_READ;
+	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);
+	PageInfo *page = StubGetPageByInstance(pinst);
+	BOOST_REQUIRE(page != 0);
+
+	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(request, request + strlen(request),
+		m, m + strlen(request));
+}
 
 BOOST_AUTO_TEST_SUITE_END()

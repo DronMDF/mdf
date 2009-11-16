@@ -76,6 +76,11 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	return 0;
 }
 
+void CallHelper::copyOutRequest(ResourceThread *thread, laddr_t base,
+	const void *request, size_t request_size) const
+{
+}
+
 int CallHelper::execute()
 {
 	ResourceThread *calledthread = createCalledThread(task, id);
