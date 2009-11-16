@@ -13,15 +13,20 @@ class ResourceThread;
 	
 class CallHelper {
 private:
+	int m_status;
+	
 	const Task *task;
 	id_t id;
 	const void *buffer;
 	size_t buffer_size;
 	int flags;
 
+	void setStatus(int status);
+
 protected:
-	ResourceThread *createCalledThread(const Task *task, id_t id) const;
-	
+	ResourceThread *createCalledThread(const Task *task, id_t id);
+
+	int getStatus() const;
 public:
 	CallHelper(const Task *task, id_t id, 
 		   const void *buffer, size_t buffer_size, int flags);

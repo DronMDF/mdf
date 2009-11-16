@@ -19,6 +19,8 @@ BOOST_AUTO_TEST_SUITE(suiteCallHelper)
 
 struct testCallHelper : public CallHelper {
 	testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
+
+	using CallHelper::getStatus;
 	using CallHelper::createCalledThread;
 };
 	
@@ -52,6 +54,8 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadInvalidId)
 	testCallHelper helper;
 	const id_t invalid_id = 0xDEAD001D;
 	BOOST_REQUIRE(helper.createCalledThread(0, invalid_id) == 0);
+
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDID);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadUncallable)
@@ -60,6 +64,23 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadUncallable)
 	testResource uncallable;
 	uncallable.Register();
 	BOOST_REQUIRE(helper.createCalledThread(0, uncallable.getId()) == 0);
+
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDID);
 }
+
+BOOST_AUTO_TEST_CASE(testCreateCalledThreadWithoutCallAccess)
+{
+	testCallHelper helper;
+	
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_READ, 0);
+
+	const Task *task = reinterpret_cast<Task *>(thread);
+	BOOST_REQUIRE(helper.createCalledThread(task, thread->getId()) == 0);
+
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_ACCESS);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

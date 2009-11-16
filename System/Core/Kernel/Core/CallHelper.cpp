@@ -16,16 +16,39 @@ namespace Core {
 
 CallHelper::CallHelper(const Task *task, id_t id, 
 		       const void *buffer, size_t buffer_size, int flags)
-	: task(task), id(id), buffer(buffer), buffer_size(buffer_size), flags(flags)
+	: m_status(SUCCESS), task(task), id(id),
+	  buffer(buffer), buffer_size(buffer_size), flags(flags)
 {
 }
 
-ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id) const
+void CallHelper::setStatus(int status)
+{
+	m_status = status;
+}
+
+int CallHelper::getStatus() const
+{
+	return m_status;
+}
+
+ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 {
 	if (task == 0) {
 		// Режим ядра - поиск ресурсов осуществляется глобально.
 		Core::Resource *resource = Core::FindResource(id);
-		return resource != 0 ? resource->Call() : 0;
+		
+		if (resource == 0) {
+			setStatus(ERROR_INVALIDID);
+			return 0;
+		}
+
+		ResourceThread *thread = resource->Call();
+		if (thread == 0) {
+			setStatus(ERROR_INVALIDID);
+			return 0;
+		}
+
+		return thread;
 	}
 	
 	// Режим пользователя - поиск осуществляется от процесса.
@@ -37,17 +60,26 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id) const
 	STUB_ASSERT(process == 0, "no current process");
 
 	ResourceInstance *instance = process->FindInstance(id);
-	if (instance != 0) return instance->Call();
+	if (instance != 0) {
+		ResourceThread *thread = instance->Call();
+		if (thread == 0) {
+			setStatus(ERROR_ACCESS);
+			return 0;
+		}
+	
+		return thread;
+	}
 	
 	// TODO: поискать среди глобальных инстанций
 	// Не всех, а только доступных публично.
+	setStatus(ERROR_INVALIDID);
 	return 0;
 }
 
 int CallHelper::execute()
 {
 	ResourceThread *calledthread = createCalledThread(task, id);
-	if (calledthread == 0) return ERROR_INVALIDID;
+	if (calledthread == 0) return getStatus();
 
 	// При указании буффера необходимо оставить ссылку на вызвавший процесс...
 	// вызвавший идентификатор кстати будет размещен в стеке.
