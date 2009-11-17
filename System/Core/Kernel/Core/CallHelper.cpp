@@ -84,6 +84,13 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 	return true;
 }
 
+bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
+	const void *request, size_t request_size) const
+{
+
+	return true;
+}
+
 int CallHelper::execute()
 {
 	ResourceThread *calledthread = createCalledThread(task, id);

@@ -30,8 +30,11 @@ protected:
 	int getStatus() const;
 	
 	ResourceThread *createCalledThread(const Task *task, id_t id);
-	bool copyOutRequest(ResourceThread *thread, const void *request,
+	bool copyOutRequest(ResourceThread *called, const void *request,
 			    size_t request_size, uint32_t access);
+
+	bool setCopyBack(ResourceThread *called, ResourceThread *thread,
+		const void *request, size_t request_size) const;
 
 public:
 	CallHelper(const Task *task, id_t id, 

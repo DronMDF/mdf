@@ -23,6 +23,7 @@ struct testCallHelper : public CallHelper {
 	using CallHelper::getStatus;
 	using CallHelper::createCalledThread;
 	using CallHelper::copyOutRequest;
+	using CallHelper::setCopyBack;
 };
 	
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
@@ -127,7 +128,12 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
 
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
-	// TODO:
+	testCallHelper helper;
+	testThread calledthread, thread;
+	char request[] = "request";
+	BOOST_REQUIRE(helper.setCopyBack(&calledthread, &thread, request, sizeof(request)));
+
+	// TODO: Проверить что копибек установился.
 }
 
 BOOST_AUTO_TEST_SUITE_END()
