@@ -24,10 +24,10 @@ CallHelper::CallHelper(const Task *task, id_t id,
 }
 
 template <typename T>
-T CallHelper::returnStatus(int status, T value)
+T CallHelper::returnStatus(int status)
 {
-	if (value == 0) m_status = status;
-	return value;
+	m_status = status;
+	return 0;
 }
 
 int CallHelper::getStatus() const
@@ -43,7 +43,9 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 		if (resource == 0) return returnStatus<ResourceThread *>(ERROR_INVALIDID);
 
 		ResourceThread *thread = resource->Call();
-		return returnStatus<ResourceThread *>(ERROR_INVALIDID, thread);
+		if (thread == 0) return returnStatus<ResourceThread *>(ERROR_INVALIDID);
+
+		return thread;
 	}
 	
 	// Режим пользователя - поиск осуществляется от процесса.
@@ -57,7 +59,9 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	ResourceInstance *instance = process->FindInstance(id);
 	if (instance != 0) {
 		ResourceThread *thread = instance->Call();
-		return returnStatus<ResourceThread *>(ERROR_ACCESS, thread);
+		if (thread == 0) return returnStatus<ResourceThread *>(ERROR_ACCESS);
+
+		return thread;
 	}
 	
 	// TODO: поискать среди глобальных инстанций

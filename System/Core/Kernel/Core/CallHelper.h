@@ -22,7 +22,7 @@ private:
 	int flags;
 
 	template<typename T>
-	T returnStatus(int status, T value = 0);
+	T returnStatus(int status);
 
 	void setStatus(int status);
 
