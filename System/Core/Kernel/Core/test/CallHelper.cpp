@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 	testThread thread(&process);
 
 	char request[] = "request";
-	helper.copyOutRequest(&thread, request, strlen(request), RESOURCE_ACCESS_READ);
+	BOOST_REQUIRE(helper.copyOutRequest(&thread, request, strlen(request), RESOURCE_ACCESS_READ));
 
 	uint32_t access = RESOURCE_ACCESS_READ;
 	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);
@@ -106,9 +106,28 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestInvalidParam)
 {
 	testCallHelper helper;
 	char request[] = "request";
-	helper.copyOutRequest(0, request, USER_TXA_SIZE + 1, 0);
+	BOOST_REQUIRE(!helper.copyOutRequest(0, request, USER_TXA_SIZE + 1, 0));
 	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDPARAM);
 }
 
+BOOST_AUTO_TEST_CASE(testCopyOutRequestValidNullPtr)
+{
+	testCallHelper helper;
+	BOOST_REQUIRE(helper.copyOutRequest(0, 0, 1, 0));
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
+}
+
+BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
+{
+	testCallHelper helper;
+	char request[] = "request";
+	BOOST_REQUIRE(helper.copyOutRequest(0, request, 0, 0));
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
+}
+
+BOOST_AUTO_TEST_CASE(testSetCopyBack)
+{
+	// TODO:
+}
 
 BOOST_AUTO_TEST_SUITE_END()
