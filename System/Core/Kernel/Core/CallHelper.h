@@ -21,6 +21,9 @@ private:
 	size_t buffer_size;
 	int flags;
 
+	template<typename T>
+	T returnStatus(int status, T value = 0);
+
 	void setStatus(int status);
 
 protected:

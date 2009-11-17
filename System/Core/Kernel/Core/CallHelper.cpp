@@ -23,9 +23,11 @@ CallHelper::CallHelper(const Task *task, id_t id,
 {
 }
 
-void CallHelper::setStatus(int status)
+template <typename T>
+T CallHelper::returnStatus(int status, T value)
 {
-	m_status = status;
+	if (value == 0) m_status = status;
+	return value;
 }
 
 int CallHelper::getStatus() const
@@ -38,19 +40,10 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	if (task == 0) {
 		// Режим ядра - поиск ресурсов осуществляется глобально.
 		Core::Resource *resource = Core::FindResource(id);
-		
-		if (resource == 0) {
-			setStatus(ERROR_INVALIDID);
-			return 0;
-		}
+		if (resource == 0) return returnStatus<ResourceThread *>(ERROR_INVALIDID);
 
 		ResourceThread *thread = resource->Call();
-		if (thread == 0) {
-			setStatus(ERROR_INVALIDID);
-			return 0;
-		}
-
-		return thread;
+		return returnStatus<ResourceThread *>(ERROR_INVALIDID, thread);
 	}
 	
 	// Режим пользователя - поиск осуществляется от процесса.
@@ -64,18 +57,12 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	ResourceInstance *instance = process->FindInstance(id);
 	if (instance != 0) {
 		ResourceThread *thread = instance->Call();
-		if (thread == 0) {
-			setStatus(ERROR_ACCESS);
-			return 0;
-		}
-	
-		return thread;
+		return returnStatus<ResourceThread *>(ERROR_ACCESS, thread);
 	}
 	
 	// TODO: поискать среди глобальных инстанций
 	// Не всех, а только доступных публично.
-	setStatus(ERROR_INVALIDID);
-	return 0;
+	return returnStatus<ResourceThread *>(ERROR_INVALIDID);
 }
 
 bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
@@ -84,10 +71,7 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 	if (request == 0) return true;
 	if (request_size == 0) return true;
 
-	if (request_size > USER_TXA_SIZE) {
-		setStatus(ERROR_INVALIDPARAM);
-		return false;
-	}
+	if (request_size > USER_TXA_SIZE) return returnStatus<bool>(ERROR_INVALIDPARAM);
 
 	STUB_ASSERT(!thread->createRequestArea(0, request_size, access),
 		    "Unable to create thread request area");
