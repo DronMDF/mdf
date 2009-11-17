@@ -33,6 +33,7 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
 	// верный вариант в режиме ядра
 	testProcess process;
 	ResourceThread *thread = helper.createCalledThread(0, process.getId());
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 	
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
@@ -48,6 +49,7 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadInUserMode)
 
 	const Task *task = reinterpret_cast<Task *>(thread);
 	BOOST_REQUIRE_EQUAL(helper.createCalledThread(task, thread->getId()), thread);
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadInvalidId)
@@ -55,7 +57,6 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadInvalidId)
 	testCallHelper helper;
 	const id_t invalid_id = 0xDEAD001D;
 	BOOST_REQUIRE(helper.createCalledThread(0, invalid_id) == 0);
-
 	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDID);
 }
 
@@ -65,7 +66,6 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadUncallable)
 	testResource uncallable;
 	uncallable.Register();
 	BOOST_REQUIRE(helper.createCalledThread(0, uncallable.getId()) == 0);
-
 	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDID);
 }
 
@@ -79,7 +79,6 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadWithoutCallAccess)
 
 	const Task *task = reinterpret_cast<Task *>(thread);
 	BOOST_REQUIRE(helper.createCalledThread(task, thread->getId()) == 0);
-
 	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_ACCESS);
 }
 
@@ -91,6 +90,7 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 
 	char request[] = "request";
 	BOOST_REQUIRE(helper.copyOutRequest(&thread, request, strlen(request), RESOURCE_ACCESS_READ));
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 
 	uint32_t access = RESOURCE_ACCESS_READ;
 	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);
