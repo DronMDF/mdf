@@ -102,4 +102,13 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 		m, m + strlen(request));
 }
 
+BOOST_AUTO_TEST_CASE(testCopyOutRequestInvalidParam)
+{
+	testCallHelper helper;
+	char request[] = "request";
+	helper.copyOutRequest(0, request, USER_TXA_SIZE + 1, 0);
+	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDPARAM);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
