@@ -20,6 +20,12 @@ private:
 protected:
 	Task *m_task;
 
+	struct {	// Возврат параметров осуществляется по этому адресу.
+		ResourceThread *thread;
+		laddr_t buffer;
+		size_t size;
+	} m_copyBack;
+	
 private:
 	// TODO: Здесь надо ввести новый тип, основанный на мемори, но иначе
 	// выделяющий память. сверху вниз, а не всю сразу, как memory. (Имеется
@@ -96,8 +102,7 @@ public:
 	bool createRequestArea(laddr_t offset, laddr_t size, uint32_t access);
 	bool copyIn(laddr_t dst, const void *src, size_t size);
 
-	virtual void setCopyBack(ResourceThread *thread, const void *request,
-				 size_t request_size);
+	virtual void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size);
 };
 
 } // namespace Core

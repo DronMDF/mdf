@@ -204,4 +204,20 @@ BOOST_AUTO_TEST_CASE(testCopyIn)
 		m, m + strlen(request));
 }
 
+BOOST_AUTO_TEST_CASE(testSetCopyBack)
+{
+	class inlineThread : public testThread {
+	public:
+		using testThread::m_copyBack;
+	} thread;
+
+	const laddr_t address = 0xADD0000;
+	const size_t size = 20;
+	thread.setCopyBack(&thread, address, size);
+
+	BOOST_REQUIRE(thread.m_copyBack.thread == &thread);
+	BOOST_REQUIRE_EQUAL(thread.m_copyBack.buffer, address);
+	BOOST_REQUIRE_EQUAL(thread.m_copyBack.size, size);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

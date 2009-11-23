@@ -23,6 +23,7 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	: Resource(),
 	  m_process(process),
 	  m_task(0),
+	  m_copyBack(),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -43,6 +44,7 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	: Resource(),
 	  m_process(process),
 	  m_task(StubTaskCreate (entry, this)),
+	  m_copyBack(),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -320,10 +322,11 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 	return true;
 }
 
-void ResourceThread::setCopyBack(ResourceThread *thread, const void *request,
-				 size_t request_size)
+void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size)
 {
-	// Пока ничего нету.
+	m_copyBack.thread = thread;
+	m_copyBack.buffer = buffer;
+	m_copyBack.size = size;
 }
 
 } // namespace Core

@@ -85,9 +85,10 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 }
 
 bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
-	const void *request, size_t request_size) const
+	const void *buffer, size_t size) const
 {
-	called->setCopyBack(thread, request, request_size);
+	laddr_t buffer_addr = reinterpret_cast<laddr_t>(buffer);
+	called->setCopyBack(thread, buffer_addr, size);
 	return true;	// А нафига здесь вообще ретурн?
 }
 

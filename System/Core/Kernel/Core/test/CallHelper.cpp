@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 	testThread thread;
 	class inlineThread : public testThread, private visit_mock {
 	public:
-		void setCopyBack(ResourceThread *, const void *, size_t) {
+		void setCopyBack(ResourceThread *, laddr_t, size_t) {
 			visit();
 		}
 	} calledthread;
