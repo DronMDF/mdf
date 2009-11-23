@@ -13,6 +13,8 @@
 #include "testThread.h"
 #include "testProcess.h"
 
+#include "TestHelpers.h"
+
 using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteCallHelper)
@@ -129,11 +131,16 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
 	testCallHelper helper;
-	testThread calledthread, thread;
+	testThread thread;
+	class inlineThread : public testThread, private visit_mock {
+	public:
+		void setCopyBack(ResourceThread *, const void *, size_t) {
+			visit();
+		}
+	} calledthread;
+	
 	char request[] = "request";
 	BOOST_REQUIRE(helper.setCopyBack(&calledthread, &thread, request, sizeof(request)));
-
-	// TODO: Проверить что копибек установился.
 }
 
 BOOST_AUTO_TEST_SUITE_END()

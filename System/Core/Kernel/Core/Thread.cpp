@@ -320,6 +320,12 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 	return true;
 }
 
+void ResourceThread::setCopyBack(ResourceThread *thread, const void *request,
+				 size_t request_size)
+{
+	// Пока ничего нету.
+}
+
 } // namespace Core
 
 extern "C"

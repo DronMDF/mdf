@@ -95,6 +95,9 @@ public:
 
 	bool createRequestArea(laddr_t offset, laddr_t size, uint32_t access);
 	bool copyIn(laddr_t dst, const void *src, size_t size);
+
+	virtual void setCopyBack(ResourceThread *thread, const void *request,
+				 size_t request_size);
 };
 
 } // namespace Core

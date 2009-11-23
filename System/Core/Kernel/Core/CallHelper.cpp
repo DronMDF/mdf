@@ -87,8 +87,8 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 	const void *request, size_t request_size) const
 {
-
-	return true;
+	called->setCopyBack(thread, request, request_size);
+	return true;	// А нафига здесь вообще ретурн?
 }
 
 int CallHelper::execute()
