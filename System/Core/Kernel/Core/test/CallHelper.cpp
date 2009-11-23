@@ -23,11 +23,27 @@ struct testCallHelper : public CallHelper {
 	testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
 
 	using CallHelper::getStatus;
+
+	using CallHelper::getCallerThread;
 	using CallHelper::createCalledThread;
 	using CallHelper::copyOutRequest;
 	using CallHelper::setCopyBack;
 };
-	
+
+BOOST_AUTO_TEST_CASE(testGetCallerThreadInKernelMode)
+{
+	testCallHelper helper;
+	BOOST_REQUIRE(helper.getCallerThread(0) == 0);
+}
+
+BOOST_AUTO_TEST_CASE(testGetCallerThreadInUserMode)
+{
+	testCallHelper helper;
+	testThread thread;
+	const Task *task = reinterpret_cast<Task *>(&thread);
+	BOOST_REQUIRE_EQUAL(helper.getCallerThread(task), &thread);
+}
+
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
 {
 	testCallHelper helper;

@@ -35,6 +35,17 @@ int CallHelper::getStatus() const
 	return m_status;
 }
 
+ResourceThread *CallHelper::getCallerThread(const Task *task) const
+{
+	if (task == 0) return 0;
+	
+	ResourceThread *thread =
+		reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
+	STUB_ASSERT(thread == 0, "No current thread");
+
+	return thread;
+}
+
 ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 {
 	if (task == 0) {
@@ -49,7 +60,7 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	}
 	
 	// Режим пользователя - поиск осуществляется от процесса.
-	ResourceThread *thread = 
+	ResourceThread *thread =
 		reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
 	STUB_ASSERT(thread == 0, "No current thread");
 
@@ -96,7 +107,7 @@ int CallHelper::execute()
 {
 	// TODO: вызывающий трэд надо определять
 	ResourceThread *caller = 0;
-	
+
 	ResourceThread *calledthread = createCalledThread(task, id);
 	if (calledthread == 0) return getStatus();
 
