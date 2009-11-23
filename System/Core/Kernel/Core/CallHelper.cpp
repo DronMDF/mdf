@@ -106,7 +106,7 @@ bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 int CallHelper::execute()
 {
 	// TODO: вызывающий трэд надо определять
-	ResourceThread *caller = 0;
+	ResourceThread *caller = getCallerThread(task);
 
 	ResourceThread *calledthread = createCalledThread(task, id);
 	if (calledthread == 0) return getStatus();
@@ -125,18 +125,12 @@ int CallHelper::execute()
 		// вызываемый просто ставится в очередь - управление не передается.
 		Scheduler().addActiveThread(calledthread);
 	} else {
-		// Синхронный вызов - вызывающий отправляется спать до завершения 
-		// работы вызываемого.
-		ResourceThread *thread = 
-			reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
-		STUB_ASSERT(thread == 0, "Sync call without thread");
-
 		// Текущая нить ждет вечно
-		thread->Sleep(CLOCK_MAX);
-		Scheduler().addInactiveThread(thread);
+		caller->Sleep(CLOCK_MAX);
+		Scheduler().addInactiveThread(caller);
 
 		// Новая нить уведомит когда завершится
-		calledthread->addObserver(thread, RESOURCE_EVENT_DESTROY);
+		calledthread->addObserver(caller, RESOURCE_EVENT_DESTROY);
 
 		// Новую нить запускаем.
 		calledthread->Run();
