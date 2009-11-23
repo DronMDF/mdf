@@ -131,16 +131,21 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
 	testCallHelper helper;
-	testThread thread;
+	
 	class inlineThread : public testThread, private visit_mock {
 	public:
-		void setCopyBack(ResourceThread *, laddr_t, size_t) {
+		void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size) {
 			visit();
+			BOOST_REQUIRE_EQUAL(thread, reinterpret_cast<ResourceThread *>(0x105EAD));
+			BOOST_REQUIRE_EQUAL(buffer, 0xADD0000);
+			BOOST_REQUIRE_EQUAL(size, 20);
 		}
 	} calledthread;
-	
-	char request[] = "request";
-	BOOST_REQUIRE(helper.setCopyBack(&calledthread, &thread, request, sizeof(request)));
+
+	// Параметры разнообразные для контроля и изоляции..
+	BOOST_REQUIRE(helper.setCopyBack(&calledthread,
+		reinterpret_cast<ResourceThread *>(0x105EAD),
+		reinterpret_cast<void *>(0xADD0000), 20));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
