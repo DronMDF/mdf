@@ -94,6 +94,9 @@ bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 
 int CallHelper::execute()
 {
+	// TODO: вызывающий трэд надо определять
+	ResourceThread *caller = 0;
+	
 	ResourceThread *calledthread = createCalledThread(task, id);
 	if (calledthread == 0) return getStatus();
 
@@ -103,8 +106,9 @@ int CallHelper::execute()
 		return getStatus();
 	}
 
-	// TODO: Если флаг READONLY не установлен и флаг COPY установлен,
-	// и буфер есть, то установить в calledthread CopyBackParams
+	if (!isSet(flags, RESOURCE_CALL_READONLY) && caller != 0) {
+		setCopyBack(calledthread, caller, buffer, buffer_size);
+	}
 
 	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
 		// вызываемый просто ставится в очередь - управление не передается.
