@@ -43,7 +43,7 @@ typedef uint32_t offset_t;
 typedef uint64_t paddr_t;
 typedef uint64_t clock_t;
 
-#define CLOCK_MAX 0x7fffffffffffffffULL
+#define CLOCK_MAX 0xffffffffffffffffULL
 
 typedef volatile uint32_t lock_t;
 

@@ -162,7 +162,7 @@ laddr_t ResourceThread::getEntry() const
 	return m_entry;
 }
 
-void ResourceThread::Sleep (timeout_t timeout)
+void ResourceThread::Sleep (clock_t timeout)
 {
 	m_wakeupstamp = timeout;
 	if (m_wakeupstamp != CLOCK_MAX) {
