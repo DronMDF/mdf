@@ -53,6 +53,12 @@ BOOST_AUTO_TEST_CASE(testFindCalledResource)
 	BOOST_REQUIRE(helper.findCalledResource(process.getId()) == &process);
 }
 
+BOOST_AUTO_TEST_CASE(testFindCalledResourceInvalidId)
+{
+	testCallHelper helper;
+	BOOST_REQUIRE(helper.findCalledResource(0xDEAD001D) == 0);
+}
+
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
 {
 	testCallHelper helper;
