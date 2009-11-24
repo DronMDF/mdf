@@ -9,6 +9,7 @@ typedef struct _Task Task;
 
 namespace Core {
 
+class Resource;
 class ResourceThread;
 	
 class CallHelper {
@@ -30,7 +31,10 @@ protected:
 	int getStatus() const;
 
 	ResourceThread *getCallerThread(const Task *task) const;
+	Resource *findCalledResource(id_t id) const;
+	
 	ResourceThread *createCalledThread(const Task *task, id_t id);
+	
 	bool copyOutRequest(ResourceThread *called, const void *request,
 			    size_t request_size, uint32_t access);
 

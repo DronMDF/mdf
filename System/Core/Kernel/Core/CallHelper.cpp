@@ -46,6 +46,11 @@ ResourceThread *CallHelper::getCallerThread(const Task *task) const
 	return thread;
 }
 
+Resource *CallHelper::findCalledResource(id_t id) const
+{
+	return Core::FindResource(id);
+}
+
 ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 {
 	if (task == 0) {
@@ -60,10 +65,7 @@ ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 	}
 	
 	// Режим пользователя - поиск осуществляется от процесса.
-	ResourceThread *thread =
-		reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
-	STUB_ASSERT(thread == 0, "No current thread");
-
+	ResourceThread *thread = getCallerThread(task);
 	ResourceProcess *process = thread->getProcess();
 	STUB_ASSERT(process == 0, "no current process");
 
@@ -105,10 +107,17 @@ bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 
 int CallHelper::execute()
 {
-	// TODO: вызывающий трэд надо определять
 	ResourceThread *caller = getCallerThread(task);
 
 	ResourceThread *calledthread = createCalledThread(task, id);
+
+	if (caller) {
+		// User mode
+
+	} else {
+		// Kernel mode
+	}
+	
 	if (calledthread == 0) return getStatus();
 
 	const uint32_t access = RESOURCE_ACCESS_READ |

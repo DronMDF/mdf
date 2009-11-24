@@ -25,6 +25,8 @@ struct testCallHelper : public CallHelper {
 	using CallHelper::getStatus;
 
 	using CallHelper::getCallerThread;
+	using CallHelper::findCalledResource;
+	
 	using CallHelper::createCalledThread;
 	using CallHelper::copyOutRequest;
 	using CallHelper::setCopyBack;
@@ -42,6 +44,13 @@ BOOST_AUTO_TEST_CASE(testGetCallerThreadInUserMode)
 	testThread thread;
 	const Task *task = reinterpret_cast<Task *>(&thread);
 	BOOST_REQUIRE_EQUAL(helper.getCallerThread(task), &thread);
+}
+
+BOOST_AUTO_TEST_CASE(testFindCalledResource)
+{
+	testCallHelper helper;
+	testProcess process;
+	BOOST_REQUIRE(helper.findCalledResource(process.getId()) == &process);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
