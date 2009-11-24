@@ -64,6 +64,10 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 void CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 	const void *buffer, size_t size) const
 {
+	if (thread == 0) return;
+	if (buffer == 0) return;
+	if (size == 0) return;
+	
 	laddr_t buffer_addr = reinterpret_cast<laddr_t>(buffer);
 	called->setCopyBack(thread, buffer_addr, size);
 }
@@ -94,7 +98,7 @@ int CallHelper::execute()
 		return ERROR_INVALIDPARAM;
 	}
 
-	if (!isSet(flags, RESOURCE_CALL_READONLY) && caller != 0) {
+	if (!isSet(flags, RESOURCE_CALL_READONLY)) {
 		setCopyBack(called, caller, buffer, buffer_size);
 	}
 

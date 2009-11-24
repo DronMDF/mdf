@@ -153,4 +153,28 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 		reinterpret_cast<void *>(0xADD0000), 20);
 }
 
+BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
+{
+	testCallHelper helper;
+
+	class inlineThread : public testThread {
+	public:
+		void setCopyBack(ResourceThread *, laddr_t, size_t) {
+			throw 0;
+		}
+	} calledthread;
+
+	// Валидные игнорирования
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(&calledthread,
+		0, reinterpret_cast<void *>(0xADD0000), 20));
+
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(&calledthread,
+		reinterpret_cast<ResourceThread *>(0x105EAD), 0, 20));
+
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(&calledthread,
+		reinterpret_cast<ResourceThread *>(0x105EAD),
+		reinterpret_cast<void *>(0xADD0000), 0));
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
