@@ -102,10 +102,12 @@ int CallHelper::execute()
 		setCopyBack(called, caller, buffer, buffer_size);
 	}
 
-	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
+	if (isSet(flags, RESOURCE_CALL_ASYNC)) {
 		// вызываемый просто ставится в очередь - управление не передается.
 		Scheduler().addActiveThread(called);
 	} else {
+		STUB_ASSERT(caller != 0, "Fatal in kernel mode");
+		
 		// Текущая нить ждет вечно
 		caller->Sleep(CLOCK_MAX);
 		Scheduler().addInactiveThread(caller);
