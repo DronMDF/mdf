@@ -109,40 +109,43 @@ int CallHelper::execute()
 {
 	ResourceThread *caller = getCallerThread(task);
 
-	ResourceThread *calledthread = createCalledThread(task, id);
+	ResourceThread *called = createCalledThread(task, id);
 
 	if (caller) {
 		// User mode
 
 	} else {
 		// Kernel mode
+		if (Resource *resource = findCalledResource(id)) {
+			called = resource->Call();
+		}
 	}
 	
-	if (calledthread == 0) return getStatus();
+	if (called == 0) return getStatus();
 
 	const uint32_t access = RESOURCE_ACCESS_READ |
 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
-	if (!copyOutRequest(calledthread, buffer, buffer_size, access)) {
+	if (!copyOutRequest(called, buffer, buffer_size, access)) {
 		return getStatus();
 	}
 
 	if (!isSet(flags, RESOURCE_CALL_READONLY) && caller != 0) {
-		setCopyBack(calledthread, caller, buffer, buffer_size);
+		setCopyBack(called, caller, buffer, buffer_size);
 	}
 
 	if ((flags & RESOURCE_CALL_ASYNC) != 0) {
 		// вызываемый просто ставится в очередь - управление не передается.
-		Scheduler().addActiveThread(calledthread);
+		Scheduler().addActiveThread(called);
 	} else {
 		// Текущая нить ждет вечно
 		caller->Sleep(CLOCK_MAX);
 		Scheduler().addInactiveThread(caller);
 
 		// Новая нить уведомит когда завершится
-		calledthread->addObserver(caller, RESOURCE_EVENT_DESTROY);
+		called->addObserver(caller, RESOURCE_EVENT_DESTROY);
 
 		// Новую нить запускаем.
-		calledthread->Run();
+		called->Run();
 	}
 
 	return SUCCESS;
