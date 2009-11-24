@@ -148,9 +148,9 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 	} calledthread;
 
 	// Параметры разнообразные для контроля и изоляции..
-	BOOST_REQUIRE(helper.setCopyBack(&calledthread,
+	helper.setCopyBack(&calledthread,
 		reinterpret_cast<ResourceThread *>(0x105EAD),
-		reinterpret_cast<void *>(0xADD0000), 20));
+		reinterpret_cast<void *>(0xADD0000), 20);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

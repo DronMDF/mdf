@@ -27,9 +27,9 @@ protected:
 	ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
 	
 	bool copyOutRequest(ResourceThread *called, const void *request,
-			    size_t request_size, uint32_t access);
+			    size_t request_size, uint32_t access) const;
 
-	bool setCopyBack(ResourceThread *called, ResourceThread *thread,
+	void setCopyBack(ResourceThread *called, ResourceThread *thread,
 		const void *request, size_t request_size) const;
 
 public:

@@ -47,7 +47,7 @@ ResourceInstance *CallHelper::getCalledInstance(ResourceThread *thread, id_t id)
 }
 
 bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
-				size_t request_size, uint32_t access)
+				size_t request_size, uint32_t access) const
 {
 	if (request == 0) return true;
 	if (request_size == 0) return true;
@@ -61,12 +61,11 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 	return true;
 }
 
-bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
+void CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 	const void *buffer, size_t size) const
 {
 	laddr_t buffer_addr = reinterpret_cast<laddr_t>(buffer);
 	called->setCopyBack(thread, buffer_addr, size);
-	return true;	// А нафига здесь вообще ретурн?
 }
 
 int CallHelper::execute()
