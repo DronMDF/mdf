@@ -35,8 +35,6 @@ protected:
 	Resource *findCalledResource(id_t id) const;
 	ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
 	
-	ResourceThread *createCalledThread(const Task *task, id_t id);
-	
 	bool copyOutRequest(ResourceThread *called, const void *request,
 			    size_t request_size, uint32_t access);
 

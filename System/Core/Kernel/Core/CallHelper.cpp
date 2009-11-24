@@ -59,37 +59,6 @@ ResourceInstance *CallHelper::getCalledInstance(ResourceThread *thread, id_t id)
 	return process->FindInstance(id);
 }
 
-ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
-{
-	if (task == 0) {
-		// Режим ядра - поиск ресурсов осуществляется глобально.
-		Core::Resource *resource = Core::FindResource(id);
-		if (resource == 0) return returnStatus<ResourceThread *>(ERROR_INVALIDID);
-
-		ResourceThread *thread = resource->Call();
-		if (thread == 0) return returnStatus<ResourceThread *>(ERROR_INVALIDID);
-
-		return thread;
-	}
-	
-	// Режим пользователя - поиск осуществляется от процесса.
-	ResourceThread *thread = getCallerThread(task);
-	ResourceProcess *process = thread->getProcess();
-	STUB_ASSERT(process == 0, "no current process");
-
-	ResourceInstance *instance = process->FindInstance(id);
-	if (instance != 0) {
-		ResourceThread *thread = instance->Call();
-		if (thread == 0) return returnStatus<ResourceThread *>(ERROR_ACCESS);
-
-		return thread;
-	}
-	
-	// TODO: поискать среди глобальных инстанций
-	// Не всех, а только доступных публично.
-	return returnStatus<ResourceThread *>(ERROR_INVALIDID);
-}
-
 bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 				size_t request_size, uint32_t access)
 {
@@ -116,8 +85,7 @@ bool CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 int CallHelper::execute()
 {
 	ResourceThread *caller = getCallerThread(task);
-
-	ResourceThread *called = createCalledThread(task, id);
+	ResourceThread *called = 0;
 
 	if (caller) {
 		// User mode
@@ -132,7 +100,7 @@ int CallHelper::execute()
 		}
 	}
 	
-	if (called == 0) return getStatus();
+	if (called == 0) return ERROR_INVALIDID;
 
 	const uint32_t access = RESOURCE_ACCESS_READ |
 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
