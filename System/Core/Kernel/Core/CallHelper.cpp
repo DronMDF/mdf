@@ -121,7 +121,10 @@ int CallHelper::execute()
 
 	if (caller) {
 		// User mode
-
+		if (ResourceInstance *inst = getCalledInstance(caller, id)) {
+			called = inst->Call();
+			if (called == 0) return ERROR_ACCESS;
+		}
 	} else {
 		// Kernel mode
 		if (Resource *resource = findCalledResource(id)) {
