@@ -51,6 +51,14 @@ Resource *CallHelper::findCalledResource(id_t id) const
 	return Core::FindResource(id);
 }
 
+ResourceInstance *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
+{
+	ResourceProcess *process = thread->getProcess();
+	STUB_ASSERT(process == 0, "no current process");
+
+	return process->FindInstance(id);
+}
+
 ResourceThread *CallHelper::createCalledThread(const Task *task, id_t id)
 {
 	if (task == 0) {

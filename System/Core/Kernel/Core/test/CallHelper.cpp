@@ -13,6 +13,8 @@
 #include "testThread.h"
 #include "testProcess.h"
 
+#include "../ResourceInstance.h"
+
 #include "TestHelpers.h"
 
 using namespace Core;
@@ -26,6 +28,7 @@ struct testCallHelper : public CallHelper {
 
 	using CallHelper::getCallerThread;
 	using CallHelper::findCalledResource;
+	using CallHelper::getCalledInstance;
 	
 	using CallHelper::createCalledThread;
 	using CallHelper::copyOutRequest;
@@ -71,6 +74,20 @@ BOOST_AUTO_TEST_CASE(testCreateCalledThreadFromProcessInKernelMode)
 	
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
+}
+
+BOOST_AUTO_TEST_CASE(testGetCalledInstance)
+{
+	testCallHelper helper;
+
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
+
+	ResourceInstance *inst = helper.getCalledInstance(thread, thread->getId());
+	BOOST_REQUIRE(inst != 0);
+	BOOST_REQUIRE(inst->getResource() == thread);
+	BOOST_REQUIRE_EQUAL(inst->Call(), thread);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateCalledThreadInUserMode)

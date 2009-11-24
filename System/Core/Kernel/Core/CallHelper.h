@@ -11,6 +11,7 @@ namespace Core {
 
 class Resource;
 class ResourceThread;
+class ResourceInstance;
 	
 class CallHelper {
 private:
@@ -32,6 +33,7 @@ protected:
 
 	ResourceThread *getCallerThread(const Task *task) const;
 	Resource *findCalledResource(id_t id) const;
+	ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
 	
 	ResourceThread *createCalledThread(const Task *task, id_t id);
 	
