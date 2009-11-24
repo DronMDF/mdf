@@ -106,7 +106,7 @@ int CallHelper::execute()
 		// вызываемый просто ставится в очередь - управление не передается.
 		Scheduler().addActiveThread(called);
 	} else {
-		STUB_ASSERT(caller != 0, "Fatal in kernel mode");
+		STUB_ASSERT(caller == 0, "Fatal in kernel mode");
 		
 		// Текущая нить ждет вечно
 		caller->Sleep(CLOCK_MAX);
