@@ -18,21 +18,8 @@ namespace Core {
 
 CallHelper::CallHelper(const Task *task, id_t id, 
 		       const void *buffer, size_t buffer_size, int flags)
-	: m_status(SUCCESS), task(task), id(id),
-	  buffer(buffer), buffer_size(buffer_size), flags(flags)
+	: task(task), id(id), buffer(buffer), buffer_size(buffer_size), flags(flags)
 {
-}
-
-template <typename T>
-T CallHelper::returnStatus(int status)
-{
-	m_status = status;
-	return 0;
-}
-
-int CallHelper::getStatus() const
-{
-	return m_status;
 }
 
 ResourceThread *CallHelper::getCallerThread(const Task *task) const
@@ -65,7 +52,7 @@ bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,
 	if (request == 0) return true;
 	if (request_size == 0) return true;
 
-	if (request_size > USER_TXA_SIZE) return returnStatus<bool>(ERROR_INVALIDPARAM);
+	if (request_size > USER_TXA_SIZE) return false;
 
 	STUB_ASSERT(!thread->createRequestArea(0, request_size, access),
 		    "Unable to create thread request area");
@@ -105,7 +92,7 @@ int CallHelper::execute()
 	const uint32_t access = RESOURCE_ACCESS_READ |
 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
 	if (!copyOutRequest(called, buffer, buffer_size, access)) {
-		return getStatus();
+		return ERROR_INVALIDPARAM;
 	}
 
 	if (!isSet(flags, RESOURCE_CALL_READONLY) && caller != 0) {

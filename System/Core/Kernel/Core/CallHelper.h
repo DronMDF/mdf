@@ -15,22 +15,13 @@ class ResourceInstance;
 	
 class CallHelper {
 private:
-	int m_status;
-	
 	const Task *task;
 	id_t id;
 	const void *buffer;
 	size_t buffer_size;
 	int flags;
 
-	template<typename T>
-	T returnStatus(int status);
-
-	void setStatus(int status);
-
 protected:
-	int getStatus() const;
-
 	ResourceThread *getCallerThread(const Task *task) const;
 	Resource *findCalledResource(id_t id) const;
 	ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;

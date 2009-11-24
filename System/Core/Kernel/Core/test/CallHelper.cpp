@@ -24,8 +24,6 @@ BOOST_AUTO_TEST_SUITE(suiteCallHelper)
 struct testCallHelper : public CallHelper {
 	testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
 
-	using CallHelper::getStatus;
-
 	using CallHelper::getCallerThread;
 	using CallHelper::findCalledResource;
 	using CallHelper::getCalledInstance;
@@ -104,7 +102,6 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 
 	char request[] = "request";
 	BOOST_REQUIRE(helper.copyOutRequest(&thread, request, strlen(request), RESOURCE_ACCESS_READ));
-	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 
 	uint32_t access = RESOURCE_ACCESS_READ;
 	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);
@@ -121,14 +118,12 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestInvalidParam)
 	testCallHelper helper;
 	char request[] = "request";
 	BOOST_REQUIRE(!helper.copyOutRequest(0, request, USER_TXA_SIZE + 1, 0));
-	BOOST_REQUIRE_EQUAL(helper.getStatus(), ERROR_INVALIDPARAM);
 }
 
 BOOST_AUTO_TEST_CASE(testCopyOutRequestValidNullPtr)
 {
 	testCallHelper helper;
 	BOOST_REQUIRE(helper.copyOutRequest(0, 0, 1, 0));
-	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 }
 
 BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
@@ -136,7 +131,6 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
 	testCallHelper helper;
 	char request[] = "request";
 	BOOST_REQUIRE(helper.copyOutRequest(0, request, 0, 0));
-	BOOST_REQUIRE_EQUAL(helper.getStatus(), SUCCESS);
 }
 
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
