@@ -176,5 +176,35 @@ BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
 		reinterpret_cast<void *>(0xADD0000), 0));
 }
 
+// TODO: Пока не заработает, только набросал...
+// BOOST_AUTO_TEST_CASE(testRunSinchronized)
+// {
+// 	testScheduler scheduler;
+// 	scheduler.inactives = new testSubScheduler;
+// 	
+// 	testCallHelper helper;
+// 	testThread caller;
+// 	
+// 	class inlineThread : public testThread, private order_mock<2> {
+// 	private:
+// 		ResourceThread *m_caller
+// 	public:
+// 		inlineThread(ResourceThread *thread) : m_caller(thread) {}
+// 		void addObserver(ResourceThread *thread, uint32_t event) {
+// 			order(1);
+// 			BOOST_REQUIRE_EQUAL(thread, m_caller);
+// 			BOOST_REQUIRE_EQUAL(event, RESOURCE_EVENT_DESTROY);
+// 		}
+// 		void Run() { 
+// 			order(2); 
+// 		}
+// 	} calledthread(&caller);
+// 	
+// 	helper.RunSinchronized(&caller, &called);
+// 	BOOST_REQUIRE_EQUAL(caller.getWakeupStamp(), CLOCK_MAX);
+// 	BOOST_REQUIRE_EQUAL(
+// 		dynamic_cast<testSubScheduler *>(scheduler.inactives).thread,
+// 			&caller);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
