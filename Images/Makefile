@@ -3,9 +3,8 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-GRUB2_SVN=http://svn.savannah.gnu.org/svn/grub/trunk/grub2
-# 2316 - появилось меню, но как буд-то не дочитал grub.cfg, только первый пункт
-GRUB2_REV=2440
+GRUB2_VERSION=1.97.1
+GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.gz
 
 GRUB2_ROOT=${CURDIR}/grub2
 
@@ -135,17 +134,28 @@ rootclean:
 	rm -rf MDF.Root
 
 .PHONY: grub2 grubclean
-grub2 : ${GRUB2_ROOT}/grub-r${GRUB2_REV}
+grub2 : ${GRUB2_ROOT}/grub-${GRUB2_VERSION}
 
-${GRUB2_ROOT}/grub-r${GRUB2_REV} :
-	rm -rf ${MDF_TEMP}/grub2 ${GRUB2_ROOT}
-	svn export ${GRUB2_SVN}@${GRUB2_REV} ${MDF_TEMP}/grub2
-	patch -d ${MDF_TEMP}/grub2 -p0 < ${CURDIR}/mb_elf_sym.patch
-	cd ${MDF_TEMP}/grub2; ./autogen.sh
-	cd ${MDF_TEMP}/grub2; ./configure --prefix=${GRUB2_ROOT} \
-		--disable-largefile
-	make -C ${MDF_TEMP}/grub2 all install
-	touch ${GRUB2_ROOT}/grub-r${GRUB2_REV}
+${GRUB2_ROOT}/grub-${GRUB2_VERSION} :
+	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE} ];  then \
+		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE} \
+			-o ${MDF_FILES}/${GRUB2_ARCHIVE}; \
+	fi
+	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE}.sig ]; then \
+		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig \
+			-o ${MDF_FILES}/${GRUB2_ARCHIVE}.sig; \
+	fi
+
+	gpg --keyserver keys.gnupg.net --recv-keys DEA2C38E
+	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
+
+	rm -rf ${MDF_TEMP}/grub-${GRUB2_VERSION} ${GRUB2_ROOT}
+	tar -xz -C ${MDF_TEMP} -f ${MDF_FILES}/${GRUB2_ARCHIVE} 
+	patch -d ${MDF_TEMP}/grub-${GRUB2_VERSION} -p0 < ${CURDIR}/mb_elf_sym.patch
+	cd ${MDF_TEMP}/grub-${GRUB2_VERSION}; ./configure \
+		--prefix=${GRUB2_ROOT} --disable-largefile --disable-werror
+	make -C ${MDF_TEMP}/grub-${GRUB2_VERSION} all install
+	touch $@
 
 grubclean:
 	rm -rf grub2
