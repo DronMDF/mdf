@@ -123,16 +123,7 @@ int CallHelper::execute()
 		Scheduler().addActiveThread(called);
 	} else {
 		STUB_ASSERT(caller == 0, "Fatal in kernel mode");
-		
-		// Текущая нить ждет вечно
-		caller->Sleep(CLOCK_MAX);
-		Scheduler().addInactiveThread(caller);
-
-		// Новая нить уведомит когда завершится
-		called->addObserver(caller, RESOURCE_EVENT_DESTROY);
-
-		// Новую нить запускаем.
-		called->Run();
+		runSinchronized(caller, called);
 	}
 
 	return SUCCESS;
