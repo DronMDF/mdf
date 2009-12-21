@@ -72,6 +72,22 @@ void CallHelper::setCopyBack(ResourceThread *called, ResourceThread *thread,
 	called->setCopyBack(thread, buffer_addr, size);
 }
 
+void CallHelper::runSinchronized(ResourceThread *caller, ResourceThread *called) const
+{
+	// Текущая нить ждет вечно
+	caller->Sleep(CLOCK_MAX);
+	Scheduler().addInactiveThread(caller);
+
+	// Новая нить уведомит когда завершится
+	called->addObserver(caller, RESOURCE_EVENT_DESTROY);
+
+	// Новую нить запускаем.
+	called->Run();
+	
+	// TODO: Нужно установить статус в caller, но пока он всегда SUCCESS, 
+	// 	Возможно потом появятся всякие TIMEOUT например.
+}
+
 int CallHelper::execute()
 {
 	ResourceThread *caller = getCallerThread(task);

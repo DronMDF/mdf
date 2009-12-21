@@ -32,6 +32,8 @@ protected:
 	void setCopyBack(ResourceThread *called, ResourceThread *thread,
 		const void *request, size_t request_size) const;
 
+	void runSinchronized(ResourceThread *caller, ResourceThread *called) const;
+		
 public:
 	CallHelper(const Task *task, id_t id, 
 		   const void *buffer, size_t buffer_size, int flags);

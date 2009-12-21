@@ -84,7 +84,7 @@ public:
 
 	bool isActive () const;
 
-	void Run();
+	virtual void Run();
 
 	virtual void Activate();
 	virtual bool Deactivate();

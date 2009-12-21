@@ -75,7 +75,7 @@ public:
 	// TODO: Эту функцию надо переименовать не знаю во что, но инстанции она не удаляет.
 	void DeleteInstance();
 
-	void addObserver(ResourceThread *thread, uint32_t event);
+	virtual void addObserver(ResourceThread *thread, uint32_t event);
 	void setEvent(uint32_t event);
 };
 
