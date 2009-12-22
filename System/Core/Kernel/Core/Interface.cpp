@@ -159,6 +159,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 extern "C"
 int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, int flags)
 {
+	CorePrint("Call\n");
 	CallHelper helper(task, id, buffer, buffer_size, flags);
 	return helper.execute();
 }
