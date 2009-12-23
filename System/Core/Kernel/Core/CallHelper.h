@@ -21,10 +21,16 @@ private:
 	size_t buffer_size;
 	int flags;
 
+	CallHelper(const CallHelper &);
+	CallHelper &operator=(const CallHelper &);
+
 protected:
+	ResourceThread *m_caller;
+	ResourceThread *m_called;
+	
 	ResourceThread *getCallerThread(const Task *task) const;
 	Resource *findCalledResource(id_t id) const;
-	ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
+	virtual ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
 	
 	bool copyOutRequest(ResourceThread *called, const void *request,
 			    size_t request_size, uint32_t access) const;
@@ -37,8 +43,14 @@ protected:
 public:
 	CallHelper(const Task *task, id_t id, 
 		   const void *buffer, size_t buffer_size, int flags);
-		   
+
 	int execute();
+
+	CallHelper(const Task *task);
+	virtual ~CallHelper();
+	
+	bool checkCalledAccess(id_t id);
+	bool createCalled(id_t id);
 };
 
 } // namespace Core

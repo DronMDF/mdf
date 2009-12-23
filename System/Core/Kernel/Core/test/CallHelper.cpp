@@ -25,6 +25,7 @@ BOOST_AUTO_TEST_SUITE(suiteCallHelper)
 
 struct testCallHelper : public CallHelper {
 	testCallHelper() : CallHelper(0, 0, 0, 0, 0) {}
+	testCallHelper(const Task *task) : CallHelper(task) {}
 
 	using CallHelper::getCallerThread;
 	using CallHelper::findCalledResource;
@@ -34,7 +35,24 @@ struct testCallHelper : public CallHelper {
 	using CallHelper::setCopyBack;
 
 	using CallHelper::runSinchronized;
+
+	using CallHelper::m_caller;
+	using CallHelper::m_called;
 };
+
+BOOST_AUTO_TEST_CASE(testCreateHelperInKernelMode)
+{
+	testCallHelper helper(0);
+	BOOST_REQUIRE(helper.m_caller == 0);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateHelperInUserMode)
+{
+	testThread thread;
+	const Task *task = reinterpret_cast<Task *>(&thread);
+	testCallHelper helper(task);
+	BOOST_REQUIRE_EQUAL(helper.m_caller, &thread);
+}
 
 BOOST_AUTO_TEST_CASE(testGetCallerThreadInKernelMode)
 {
@@ -50,19 +68,6 @@ BOOST_AUTO_TEST_CASE(testGetCallerThreadInUserMode)
 	BOOST_REQUIRE_EQUAL(helper.getCallerThread(task), &thread);
 }
 
-BOOST_AUTO_TEST_CASE(testFindCalledResource)
-{
-	testCallHelper helper;
-	testProcess process;
-	BOOST_REQUIRE(helper.findCalledResource(process.getId()) == &process);
-}
-
-BOOST_AUTO_TEST_CASE(testFindCalledResourceInvalidId)
-{
-	testCallHelper helper;
-	BOOST_REQUIRE(helper.findCalledResource(0xDEAD001D) == 0);
-}
-
 BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 {
 	testCallHelper helper;
@@ -76,6 +81,81 @@ BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 	BOOST_REQUIRE(inst->getResource() == thread);
 	BOOST_REQUIRE_EQUAL(inst->Call(), thread);
 }
+
+BOOST_AUTO_TEST_CASE(testCheckCalledAccessInKernelMode)
+{
+	CallHelper helper(0);
+	testThread called;
+	BOOST_REQUIRE(helper.checkCalledAccess(called.getId()));
+}
+
+BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
+{
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
+
+	struct testCallHelper : public CallHelper, private visit_mock {
+		testCallHelper() : CallHelper(0) {}
+		ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const {
+			visit();
+			return CallHelper::getCalledInstance(thread, id);
+		}
+		using CallHelper::m_caller;
+	} helper;
+	helper.m_caller = thread;
+
+	BOOST_REQUIRE(helper.checkCalledAccess(thread->getId()));
+}
+
+BOOST_AUTO_TEST_CASE(testCheckNoAccess)
+{
+	testProcess process;
+	ResourceThread *thread = new testThread(&process);
+	process.Attach(thread, RESOURCE_ACCESS_READ, 0);
+
+	CallHelper helper(reinterpret_cast<Task *>(thread));
+	BOOST_REQUIRE(!helper.checkCalledAccess(thread->getId()));
+}
+
+BOOST_AUTO_TEST_CASE(testFindCalledResource)
+{
+	testCallHelper helper(0);
+	testProcess process;
+	BOOST_REQUIRE(helper.findCalledResource(process.getId()) == &process);
+}
+
+BOOST_AUTO_TEST_CASE(testFindCalledResourceInvalidId)
+{
+	testCallHelper helper(0);
+	BOOST_REQUIRE(helper.findCalledResource(0xDEAD001D) == 0);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateCalledAlready)
+{
+	testCallHelper helper(0);
+	testThread caller;
+	helper.m_called = &caller;
+	BOOST_REQUIRE(helper.createCalled(0));
+}
+
+BOOST_AUTO_TEST_CASE(testCreateCalled)
+{
+	testCallHelper helper(0);
+	testThread thread;
+	BOOST_REQUIRE(helper.createCalled(thread.getId()));
+	BOOST_REQUIRE_EQUAL(helper.m_called, &thread);
+}
+
+BOOST_AUTO_TEST_CASE(testCreateUncalled)
+{
+	testResource uncallable;
+	uncallable.Register();
+
+	CallHelper helper(0);
+	BOOST_REQUIRE(!helper.createCalled(uncallable.getId()));
+}
+
 
 BOOST_AUTO_TEST_CASE(testCallUncallable)
 {

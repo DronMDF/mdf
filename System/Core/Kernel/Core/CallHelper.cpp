@@ -22,6 +22,15 @@ CallHelper::CallHelper(const Task *task, id_t id,
 {
 }
 
+CallHelper::CallHelper(const Task *task)
+	: m_caller(getCallerThread(task)), m_called(0)
+{
+}
+
+CallHelper::~CallHelper()
+{
+}
+
 ResourceThread *CallHelper::getCallerThread(const Task *task) const
 {
 	if (task == 0) return 0;
@@ -33,17 +42,41 @@ ResourceThread *CallHelper::getCallerThread(const Task *task) const
 	return thread;
 }
 
-Resource *CallHelper::findCalledResource(id_t id) const
-{
-	return Core::FindResource(id);
-}
-
 ResourceInstance *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
 {
 	ResourceProcess *process = thread->getProcess();
 	STUB_ASSERT(process == 0, "no current process");
 
 	return process->FindInstance(id);
+}
+
+bool CallHelper::checkCalledAccess(id_t id)
+{
+	if (m_caller == 0) return true;
+
+	if (ResourceInstance *inst = getCalledInstance(m_caller, id)) {
+		m_called = inst->Call();
+		if (m_called == 0) return false;
+	}
+
+	return true;
+}
+
+Resource *CallHelper::findCalledResource(id_t id) const
+{
+	return Core::FindResource(id);
+}
+
+bool CallHelper::createCalled(id_t id)
+{
+	if (m_called != 0) return true;	// Определился на предыдущем шаге
+		
+	STUB_ASSERT(m_caller != 0, "call checkCalledAccess first");
+	if (Resource *resource = findCalledResource(id)) {
+		m_called = resource->Call();
+	}
+
+	return m_called != 0;
 }
 
 bool CallHelper::copyOutRequest(ResourceThread *thread, const void *request,

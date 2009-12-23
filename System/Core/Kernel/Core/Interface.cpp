@@ -159,9 +159,34 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 extern "C"
 int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, int flags)
 {
-	CorePrint("Call\n");
 	CallHelper helper(task, id, buffer, buffer_size, flags);
 	return helper.execute();
+
+//	CallHelper helper(task);
+//
+//	if (!helper.checkCalledId(id)) return ERROR_ACCESS;
+//	if (!helper.createCalled(id)) return ERROR_INVALIDID;
+//
+// TODO: И этот код немного перепахать
+// 	const uint32_t access = RESOURCE_ACCESS_READ |
+// 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
+// 	if (!copyOutRequest(called, buffer, buffer_size, access)) {
+// 		return ERROR_INVALIDPARAM;
+// 	}
+// 
+// 	if (!isSet(flags, RESOURCE_CALL_READONLY)) {
+// 		setCopyBack(called, caller, buffer, buffer_size);
+// 	}
+// 
+// 	if (isSet(flags, RESOURCE_CALL_ASYNC)) {
+// 		// вызываемый просто ставится в очередь - управление не передается.
+// 		Scheduler().addActiveThread(called);
+// 	} else {
+// 		STUB_ASSERT(caller == 0, "Fatal in kernel mode");
+// 		runSinchronized(caller, called);
+// 	}
+// 
+// 	return SUCCESS;
 }
 
 extern "C"

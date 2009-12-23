@@ -139,11 +139,11 @@ grub2 : ${GRUB2_ROOT}/grub-${GRUB2_VERSION}
 ${GRUB2_ROOT}/grub-${GRUB2_VERSION} :
 	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE} ];  then \
 		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE} \
-			-o ${MDF_FILES}/${GRUB2_ARCHIVE}; \
+			-O ${MDF_FILES}/${GRUB2_ARCHIVE}; \
 	fi
 	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE}.sig ]; then \
 		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig \
-			-o ${MDF_FILES}/${GRUB2_ARCHIVE}.sig; \
+			-O ${MDF_FILES}/${GRUB2_ARCHIVE}.sig; \
 	fi
 
 	gpg --keyserver keys.gnupg.net --recv-keys DEA2C38E
