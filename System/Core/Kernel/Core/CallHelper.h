@@ -15,12 +15,6 @@ class ResourceInstance;
 	
 class CallHelper {
 private:
-	const Task *task;
-	id_t id;
-	const void *buffer;
-	size_t buffer_size;
-	int flags;
-
 	CallHelper(const CallHelper &);
 	CallHelper &operator=(const CallHelper &);
 
@@ -29,23 +23,9 @@ protected:
 	ResourceThread *m_called;
 	
 	ResourceThread *getCallerThread(const Task *task) const;
-	Resource *findCalledResource(id_t id) const;
 	virtual ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const;
-	
-	bool copyOutRequest(ResourceThread *called, const void *request,
-			    size_t request_size, uint32_t access) const;
 
-	void setCopyBack(ResourceThread *called, ResourceThread *thread,
-		const void *request, size_t request_size) const;
-
-	void runSinchronized(ResourceThread *caller, ResourceThread *called) const;
-		
 public:
-	CallHelper(const Task *task, id_t id, 
-		   const void *buffer, size_t buffer_size, int flags);
-
-	int execute();
-
 	CallHelper(const Task *task);
 	virtual ~CallHelper();
 	
@@ -54,6 +34,8 @@ public:
 
 	bool copyOutRequest(const void *request, size_t size, uint32_t access) const;
 	void setCopyBack(const void *request, size_t size) const;
+
+	void runAsinchronized() const;
 	void runSinchronized() const;
 };
 
