@@ -164,18 +164,17 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 
 //	CallHelper helper(task);
 //
-//	if (!helper.checkCalledId(id)) return ERROR_ACCESS;
+//	if (!helper.checkCalledAccess(id)) return ERROR_ACCESS;
 //	if (!helper.createCalled(id)) return ERROR_INVALIDID;
 //
-// TODO: И этот код немного перепахать
 // 	const uint32_t access = RESOURCE_ACCESS_READ |
 // 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
-// 	if (!copyOutRequest(called, buffer, buffer_size, access)) {
-// 		return ERROR_INVALIDPARAM;
-// 	}
+// 	if (!helper.copyOutRequest(buffer, buffer_size, access)) {
+//		return ERROR_INVALIDPARAM;
+//	}
 // 
 // 	if (!isSet(flags, RESOURCE_CALL_READONLY)) {
-// 		setCopyBack(called, caller, buffer, buffer_size);
+// 		helper.setCopyBack(buffer, buffer_size);
 // 	}
 // 
 // 	if (isSet(flags, RESOURCE_CALL_ASYNC)) {
@@ -183,7 +182,7 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 // 		Scheduler().addActiveThread(called);
 // 	} else {
 // 		STUB_ASSERT(caller == 0, "Fatal in kernel mode");
-// 		runSinchronized(caller, called);
+// 		helper.runSinchronized();
 // 	}
 // 
 // 	return SUCCESS;

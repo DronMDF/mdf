@@ -178,6 +178,27 @@ BOOST_AUTO_TEST_CASE(testCallWithoutCallAccess)
 	BOOST_REQUIRE_EQUAL(helper.execute(), ERROR_ACCESS);
 }
 
+BOOST_AUTO_TEST_CASE(testCopyOutRequestNew)
+{
+	testProcess process;
+	testThread thread(&process);
+
+	testCallHelper helper;
+	helper.m_called = &thread;
+
+	char request[] = "request";
+	BOOST_REQUIRE(helper.copyOutRequest(request, strlen(request), RESOURCE_ACCESS_READ));
+
+	uint32_t access = RESOURCE_ACCESS_READ;
+	const PageInstance *pinst = thread.PageFault(USER_TXA_BASE, &access);
+	PageInfo *page = StubGetPageByInstance(pinst);
+	BOOST_REQUIRE(page != 0);
+
+	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(request, request + strlen(request),
+		m, m + strlen(request));
+}
+
 BOOST_AUTO_TEST_CASE(testCopyOutRequest)
 {
 	testCallHelper helper;
@@ -215,6 +236,44 @@ BOOST_AUTO_TEST_CASE(testCopyOutRequestValidEmptyBufer)
 	testCallHelper helper;
 	char request[] = "request";
 	BOOST_REQUIRE(helper.copyOutRequest(0, request, 0, 0));
+}
+
+BOOST_AUTO_TEST_CASE(testSetCopyBackNew)
+{
+	class inlineThread : public testThread, private visit_mock {
+	public:
+		void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size) {
+			visit();
+			BOOST_REQUIRE_EQUAL(thread, reinterpret_cast<ResourceThread *>(0x105EAD));
+			BOOST_REQUIRE_EQUAL(buffer, 0xADD0000);
+			BOOST_REQUIRE_EQUAL(size, 20);
+		}
+	} thread;
+
+	testCallHelper helper;
+	helper.m_caller = reinterpret_cast<ResourceThread *>(0x105EAD);
+	helper.m_called = &thread;
+
+	helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 20);
+}
+
+BOOST_AUTO_TEST_CASE(testSetCopyBackValidityNew)
+{
+	class inlineThread : public testThread {
+	public:
+		void setCopyBack(ResourceThread *, laddr_t, size_t) {
+			throw 0;
+		}
+	} thread;
+
+	testCallHelper helper;
+	helper.m_called = &thread;
+	helper.m_caller = 0;
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 20));
+
+	helper.m_caller = reinterpret_cast<ResourceThread *>(0x105EAD);
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(0, 20));
+	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 0));
 }
 
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
@@ -258,6 +317,39 @@ BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
 	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(&calledthread,
 		reinterpret_cast<ResourceThread *>(0x105EAD),
 		reinterpret_cast<void *>(0xADD0000), 0));
+}
+
+BOOST_AUTO_TEST_CASE(testRunSinchronizedNew)
+{
+	testSubScheduler *subsched = new testSubScheduler;
+	
+	testScheduler scheduler;
+	scheduler.m_inactives = subsched;
+
+	testThread caller;
+
+	class inlineThread : public testThread, private order_mock<2> {
+	private:
+		ResourceThread *m_caller;
+	public:
+		inlineThread(ResourceThread *thread) : m_caller(thread) {}
+		void addObserver(ResourceThread *thread, uint32_t event) {
+			order(1);
+			BOOST_REQUIRE_EQUAL(thread, m_caller);
+			BOOST_REQUIRE_EQUAL(event, RESOURCE_EVENT_DESTROY);
+		}
+		void Run() {
+			order(2);
+		}
+	} called(&caller);
+
+	testCallHelper helper;
+	helper.m_caller = &caller;
+	helper.m_called = &called;
+
+	helper.runSinchronized();
+	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), CLOCK_MAX);
+	BOOST_REQUIRE_EQUAL(subsched->thread, &caller);
 }
 
 BOOST_AUTO_TEST_CASE(testRunSinchronized)

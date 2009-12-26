@@ -51,6 +51,10 @@ public:
 	
 	bool checkCalledAccess(id_t id);
 	bool createCalled(id_t id);
+
+	bool copyOutRequest(const void *request, size_t size, uint32_t access) const;
+	void setCopyBack(const void *request, size_t size) const;
+	void runSinchronized() const;
 };
 
 } // namespace Core
