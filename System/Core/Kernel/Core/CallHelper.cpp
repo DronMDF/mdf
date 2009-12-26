@@ -75,7 +75,7 @@ bool CallHelper::createCalled(id_t id)
 	if (m_called != 0) return true;	// Определился на предыдущем шаге
 		
 	STUB_ASSERT(m_caller != 0, "call checkCalledAccess first");
-	if (Resource *resource = findCalledResource(id)) {
+	if (Resource *resource = Core::FindResource(id)) {
 		m_called = resource->Call();
 	}
 
