@@ -27,6 +27,8 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 	if (outhread != 0) {
 		STUB_ASSERT(outhread->ScheduleLink.isLinked(), "Thread in list");
 
+		CorePrint ("Outthread: %08x\n", outhread->getId());
+
 		outhread->setTimestamp(StubGetCurrentClock());
 
 		// Манипуляции с выходящей нитью
@@ -61,7 +63,7 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 
 	Core::ResourceThread *inthread = Scheduler().getThread();
 	if (inthread != 0) {
-		// CorePrint ("Inthread: %08x\n", inthread->getId());
+		CorePrint ("Inthread: %08x\n", inthread->getId());
 		if (inthread != outhread) {
 			inthread->Run();
 		}

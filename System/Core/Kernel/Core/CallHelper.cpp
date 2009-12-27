@@ -107,6 +107,11 @@ void CallHelper::runAsinchronized() const
 void CallHelper::runSinchronized() const
 {
 	STUB_ASSERT(m_caller == 0, "Fatal in kernel mode");
+
+	const id_t id_caller = m_caller->getId();
+	const id_t id_called = m_called->getId();
+	
+	CorePrint("Run Sinchronized 0x%08x -> 0x%08x\n", id_caller, id_called);
 	
 	// Текущая нить ждет вечно
 	m_caller->Sleep(CLOCK_MAX);
@@ -118,6 +123,8 @@ void CallHelper::runSinchronized() const
 	// Новую нить запускаем.
 	m_called->Run();
 
+	CorePrint("Back from Sinchronized 0x%08x -> 0x%08x\n", id_called, id_caller);
+	
 	// TODO: Нужно установить статус в caller, но пока он всегда SUCCESS,
 	// 	Возможно потом появятся всякие TIMEOUT например.
 }

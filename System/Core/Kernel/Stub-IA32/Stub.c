@@ -68,12 +68,7 @@ static
 void __init__ StubParseCommandLine (const char * const cl)
 {
 	for (int i = 0; cl[i] != '\0'; i++) {
-		// Пропускаем ключевое слово.
-		if (cl[i] != ' ')
-			continue;
-
-		while (cl[i] == ' ')
-			i++;
+		if (cl[i] == ' ') continue;
 
 		if (!StubFindCommand (cl + i)) {
 			// TODO: Писать содержимое команды небезопасно.
