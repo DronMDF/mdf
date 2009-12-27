@@ -24,10 +24,10 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 	Core::ResourceThread *outhread =
 		reinterpret_cast<Core::ResourceThread *>(StubTaskGetThread(outask));
 
+	CorePrint("CoreWait from 0x%08x\n", outhread ? outhread->getId() : 0);
+		
 	if (outhread != 0) {
 		STUB_ASSERT(outhread->ScheduleLink.isLinked(), "Thread in list");
-
-		CorePrint ("Outthread: %08x\n", outhread->getId());
 
 		outhread->setTimestamp(StubGetCurrentClock());
 
@@ -49,8 +49,10 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 			}
 
 			outhread->Sleep(timeout);
+			CorePrint ("Inactive outthread: 0x%08x\n", outhread->getId());
 			Scheduler().addInactiveThread(outhread);
 		} else {
+			CorePrint ("Active outthread: 0x%08x\n", outhread->getId());
 			Scheduler().addActiveThread(outhread);
 		}
 	}
@@ -58,17 +60,14 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 	// TODO: Тут еще важно чтобы никто не схватил нить пока она стоит в очереди.
 	// Промежуток add-get должен быть атомарным (блокировка)
 
-	// А тут надо запросить планировщик, чтобы дал новую нить к выполнению.
-	// Состояние этой нити уже отражает ее планы на будующее.
-
 	Core::ResourceThread *inthread = Scheduler().getThread();
 	if (inthread != 0) {
-		CorePrint ("Inthread: %08x\n", inthread->getId());
+		CorePrint ("Inthread: 0x%08x\n", inthread->getId());
 		if (inthread != outhread) {
 			inthread->Run();
 		}
 	} else {
-		// Нету нитей для выполнения
+		CorePrint ("Idle...\n");
 		StubCPUIdle();
 	}
 

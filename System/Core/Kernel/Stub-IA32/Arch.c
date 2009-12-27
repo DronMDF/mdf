@@ -112,7 +112,7 @@ enum SELECTOR_PL {
 #define STUB_MAX_TASK_COUNT	4096
 #define STUB_MAX_CPU_COUNT	2048
 
-static descriptor_t *GDT = nullptr;
+static volatile descriptor_t *GDT = nullptr;
 static clock_t *task_time = nullptr;
 
 enum GDT_IDX {
@@ -489,10 +489,13 @@ void StubTaskContextSetPDir (const Task *task, const PageInfo *pdir)
 Task *StubGetCurrentTask ()
 {
 	unsigned int selector = StubGetCurrentTaskSelector();
-
+	
 	unsigned int di = selector / sizeof (descriptor_t);
+
 	if (di < GDT_TASK_BASE || GDT_TASK_BASE + STUB_MAX_TASK_COUNT <= di)
 		return nullptr;	// Возможно CPU... но не Task.
+
+	CorePrint("Current task selector %u\n", di - GDT_TASK_BASE);
 
 	return StubGetTaskBySlot(di - GDT_TASK_BASE);
 }
@@ -501,6 +504,9 @@ void StubTaskExecute (const Task *task)
 {
 	tss_t *context = task->context;
 	StubTaskSlotUse (context);
+
+	CorePrint("Run task selector %u\n", context->slot);
+	
 	StubTaskSwitch (StubGetSelectorTask(context->slot));
 }
 
@@ -789,6 +795,8 @@ void StubInterruptHandler (const int irq)
 int StubWait (id_t id, int event, timeout_t timeout)
 {
 	const Task *task = StubGetCurrentTask();
+	CorePrint ("StubWait from 0x%08x\n", task);
+	
 	return CoreWait(task, id, event, timeout);
 }
 
@@ -834,6 +842,8 @@ int StubCall (id_t id, uaddr_t param, size_t size, int flags)
 		return ERROR_INVALIDPARAM;
 
 	const Task *task = StubGetCurrentTask();
+	CorePrint ("StubCall from 0x%08x\n", task);
+	
 	int rv = CoreCall(task, id, l2vptr(paddr), size, flags);
 
 	if (rv != SUCCESS) {

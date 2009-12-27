@@ -210,6 +210,8 @@ bool ResourceThread::Deactivate()
 
 void ResourceThread::Kill()
 {
+	CorePrint("Kill Thread: %08x\n", getId());
+
 	// TODO: вернуть TPC буфер в вызывающий процесс (если надо)
 
 	Scheduler().addKillThread(this);

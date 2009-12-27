@@ -87,8 +87,11 @@ void
 BlinkThread (id_t process __attribute__((unused)),
 	void *param, size_t size, uint32_t flags __attribute__((unused)))
 {
-	if (size < sizeof(int))
+	if (size < sizeof(int)) {
+		// TODO: Выход происходит здесь, видимо блок параметров не доходит до нити
+		Message(1, "Param problem");
 		return;
+	}
 
 	int row = *(int *)param;
 	size_t c = 0;
