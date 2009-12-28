@@ -179,10 +179,15 @@ void *StubTaskGetThread (const Task *task)
 	return const_cast<Task *>(task);
 }
 
-void StubSetStackFrame (struct StubStackFrame *, id_t, offset_t, size_t, int)
+void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
+	offset_t txa_offset, size_t txa_size, int flags)
 {
+	frame->flags = flags;
+	frame->txa_size = txa_size;
+	frame->txa_ptr = (frame->txa_size != 0) ? (USER_MEMORY_BASE + USER_TXA_BASE + txa_offset) : 0;
+	frame->caller = caller,
+	frame->retmagic = RETMAGIC;
 }
-
 void StubPrintChar (const int c)
 {
 	cout << static_cast<char>(c);

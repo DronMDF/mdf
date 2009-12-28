@@ -288,11 +288,21 @@ void ResourceThread::setEvent(uint32_t event)
 	m_event = event;
 }
 
-bool ResourceThread::createRequestArea(laddr_t offset, laddr_t size, uint32_t access)
+bool ResourceThread::createRequestArea(ResourceThread *caller,
+	laddr_t offset, laddr_t size, uint32_t access)
 {
 	if (m_txa != 0) return false;
+	
 	m_txa = new Memory(offset + size, Memory::ALLOC);
+	m_txa_offset = offset;
 	m_txa_access = access;
+
+	const id_t caller_id = (caller != 0) ? caller->getId() : 0;
+	
+	StubStackFrame stack_frame;
+	StubSetStackFrame(&stack_frame, caller_id, m_txa_offset, size, m_txa_access);
+	m_stack.Copy(&stack_frame, sizeof(StubStackFrame), USER_STACK_SIZE - sizeof(StubStackFrame));
+
 	return true;
 }
 

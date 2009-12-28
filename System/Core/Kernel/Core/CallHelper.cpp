@@ -82,7 +82,7 @@ bool CallHelper::copyOutRequest(const void *request, size_t size,
 
 	if (size > USER_TXA_SIZE) return false;
 
-	STUB_ASSERT(!m_called->createRequestArea(0, size, access),
+	STUB_ASSERT(!m_called->createRequestArea(m_caller, 0, size, access),
 		    "Unable to create thread request area");
 	STUB_ASSERT(!m_called->copyIn(USER_TXA_BASE, request, size),
 		    "Unable to copy txa content");

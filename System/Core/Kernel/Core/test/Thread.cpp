@@ -220,4 +220,41 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 	BOOST_REQUIRE_EQUAL(thread.m_copyBack.size, size);
 }
 
+BOOST_AUTO_TEST_CASE(testCreateRequestArea)
+{
+	class inlineThread : public testThread {
+	public:
+		using testThread::m_txa;
+		using testThread::m_txa_offset;
+		using testThread::m_txa_access;
+	} thread;
+
+	offset_t offset = 123;
+	size_t size = 12345;
+	uint32_t access = RESOURCE_ACCESS_READ;
+	
+	BOOST_REQUIRE(thread.createRequestArea(&thread, offset, size, access));
+
+	BOOST_REQUIRE_EQUAL(thread.m_txa_offset, offset);
+	BOOST_REQUIRE_EQUAL(thread.m_txa_access, access);
+
+	BOOST_REQUIRE(thread.m_txa != 0);
+	BOOST_REQUIRE_EQUAL(thread.m_txa->getSize(), offset + size);
+
+	const laddr_t frameptr = USER_STACK_BASE + USER_STACK_SIZE - sizeof(StubStackFrame);
+	const PageInstance *pinst = thread.PageFault(frameptr, &access);
+	PageInfo *page = StubGetPageByInstance(pinst);
+	BOOST_REQUIRE(page != 0);
+
+	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+	const StubStackFrame *frame =
+		reinterpret_cast<const StubStackFrame *>(m + (frameptr % PAGE_SIZE));
+
+	BOOST_REQUIRE_EQUAL(frame->flags, access);
+	BOOST_REQUIRE_EQUAL(frame->txa_size, size);
+	BOOST_REQUIRE_EQUAL(frame->txa_ptr, USER_TXA_BASE - USER_MEMORY_BASE + offset);
+	BOOST_REQUIRE_EQUAL(frame->caller, thread.getId());
+	BOOST_REQUIRE_EQUAL(frame->retmagic, RETMAGIC);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

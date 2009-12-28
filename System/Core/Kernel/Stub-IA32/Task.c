@@ -73,11 +73,11 @@ void *StubTaskGetThread (const Task *task)
 void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
 	offset_t txa_offset, size_t txa_size, int flags)
 {
-	frame->flags		= flags;
-	frame->txa_size 	= txa_size;
-	frame->txa_ptr		= l2uaddr(USER_TXA_BASE + txa_offset);
-	frame->caller		= caller,
-	frame->retmagic		= RETMAGIC;
+	frame->flags = flags;
+	frame->txa_size = txa_size;
+	frame->txa_ptr = (frame->txa_size != 0) ? l2uaddr(USER_TXA_BASE + txa_offset) : 0;
+	frame->caller = caller,
+	frame->retmagic = RETMAGIC;
 }
 
 void StubTaskRun (Task *task)

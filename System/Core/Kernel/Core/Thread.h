@@ -32,10 +32,12 @@ private:
 	// ввиду память для указателей на сраничные инстанции).
 	Memory	m_stack;
 
+protected:
 	Memory	*m_txa;	// thread exchange area (опциональная)
 	offset_t m_txa_offset;
 	uint32_t m_txa_access;
 
+private:
 	clock_t m_timestamp;
 	clock_t m_wakeupstamp;
 
@@ -99,7 +101,8 @@ public:
 	void setEvent(uint32_t event);
 	uint32_t getEvent() const;
 
-	bool createRequestArea(laddr_t offset, laddr_t size, uint32_t access);
+	bool createRequestArea(ResourceThread *caller,
+			       laddr_t offset, laddr_t size, uint32_t access);
 	bool copyIn(laddr_t dst, const void *src, size_t size);
 
 	virtual void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size);
