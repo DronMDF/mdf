@@ -27,8 +27,10 @@ ResourceInstance::ResourceInstance (Resource *resource, uint32_t access, uint32_
 
 ResourceInstance::~ResourceInstance()
 {
+	CorePrint("Delete instances to 0x%08x\n", m_resource);
 	if (m_resource != 0)
 		m_resource->DeleteInstance();
+	CorePrint("Deleted instance\n");
 }
 
 int ResourceInstance::Modify (int paramid, const void *param, size_t param_size)

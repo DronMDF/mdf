@@ -27,8 +27,12 @@ Resource::Resource (void)
 
 Resource::~Resource (void)
 {
+	CorePrint("Resource 0x%08x a deleted\n", this);
+	
 	delete[] m_name;
 	delete m_event;
+	
+	CorePrint("Resource 0x%08x a deleted done\n", this);
 }
 
 int Resource::getInstancesCount() const
@@ -124,9 +128,13 @@ ResourceInstance *Resource::CreateInstance (int capability, unsigned long param)
 
 void Resource::DeleteInstance ()
 {
+	CorePrint("Instances release %u\n", m_instances_count);
+	
 	--m_instances_count;
 	if (m_instances_count == 0)
 		delete this;
+
+	CorePrint("Done instances release %u\n", m_instances_count);
 }
 
 void Resource::addObserver(ResourceThread *thread, uint32_t event)

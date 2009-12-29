@@ -39,7 +39,9 @@ ResourceThread *KillScheduler::getThread()
 
 		if (dthread->Deactivate()) {
 			m_queue.Remove(dthread);
+			CorePrint ("ThreadPtr 0x%08x remove from kill queue\n", dthread);
 			dthread->getProcess()->Detach(dthread);
+			CorePrint ("ThreadPtr 0x%08x a finish and die\n", dthread);
 		}
 	}
 

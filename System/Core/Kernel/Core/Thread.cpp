@@ -65,6 +65,7 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 
 ResourceThread::~ResourceThread()
 {
+	CorePrint("ThreadPtr 0x%08x a deleted\n", this);
 	delete m_txa;
 }
 
@@ -197,6 +198,8 @@ void ResourceThread::Activate()
 
 bool ResourceThread::Deactivate()
 {
+	CorePrint("Deactivate Thread: 0x%08x (ptr: 0x%08x)\n", getId(), this);
+	
 	STUB_ASSERT(getInstancesCount() > 1, "Many instances for thread");
 
 	// должен попытаться удалить Task, если получилось - вернет true
@@ -210,7 +213,7 @@ bool ResourceThread::Deactivate()
 
 void ResourceThread::Kill()
 {
-	CorePrint("Kill Thread: %08x\n", getId());
+	CorePrint("Kill Thread: 0x%08x (ptr: 0x%08x)\n", getId(), this);
 
 	// TODO: вернуть TPC буфер в вызывающий процесс (если надо)
 
@@ -220,8 +223,10 @@ void ResourceThread::Kill()
 	// TODO: А может быть заставить Scheduler хальтить при отсутствии нитей?
 	ResourceThread *thread = Scheduler().getThread();
 	if (thread != 0) {
+		CorePrint("Run Thread (after kill) 0x%08x\n", thread->getId());
 		thread->Run();
 	} else {
+		CorePrint("CPU iddle... (after kill)\n");
 		StubCPUIdle();
 	}
 }

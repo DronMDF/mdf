@@ -24,7 +24,9 @@ void *operator new[](unsigned int size)
 void operator delete(void *ptr) throw()
 {
 	if (ptr == 0) return;	// Допустимо по стандарту.
+	CorePrint("delete 0x%08x\n", ptr);
 	StubMemoryFree (ptr);
+	CorePrint("delete 0x%08x done\n", ptr);
 }
 
 void operator delete[](void *ptr) throw()
