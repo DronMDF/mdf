@@ -91,7 +91,7 @@ void ParseCIE(const void *ptr)
 	const int32_t dalign = SLEB128(&ciep);
 	CorePrint("EH CIE Data Alignment Factor: %d\n", dalign);
 
-	const int return_reg = *ciep;
+	//const int return_reg = *ciep;
 	ciep += sizeof(uint8_t);
 
 	bool augdata = false;
@@ -149,7 +149,7 @@ void _Unwind_Resume(_Unwind_Exception *)
 }
 
 extern "C"
-_Unwind_Reason_Code _Unwind_RaiseException(_Unwind_Exception *exception_object)
+_Unwind_Reason_Code _Unwind_RaiseException(_Unwind_Exception *)
 {
 	return _URC_NO_REASON;
 }
@@ -198,7 +198,7 @@ void __terminate_handler()
 } // local namespace
 
 extern "C"
-void *__cxa_begin_catch(_Unwind_Exception *ue)
+void *__cxa_begin_catch(_Unwind_Exception *)
 {
 	return 0;
 }
@@ -211,7 +211,7 @@ void __cxa_end_catch(void)
 extern "C" void __eh_frame();
 
 extern "C"
-void __cxa_throw (void *thrown_exception, std::type_info *tinfo, void (*dtor)(void *))
+void __cxa_throw (void *thrown_exception, std::type_info *, void (*dtor)(void *))
 {
 	ParseCIE(reinterpret_cast<const void *>(__eh_frame));
 

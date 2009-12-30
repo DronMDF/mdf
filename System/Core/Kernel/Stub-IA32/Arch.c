@@ -37,8 +37,8 @@ extern void __bss_end;
 uint32_t StubGetCurrentTaskSelector();
 void StubTaskSwitch (uint32_t selector);
 
-void StubSetGDT (void *gdt, size_t gdt_size);
-void StubSetIDT (void *idt, size_t idt_size);
+void StubSetGDT (volatile void *gdt, size_t gdt_size);
+void StubSetIDT (volatile void *idt, size_t idt_size);
 
 // -----------------------------------------------------------------------------
 // Общие определения
@@ -112,8 +112,8 @@ enum SELECTOR_PL {
 #define STUB_MAX_TASK_COUNT	4096
 #define STUB_MAX_CPU_COUNT	2048
 
-static descriptor_t *GDT = nullptr;
-static clock_t *task_time = nullptr;
+static volatile descriptor_t *GDT = nullptr;
+static volatile clock_t *task_time = nullptr;
 
 enum GDT_IDX {
 	GDT_CPU_BASE	= 2048,
@@ -221,7 +221,7 @@ void __init__ StubInitGDT ()
 	// FIXME: RELEASE
 	STUB_ASSERT (GDT == nullptr, "Cannot alloc GDT");
 
-	StubMemoryClear (GDT, gdt_size);
+	StubMemoryClear ((descriptor_t *)GDT, gdt_size);
 
 	StubSetSegmentDescriptorBySelector (KERNEL_CODE_SELECTOR,
 		0, (size_t)&__text_end,
@@ -244,7 +244,7 @@ void __init__ StubInitGDT ()
 	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
 
 	// Чистить эту память в принципе не обязательно, но для порядку почистим.
-	StubMemoryClear (task_time, task_time_size);
+	StubMemoryClear ((clock_t *)task_time, task_time_size);
 
 	CorePrint ("GDT initialized.\n");
 }
