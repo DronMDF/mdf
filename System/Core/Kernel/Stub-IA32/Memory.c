@@ -67,7 +67,7 @@ STATIC_ASSERT (sizeof (MCBLink) == 12);
 
 struct _MCB {
 #ifdef MEMORY_PROTECTOR
-	char prot1[8];
+	unsigned long prot1;
 #endif
 	size_t size_prev;
 	size_t size;
@@ -75,14 +75,14 @@ struct _MCB {
 	// Возможно, для реаллока придется сохранить выравнивание блока
 
 #ifdef MEMORY_PROTECTOR
-	char prot2[8];
+	unsigned long prot2;
 #endif
 
 	MCBLink link[0];
 };
 
 #ifdef MEMORY_PROTECTOR
-STATIC_ASSERT (sizeof (MCB) == 24);
+STATIC_ASSERT (sizeof (MCB) == 16);
 #else
 STATIC_ASSERT (sizeof (MCB) == 8);
 #endif
@@ -131,8 +131,7 @@ static
 void StubMemoryEnqueue (MCBHead * const head, MCB * const block)
 {
 	#ifdef MEMORY_PROTECTOR
-		StubMemoryRefuse(block->prot1, sizeof(block->prot1));
-		StubMemoryCopy(block->prot2, block->prot1, sizeof(block->prot1));
+		block->prot1 = block->prot2 = 0xB10C1D1E;
 	#endif
 
 	ListItemLink (head->free, block, link[0]);
@@ -159,7 +158,6 @@ MCB *StubMemoryDequeueAlign (MCBHead * const head, MCB * const block,
 	if (osize < size + (aligned - v2laddr(block->link)))
 		return nullptr;
 
-	CorePrint("dequeue 1\n");
 	StubMemoryDequeue (head, block);
 
 	const size_t asize = aligned - v2laddr(block->link) - sizeof (MCB);
@@ -197,10 +195,14 @@ void StubMemorySplitBlock (MCBHead * const head, MCB * const block, const size_t
 
 		block->size = size;
 		MCB *next = StubMemoryNextBlock (block);
-
 		next->size = (osize - size - sizeof (MCB)) | last;
 		next->size_prev = size;
 
+		MCB *nnext = StubMemoryNextBlock(next);
+		if (nnext != 0) {
+			nnext->size_prev = next->size;
+		}
+		
 		StubMemoryEnqueue (head, next);
 	}
 }
@@ -211,19 +213,11 @@ MCB *StubMemoryDefrag (MCBHead * const head, MCB *block)
 	STUB_ASSERT (isSet (block->size, MCB_USED), "Used block");
 
 	MCB *next = StubMemoryNextBlock (block);
-	if (next != nullptr) {
-		STUB_ASSERT(StubMemoryPreviousBlock(next) != block, "Corrupted memory");
-	}
 
 	if (!isPreviousUsed (block)) {
 		MCB *prev = StubMemoryPreviousBlock (block);
-		
 		if (prev != nullptr) {
-			STUB_ASSERT(StubMemoryNextBlock(prev) != block, "Corrupted memory");
 			// Сливаем с предыдущим...
-			CorePrint("dequeue 2 (0x%08x) size: %u\n", prev->link,
-					prev->size - sizeof(MCB));
-					
 			StubMemoryDequeue (head, prev);
 			// Бит MCB_LAST перенесется автоматичски
 			prev->size += block->size + sizeof (MCB);
@@ -235,7 +229,6 @@ MCB *StubMemoryDefrag (MCBHead * const head, MCB *block)
 	// next изменяется и его всеравно придется проверять.
 	if (next != nullptr && !isUsed(next)) {
 		// Сливаем со следующим.
-		CorePrint("dequeue 3\n");
 		StubMemoryDequeue (head, next);
 		block->size += next->size + sizeof (MCB);
 		next = StubMemoryNextBlock (block);
@@ -260,8 +253,7 @@ void __init__ StubMemoryCheck (const MCBHead * const head)
 		b = a, a = StubMemoryNextBlock (b))
 	{
 		#ifdef MEMORY_PROTECTOR
-		STUB_ASSERT (!StubMemoryEqual(a->prot1, a->prot2, sizeof(a->prot1)),
-			     "Protection corrupted");
+		STUB_ASSERT (a->prot1 != a->prot2, "Protection corrupted");
 		#endif
 		STUB_ASSERT (b->size != a->size_prev, "Blocks corrupted");
 
@@ -302,8 +294,9 @@ void __init__ StubMemoryInit (MCBHead * const head,
 	}
 
 	nfirst->size = v2laddr(ofirst) - v2laddr(nfirst->link);
+	STUB_ASSERT(BlockSize(nfirst) % 4 != 0, "Unaligned nfirst->size");
+
 	ofirst->size_prev = nfirst->size;
-	STUB_ASSERT (BlockSize (nfirst) % 4 != 0, "Unaligned nfirst->size");
 
 	// (Хвостовой блок так же поглощает последний свободный блок старого хипа
 	MCB *nlast = (MCB *)(v2laddr(oldhead->first) + oldhead->size);
@@ -374,7 +367,6 @@ void *StubMemoryAllocInternal (MCBHead * const head, size_t size, int align)
 			STUB_ASSERT (size >= (block->size & ~MCB_LAST), "Small block");
 		} else {
 			// Блок уже выровнен или не требует выравнивания.
-			CorePrint("dequeue 4\n");
 			StubMemoryDequeue (head, block);
 		}
 
@@ -400,8 +392,7 @@ void StubMemoryFreeInternal (MCBHead * const head, void * const ptr)
 	block->size &= ~MCB_USED;
 
 #ifdef MEMORY_PROTECTOR
-	STUB_ASSERT (!StubMemoryEqual(block->prot1, block->prot2, sizeof(block->prot1)),
-		     "Protection corrupted");
+	STUB_ASSERT (block->prot1 != block->prot2, "Protection corrupted");
 #endif
 
 	block = StubMemoryDefrag (head, block);

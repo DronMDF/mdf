@@ -164,16 +164,12 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 
 int ResourceProcess::Detach(Resource *resource)
 {
-	CorePrint("Detach resource 0x%08x\n", resource->getId());
 	for (ResourceInstance *instance = m_instance_list.getFirst();
 		instance != 0; instance = m_instance_list.getNext(instance))
 	{
 		if (instance->getId() == resource->getId()) {
-			CorePrint("1\n");
 			m_instance_list.Remove(instance);
-			CorePrint("2\n");
 			delete instance;
-			CorePrint("3\n");
 			return SUCCESS;
 		}
 	}

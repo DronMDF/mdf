@@ -96,8 +96,6 @@ const PageInstance *StubTaskPageFault (laddr_t addr, uint32_t *access)
 	Task *current = StubGetCurrentTask();
 	STUB_ASSERT (current == nullptr, "No user task");
 
-	CorePrint("PageFault 0x%08x (0x%08x)\n", current, addr);
-	
 	const PageInstance *instance = CoreThreadPageFault (current, addr, access);
 
 	// Может быть и нарушение доступа.

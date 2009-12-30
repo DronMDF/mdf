@@ -111,8 +111,8 @@ void StubClockHandler()
 	stubClock++;
 
 	// Переключаемся на кого нибудь (или не переключаемся).
-	CorePrint("StubClockHandler %lu\n", stubClock);
-	StubWait(0, 0, 0);
+	const Task *task = StubGetCurrentTask();
+	CoreWait(task, 0, 0, 0);
 }
 
 clock_t StubGetCurrentClock()
