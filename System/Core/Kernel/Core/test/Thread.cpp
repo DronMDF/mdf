@@ -21,6 +21,7 @@
 #include "testThread.h"
 #include "testProcess.h"
 #include "testScheduler.h"
+#include "testSubScheduler.h"
 
 using namespace std;
 using namespace Core;
@@ -69,7 +70,7 @@ BOOST_FIXTURE_TEST_CASE(call, create_fixture)
 	// Этот метод проходит, но после того происходит попытка удаления непустого списка.
 	// Видимо новая нить подвисает?
 
-	uint32_t param = 0xDEADC0DE;
+	//uint32_t param = 0xDEADC0DE;
 	//BOOST_WARN(CoreCall(task, id, &param, sizeof(uint32_t),
 	//	RESOURCE_CALL_ASYNC | RESOURCE_CALL_COPY) == SUCCESS);
 
@@ -206,28 +207,18 @@ BOOST_AUTO_TEST_CASE(testCopyIn)
 
 BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
-	class inlineThread : public testThread {
-	public:
-		using testThread::m_copyBack;
-	} thread;
+	testThread thread;
 
 	const laddr_t address = 0xADD0000;
-	const size_t size = 20;
-	thread.setCopyBack(&thread, address, size);
+	thread.setCopyBack(&thread, address);
 
-	BOOST_REQUIRE(thread.m_copyBack.thread == &thread);
-	BOOST_REQUIRE_EQUAL(thread.m_copyBack.buffer, address);
-	BOOST_REQUIRE_EQUAL(thread.m_copyBack.size, size);
+	BOOST_REQUIRE_EQUAL(thread.m_copyback_id, thread.getId());
+	BOOST_REQUIRE_EQUAL(thread.m_copyback_addr, address);
 }
 
 BOOST_AUTO_TEST_CASE(testCreateRequestArea)
 {
-	class inlineThread : public testThread {
-	public:
-		using testThread::m_txa;
-		using testThread::m_txa_offset;
-		using testThread::m_txa_access;
-	} thread;
+	testThread thread;
 
 	offset_t offset = 123;
 	size_t size = 12345;
@@ -256,5 +247,34 @@ BOOST_AUTO_TEST_CASE(testCreateRequestArea)
 	BOOST_REQUIRE_EQUAL(frame->caller, thread.getId());
 	BOOST_REQUIRE_EQUAL(frame->retmagic, RETMAGIC);
 }
+
+// BOOST_AUTO_TEST_CASE(testCopyBack)
+// {
+// 	testScheduler scheduler;
+// 	scheduler.m_killed = new nullSubScheduler;
+// 
+// 	const char *message = "test message";
+// 
+// 	// С тестом копибека - проблема... он ведь копирует с реального адреса txa
+// 	testThread thread;
+// 	BOOST_TEST_CHECKPOINT("1");
+// 	thread.createRequestArea(&thread, 0, strlen(message), RESOURCE_ACCESS_READ);
+// 	BOOST_TEST_CHECKPOINT("2");
+// 	thread.copyIn(USER_TXA_BASE, message, strlen(message));
+// 	BOOST_TEST_CHECKPOINT("3");
+// 	thread.setCopyBack(&thread, USER_STACK_BASE);
+// 	BOOST_TEST_CHECKPOINT("4");
+// 
+// 	thread.Kill();	// Копирует реплай по указанному месту.
+// 
+// 	BOOST_TEST_CHECKPOINT("5");
+// 	
+// 	uint32_t access = RESOURCE_ACCESS_READ;
+// 	const PageInstance *pinst = thread.PageFault(USER_STACK_BASE, &access);
+// 	PageInfo *page = StubGetPageByInstance(pinst);
+// 	BOOST_REQUIRE(page != 0);
+// 	const char *m = reinterpret_cast<const char *>(StubPageTemporary(page));
+// 	BOOST_REQUIRE_EQUAL_COLLECTIONS(message, message + strlen(message), m, m + strlen(message));
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

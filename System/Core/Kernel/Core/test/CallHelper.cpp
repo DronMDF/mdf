@@ -186,11 +186,10 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
 	class inlineThread : public testThread, private visit_mock {
 	public:
-		void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size) {
+		void setCopyBack(ResourceThread *thread, laddr_t buffer) {
 			visit();
 			BOOST_REQUIRE_EQUAL(thread, reinterpret_cast<ResourceThread *>(0x105EAD));
 			BOOST_REQUIRE_EQUAL(buffer, 0xADD0000);
-			BOOST_REQUIRE_EQUAL(size, 20);
 		}
 	} thread;
 
@@ -205,7 +204,7 @@ BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
 {
 	class inlineThread : public testThread {
 	public:
-		void setCopyBack(ResourceThread *, laddr_t, size_t) {
+		void setCopyBack(ResourceThread *, laddr_t) {
 			throw 0;
 		}
 	} thread;

@@ -20,11 +20,9 @@ private:
 protected:
 	Task *m_task;
 
-	struct {	// Возврат параметров осуществляется по этому адресу.
-		ResourceThread *thread;
-		laddr_t buffer;
-		size_t size;
-	} m_copyBack;
+	// Параметры обратного копирования TXA;
+	id_t m_copyback_id;
+	laddr_t m_copyback_addr;
 	
 private:
 	// TODO: Здесь надо ввести новый тип, основанный на мемори, но иначе
@@ -105,7 +103,7 @@ public:
 			       laddr_t offset, laddr_t size, uint32_t access);
 	bool copyIn(laddr_t dst, const void *src, size_t size);
 
-	virtual void setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size);
+	virtual void setCopyBack(ResourceThread *thread, laddr_t buffer);
 };
 
 } // namespace Core

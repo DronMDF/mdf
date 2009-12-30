@@ -16,6 +16,8 @@
 #include "Process.h"
 #include "Scheduler.h"
 
+#include "Resources.h"	// TODO: Устаревающее
+
 namespace Core {
 
 // TODO: Этот конструктор вообще уже не нужен.
@@ -23,7 +25,8 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	: Resource(),
 	  m_process(process),
 	  m_task(0),
-	  m_copyBack(),
+	  m_copyback_id(INVALID_ID),
+	  m_copyback_addr(0),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -44,7 +47,8 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	: Resource(),
 	  m_process(process),
 	  m_task(StubTaskCreate (entry, this)),
-	  m_copyBack(),
+	  m_copyback_id(INVALID_ID),
+	  m_copyback_addr(0),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -210,7 +214,16 @@ bool ResourceThread::Deactivate()
 
 void ResourceThread::Kill()
 {
-	// TODO: вернуть TPC буфер в вызывающий процесс (если надо)
+	// TODO: Надо в отдельную функцию.
+	if (m_copyback_id != INVALID_ID) {
+		if (Resource *resource = FindResource(m_copyback_id)) {
+			if (ResourceThread *caller = resource->asThread()) {
+				caller->copyIn(m_copyback_addr,
+					reinterpret_cast<void *>(USER_TXA_BASE + m_txa_offset),
+					m_txa->getSize() - m_txa_offset);
+			}
+		}
+	}
 
 	Scheduler().addKillThread(this);
 
@@ -332,11 +345,10 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 	return true;
 }
 
-void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer, size_t size)
+void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 {
-	m_copyBack.thread = thread;
-	m_copyBack.buffer = buffer;
-	m_copyBack.size = size;
+	m_copyback_id = thread->getId();
+	m_copyback_addr = buffer;
 }
 
 } // namespace Core
@@ -351,4 +363,3 @@ const PageInstance *CoreThreadPageFault (const Task *task, laddr_t addr, uint32_
 
 	return instance;
 }
-

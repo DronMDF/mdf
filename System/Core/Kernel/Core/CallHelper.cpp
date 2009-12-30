@@ -94,8 +94,7 @@ void CallHelper::setCopyBack(const void *buffer, size_t size) const
 	if (buffer == 0) return;
 	if (size == 0) return;
 
-	laddr_t buffer_addr = reinterpret_cast<laddr_t>(buffer);
-	m_called->setCopyBack(m_caller, buffer_addr, size);
+	m_called->setCopyBack(m_caller, reinterpret_cast<laddr_t>(buffer));
 }
 
 void CallHelper::runAsinchronized() const

@@ -7,6 +7,11 @@
 
 namespace Core { class ResourceThread; }
 
+struct nullSubScheduler : public Core::SubScheduler {
+	virtual Core::ResourceThread *getThread() { return 0; }
+	virtual void addThread(Core::ResourceThread *) { }
+};
+
 struct testSubScheduler : public Core::SubScheduler {
 	Core::ResourceThread *thread;
 	
