@@ -321,6 +321,9 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 {
 	// TODO: Кароче, надо найти регион, который включает данную область
 	//	и вызвать Copy на него, А пока очень костыльно.
+
+	// TODO: Причем в процессе стоит подходить к copyIn более творчески, ибо
+	//	блок может пересекать несколько регионов.
 	
 	const char *ssrc = reinterpret_cast<const char *>(src);
 	
