@@ -59,6 +59,8 @@ public:
 	void Copy(const void *src, size_t size, offset_t offset = 0);
 	void Map(const void *src, size_t size, offset_t offset = 0);
 
+	bool copyIn(offset_t offset, const void *src, size_t size);
+
 	bool inBounds(laddr_t base, laddr_t addr, offset_t offset = 0) const;
 	const PageInstance *PageFault(offset_t offset);
 };

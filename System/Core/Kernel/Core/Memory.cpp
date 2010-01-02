@@ -176,4 +176,28 @@ const PageInstance *Memory::PageFault(offset_t offset)
 	return instance;
 }
 
+bool Memory::copyIn(offset_t offset, const void *src, size_t size)
+{
+	if (offset + size > m_size) return false;
+
+	const size_t limit = min(m_size, size_t(offset) + size);
+	const char *ssrc = static_cast<const char *>(src);
+	for (offset_t soff = offset; soff < limit; ) {
+		const offset_t poff = soff % PAGE_SIZE;
+		const size_t psize = min(PAGE_SIZE - poff, limit - soff);
+		
+		const PageInstance *instance = PageFault(soff);
+		if (instance == 0) return false;
+		PageInfo *page = StubGetPageByInstance(instance);
+		const laddr_t addr = StubPageTemporary(page);
+		StubMemoryCopy (reinterpret_cast<void *>(addr + poff), ssrc, psize);
+		StubPageUntemporary(page);
+
+		soff += psize;
+		ssrc += psize;
+	}
+	
+	return true;
+}
+
 } // namespace Core
