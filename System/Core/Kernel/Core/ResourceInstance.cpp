@@ -1,14 +1,14 @@
 //
-// Copyright (c) 2000-2009 Андрей Валяев <dron@infosec.ru>
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "ResourceInstance.h"
-
-#include "Resource.h"
-#include "Resources.h"	// TODO: раздербанить
-
+#include "Kernel.h"
 #include "CoreLocal.h"
+
+#include "ResourceInstance.h"
+#include "Resource.h"
+#include "Region.h"
 
 namespace Core {
 

@@ -1,17 +1,20 @@
 //
-// Copyright (c) 2000-2009 Андрей Валяев <dron@infosec.ru>
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
+#include "Kernel.h"
 #include "CoreLocal.h"
 
-#include "Resources.h"
 #include "ResourceInstance.h"
+#include "Region.h"
 #include "Process.h"
 #include "Thread.h"
 #include "Call.h"
 #include "Scheduler.h"
 #include "CallHelper.h"
+
+#include "Resources.h"	// Для Core::FindResource
 
 using namespace Core;
 
