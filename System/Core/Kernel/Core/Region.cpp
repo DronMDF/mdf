@@ -25,6 +25,16 @@ ResourceRegion::ResourceRegion (const struct KernelCreateRegionParam * const par
 {
 }
 
+ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
+	: m_memory(offset + size, Memory::ALLOC),
+	  m_offset(offset),
+	  m_access(access),
+	  m_flags(0),
+	  m_parent(0),
+	  m_parent_offset(0)
+{
+}
+
 ResourceRegion::~ResourceRegion ()
 {
 }
@@ -214,6 +224,12 @@ offset_t ResourceRegion::getOffset() const
 size_t ResourceRegion::getSize() const
 {
 	return m_memory.getSize() - m_offset;
+}
+
+bool ResourceRegion::copyIn(offset_t offset, const void *src, size_t size)
+{
+	if (offset < m_offset) return false;
+	return m_memory.copyIn(offset, src, size);
 }
 
 } // namespace Core

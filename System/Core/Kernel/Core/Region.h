@@ -8,6 +8,9 @@
 #include "Resource.h"
 #include "Memory.h"
 
+struct KernelCreateRegionParam;
+struct KernelModifyRegionBindParam;
+
 namespace Core {
 
 // -----------------------------------------------------------------------------
@@ -30,22 +33,23 @@ private:
 	offset_t m_parent_offset;
 
 private:
-	ResourceRegion ();
-	ResourceRegion (const ResourceRegion &);
-	ResourceRegion & operator = (const ResourceRegion &);
+	ResourceRegion();
+	ResourceRegion(const ResourceRegion &);
+	ResourceRegion & operator =(const ResourceRegion &);
 
 	virtual ResourceRegion *asRegion ();
 
-	int ModifyBindPhysical (const KernelModifyRegionBindParam * const param);
-	int ModifyBindRegion (const KernelModifyRegionBindParam * const param);
+	int ModifyBindPhysical (const KernelModifyRegionBindParam *param);
+	int ModifyBindRegion (const KernelModifyRegionBindParam *param);
 
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 
 public:
-	explicit ResourceRegion (const KernelCreateRegionParam * const params);
+	explicit ResourceRegion(const KernelCreateRegionParam *params);
+	explicit ResourceRegion(offset_t offset, size_t size, uint32_t access);
 	virtual ~ResourceRegion();
 
-	virtual int Modify (int param_id, const void *param, size_t param_size);
+	virtual int Modify(int param_id, const void *param, size_t param_size);
 
 	bool inBounds(laddr_t addr, laddr_t base = 0) const;
 
@@ -53,6 +57,8 @@ public:
 
 	offset_t getOffset() const;
 	size_t getSize() const;
+
+	bool copyIn(offset_t offset, const void *src, size_t size);
 };
 
 } // namespace Core
