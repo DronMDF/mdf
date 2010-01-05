@@ -58,7 +58,7 @@ public:
 	offset_t getOffset() const;
 	size_t getSize() const;
 
-	bool copyIn(offset_t offset, const void *src, size_t size);
+	virtual bool copyIn(offset_t offset, const void *src, size_t size);
 };
 
 } // namespace Core

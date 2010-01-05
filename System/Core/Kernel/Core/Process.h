@@ -41,6 +41,8 @@ public:
 	ResourceInstance *FindInstance (id_t id) const;
 
 	int ModifyResource(id_t id, int param_id, const void *param, size_t param_size);
+
+	bool copyIn(offset_t offset, const void *src, size_t size);
 };
 
 } // namespace Core;

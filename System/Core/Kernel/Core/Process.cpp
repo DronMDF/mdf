@@ -131,6 +131,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 	return base;
 }
 
+// TODO: Эта база - юзерлевела... надо бы переделать в кернеллевел..
 int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
@@ -243,6 +244,36 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 	}
 
 	return instance->Modify(param_id, param, param_size);
+}
+
+bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
+{
+	for (ResourceInstance *instance = m_instance_list.getFirst();
+		instance != 0;
+		instance = m_instance_list.getNext (instance))
+	{
+		if (!instance->inBounds(offset)) continue;
+		
+		// TODO: Всякая вот эта вот рутира просится в ResourceInstance
+		Resource *resource = instance->getResource();
+		ResourceRegion *region = resource->asRegion();
+		if (region == 0) continue;
+
+		const laddr_t limit = instance->getAddr() + region->getOffset() + region->getSize();
+		size_t validsize = size;
+
+		if (offset + size > limit) {
+			// В этот регион все не влезает - пусть найдет место для хвоста.
+			validsize = limit - offset;
+			if (!copyIn(limit, static_cast<const char *>(src) + validsize, size - validsize)) {
+				return false;
+			}
+		}
+
+		return region->copyIn(offset - instance->getAddr(), src, validsize);
+	}
+
+	return false;
 }
 
 } // namespace Core

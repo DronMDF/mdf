@@ -184,7 +184,7 @@ void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
 {
 	frame->flags = flags;
 	frame->txa_size = txa_size;
-	frame->txa_ptr = (frame->txa_size != 0) ? (USER_MEMORY_BASE + USER_TXA_BASE + txa_offset) : 0;
+	frame->txa_ptr = (frame->txa_size != 0) ? (USER_TXA_BASE - USER_MEMORY_BASE + txa_offset) : 0;
 	frame->caller = caller,
 	frame->retmagic = RETMAGIC;
 }
