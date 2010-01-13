@@ -30,7 +30,7 @@ static
 void PrintByte (const uint64_t value)
 {
 	static const char * const bip[] =
-		{ "b", "KiB", "MiB", "GiB" };
+		{ " B", " KiB", " MiB", " GiB" };
 
 	uint64_t bv = value;
 	int v = 0;
