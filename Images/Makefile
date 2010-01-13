@@ -17,47 +17,16 @@ release : MDF_PACKAGES_CLEANUP=MDF-libc Kernel-IA32 KernelLib Core Stub-IA32-Typ
 DATE=${shell date +%Y%m%d}
 
 all help :
-	@echo "Варианты сборки: iso - grub legasy iso, iso2 - grub2 iso, flash - grub2 flash."
-
-.PHONY: iso mdf-current-legacy.iso
-iso mdf-current-legacy.iso : root
-	rm -rf ${MDF_TEMP}/iso mdf-current-legacy.iso
-	mkdir -p ${MDF_TEMP}/iso/MDF.Root
-	mkdir -p ${MDF_TEMP}/iso/MDF
-	mkdir -p ${MDF_TEMP}/iso/MDF.iso
-
-	cp -a iso/boot ${MDF_TEMP}/iso/boot
-
-	# бинарники
-	cp -a ${MDF_ROOT}/* ${MDF_TEMP}/iso/MDF.Root/
-
-	# Исходники
-	cp -a ${MDF_REPOS}/* ${MDF_TEMP}/iso/MDF/
-
-	# Исходники для сборки имиджей
-	cp -a qemu ${MDF_TEMP}/iso/MDF.iso/
-	cp -a .bochsrc ${MDF_TEMP}/iso/MDF.iso/
-	cp -a Makefile ${MDF_TEMP}/iso/MDF.iso/
-	cp -a iso ${MDF_TEMP}/iso/MDF.iso/
-
-	# Зачистка от SVN информации
-	find ${MDF_TEMP}/iso -name .svn | xargs rm -rf
-
-	mkisofs -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 \
-		-boot-info-table -iso-level 3 -r -J -input-charset=utf8 \
-		-publisher "Dron <dron@infosec.ru>" \
-		-o mdf-current-legacy.iso ${MDF_TEMP}/iso
+	@echo "Варианты сборки: iso2 - grub2 iso, flash - grub2 flash."
 
 .PHONY: iso2 mdf-current.iso
 iso2 mdf-current.iso : root grub2
 	rm -rf ${MDF_TEMP}/iso2 ${MDF_TEMP}/iso2.tmp mdf-current.iso
-	mkdir -p ${MDF_TEMP}/iso2/MDF.Root
-	mkdir -p ${MDF_TEMP}/iso2/MDF
-	mkdir -p ${MDF_TEMP}/iso2/MDF.iso
-	mkdir -p ${MDF_TEMP}/iso2.tmp
+	mkdir -p ${MDF_TEMP}/iso2
 
-	# TODO Создать образ GRUB
+	# Создать образ GRUB
 	mkdir -p ${MDF_TEMP}/iso2/boot/grub
+	mkdir -p ${MDF_TEMP}/iso2.tmp
 	${GRUB2_ROOT}/bin/grub-mkimage -o ${MDF_TEMP}/iso2.tmp/grub-image.tmp \
 		${GRUB2_MODULES} biosdisk iso9660
 	cp ${GRUB2_ROOT}/lib/grub/i386-pc/cdboot.img ${MDF_TEMP}/iso2/boot/grub/grub-image
@@ -65,18 +34,16 @@ iso2 mdf-current.iso : root grub2
 	cp grub.cfg ${MDF_TEMP}/iso2/boot/grub/
 
 	# бинарники
-	cp -a ${MDF_ROOT}/* ${MDF_TEMP}/iso2/MDF.Root/
+	cp -a ${MDF_ROOT} ${MDF_TEMP}/iso2/MDF.Root
 
 	# Исходники
-	cp -a ${MDF_REPOS}/* ${MDF_TEMP}/iso2/MDF/
+	cp -a ${MDF_REPOS} ${MDF_TEMP}/iso2/MDF
+	rm -rf ${MDF_TEMP}/iso2/MDF/Images/* ${MDF_TEMP}/iso2/MDF/.hg*
 
 	# Исходники для сборки имиджей
-	cp -a qemu ${MDF_TEMP}/iso2/MDF.iso/
-	cp -a .bochsrc ${MDF_TEMP}/iso2/MDF.iso/
-	cp -a Makefile ${MDF_TEMP}/iso2/MDF.iso/
-
-	# Зачистка от SVN информации
-	find ${MDF_TEMP}/iso2 -name .svn | xargs rm -rf
+	cp -a Makefile qemu .bochsrc ${MDF_TEMP}/iso2/MDF/Images/
+	cp -a grub.cfg mb_elf_sym.patch ${MDF_TEMP}/iso2/MDF/Images/
+	#cp -a qemu.disk ${MDF_TEMP}/iso2/MDF/Images/
 
 	mkisofs -b boot/grub/grub-image -no-emul-boot -boot-load-size 4 \
 		-boot-info-table -iso-level 3 -r -J -input-charset=utf8 \
@@ -110,11 +77,6 @@ flash mdf-current.flash : root
 
 .PHONY: release
 release : mdf-${DATE}.iso.bz2 mdf-${DATE}.flash
-
-.PHONY: release-legacy
-release-legacy mdf-${DATE}-legacy.iso.bz2 : mdf-current-legacy.iso
-	cp $< mdf-${DATE}-legacy.iso
-	bzip2 -f mdf-${DATE}-legacy.iso
 
 mdf-${DATE}.iso.bz2 : mdf-current.iso
 	cp $< mdf-${DATE}.iso
