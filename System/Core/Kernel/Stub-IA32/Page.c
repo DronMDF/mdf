@@ -606,10 +606,15 @@ bool StubMemoryReadable (laddr_t addr, size_t size)
 // Просто, это вынуждает применять const_cast в коре.
 laddr_t StubPageTemporary (PageInfo *page)
 {
-	if (page->kaddr != 0)
+	if (page->kaddr != 0) {
+		STUB_ASSERT(!isSet(page->flags, PFLAG_TEMPORARY) &&
+			!isSet(page->flags, PFLAG_KERNEL),
+			"Kernel addr fon non-kernel page");
+		STUB_ASSERT(isSet(page->flags, PFLAG_TEMPORARY | PFLAG_KERNEL),
+			"Kernel addr with invalid flags combination");
 		return page->kaddr;
+	}
 
-	//StubLock (&tempotrary);
 	for (laddr_t tptr = KERNEL_TEMP_BASE;
 		tptr < KERNEL_TEMP_BASE + KERNEL_TEMP_SIZE;
 		tptr += PAGE_SIZE)
@@ -629,17 +634,20 @@ laddr_t StubPageTemporary (PageInfo *page)
 
 void StubPageUntemporary (PageInfo *page)
 {
-	STUB_ASSERT (!isSet(page->flags, PFLAG_TEMPORARY), "Not temporary page");
 	STUB_ASSERT (page->kaddr == 0, "Missing temp page addr");
+	if (isSet(page->flags, PFLAG_KERNEL)) {
+		// В основном это для страниц видеопамяти, которые и так в
+		// пространстве ядра, но не TEMPORARY
+		return;
+	}
+	
+	STUB_ASSERT (!isSet(page->flags, PFLAG_TEMPORARY), "Not temporary page");
 
 	const laddr_t addr = page->kaddr;
 
-	//StubLock (&tempotrary);
 	page->kaddr = 0;
 	page->flags &= ~PFLAG_TEMPORARY;
 	stubPageTable[ptidx(addr)] = 0;
-	// StubUnlock (&temporary);
-
 	StubPageFlush();
 }
 
