@@ -144,11 +144,11 @@ static PageRegion *pageRegion[MAX_PAGE_REGION] = {0};
 typedef uint32_t page_descriptor_t;
 
 static
-page_descriptor_t * const stubPageTable =
+volatile page_descriptor_t * const stubPageTable =
 	(page_descriptor_t *)KERNEL_PAGETABLE_BASE;
 
 static
-page_descriptor_t * const stubPageDir =
+volatile page_descriptor_t * const stubPageDir =
 	(page_descriptor_t *)(KERNEL_PAGETABLE_BASE + KERNEL_PAGETABLE_BASE / PAGE_SIZE * 4);
 
 // Индекс PDir в самом себе -
@@ -427,7 +427,7 @@ void StubPageInitPDir (const laddr_t ldir)
 	StubMemoryClear (l2vptr(ldir), PAGE_SIZE);
 
 	// Промапить ядро
-	StubMemoryCopy (l2vptr(ldir), stubPageDir, stubPdIdx * 4);
+	StubMemoryCopy (l2vptr(ldir), (const void *)stubPageDir, stubPdIdx * 4);
 }
 
 void StubPageTaskInit (Task *task)

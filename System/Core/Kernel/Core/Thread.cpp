@@ -84,8 +84,8 @@ void ResourceThread::setStack (offset_t request, size_t request_size, int flags)
 	// TODO: Установить идентификатор вызывающей нити.
 	StubSetStackFrame (&stack_frame, 0, request, request_size, flags);
 
-	m_stack.Copy (&stack_frame, sizeof (struct StubStackFrame),
-		USER_STACK_SIZE - sizeof (struct StubStackFrame));
+	m_stack.copyIn(USER_STACK_SIZE - sizeof (struct StubStackFrame),
+		       &stack_frame, sizeof (struct StubStackFrame));
 }
 
 void ResourceThread::setRequest (const void *request, size_t request_size, int flags)
@@ -95,9 +95,11 @@ void ResourceThread::setRequest (const void *request, size_t request_size, int f
 
 	m_txa_offset = 0;
 
-	if (!isSet(flags, RESOURCE_CALL_COPY)) {
+	const bool map_request = !isSet(flags, RESOURCE_CALL_COPY);
+	
+	if (map_request) {
 		// При маппинге параметров учитывается смещение.
-		m_txa_offset = reinterpret_cast<laddr_t>(request) & ~(PAGE_SIZE - 1); //PFLAG_MASK
+		m_txa_offset = reinterpret_cast<laddr_t>(request) % PAGE_SIZE;
 	}
 
 	STUB_ASSERT (m_txa_offset + request_size > USER_TXA_SIZE, "Big request");
@@ -108,19 +110,18 @@ void ResourceThread::setRequest (const void *request, size_t request_size, int f
 	m_txa_access = RESOURCE_ACCESS_READ |
 		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
 
-	if (isSet(flags, RESOURCE_CALL_COPY)) {
-		m_txa->Copy (request, request_size);
+	if (map_request) {
+		m_txa->Map(request, request_size);
 	} else {
-		m_txa->Map (request, request_size);
+		m_txa->copyIn(0, request, request_size);
 	}
 
 	// TODO: В стек наверное надо устанавливать смещение в пространстве
 	//	пользователя.
 	setStack (m_txa_offset, request_size, flags);
 
-	if (!isSet(flags, RESOURCE_CALL_READONLY) &&
-		isSet(flags, RESOURCE_CALL_COPY))
-	{
+	// TODO: Выбросить эту ерунду нафиг
+	if (!isSet(flags, RESOURCE_CALL_READONLY) && !map_request) {
 		// Зафиксировать место откуда блок поступил, чтобы потом скопировать его обратно.
 	}
 }
@@ -312,7 +313,8 @@ bool ResourceThread::createRequestArea(ResourceThread *caller,
 	
 	StubStackFrame stack_frame;
 	StubSetStackFrame(&stack_frame, caller_id, m_txa_offset, size, m_txa_access);
-	m_stack.Copy(&stack_frame, sizeof(StubStackFrame), USER_STACK_SIZE - sizeof(StubStackFrame));
+	m_stack.copyIn(USER_STACK_SIZE - sizeof(StubStackFrame),
+		       &stack_frame, sizeof(StubStackFrame));
 
 	return true;
 }

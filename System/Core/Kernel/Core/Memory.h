@@ -56,7 +56,6 @@ public:
 
 	bool PhysicalBind(paddr_t poffset, size_t size, offset_t shift);
 
-	void Copy(const void *src, size_t size, offset_t offset = 0);
 	void Map(const void *src, size_t size, offset_t offset = 0);
 
 	bool copyIn(offset_t offset, const void *src, size_t size);

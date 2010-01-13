@@ -109,31 +109,13 @@ bool Memory::PhysicalBind (paddr_t poffset, size_t size, offset_t shift)
 	return true;
 }
 
-void Memory::Copy(const void *src, size_t size, offset_t offset)
-{
-	const char *ssrc = reinterpret_cast<const char *>(src);
-
-	for (offset_t soff = 0; soff < size && offset + soff < m_size; )
-	{
-		const PageInstance *instance = PageFault(offset + soff);
-		STUB_ASSERT (instance == 0, "No page");
-
-		PageInfo *page = StubGetPageByInstance(instance);
-
-		const laddr_t addr = StubPageTemporary(page);
-		const offset_t poff = (offset + soff) % PAGE_SIZE;
-		const size_t psize = min(PAGE_SIZE - poff, size - soff, m_size - offset - soff);
-		StubMemoryCopy (reinterpret_cast<void *>(addr + poff), ssrc + soff, psize);
-		StubPageUntemporary(page);
-
-		soff += psize;
-	}
-}
-
 void Memory::Map (const void *ptr, size_t size, offset_t offset)
 {
-	// Ну пока не мапим ничего.
-	Copy(ptr, size, offset);
+	STUB_ASSERT(reinterpret_cast<laddr_t>(ptr) % PAGE_SIZE != offset % PAGE_SIZE,
+		    "Unaligned mapping");
+		    
+	// TODO: Ну пока не мапим ничего.
+	copyIn(offset, ptr, size);
 }
 
 bool Memory::inBounds (laddr_t base, laddr_t addr, offset_t offset) const

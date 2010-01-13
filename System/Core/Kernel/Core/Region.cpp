@@ -160,12 +160,12 @@ const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInsta
 
 	if (offset < PAGE_SIZE) {
 		// Первая страница копируется не полностью
-		m_memory.Copy(reinterpret_cast<void *>(pa + m_offset),
-			PAGE_SIZE - m_offset, m_offset);
+		m_memory.copyIn(m_offset, reinterpret_cast<void *>(pa + m_offset),
+			PAGE_SIZE - m_offset);
 	} else {
 		// Последняя тоже не полностью, но за этим проследит Memory
-		m_memory.Copy(reinterpret_cast<void *>(pa),
-			PAGE_SIZE, offset & ~(PAGE_SIZE - 1));
+		m_memory.copyIn(offset & ~(PAGE_SIZE - 1),
+				reinterpret_cast<void *>(pa), PAGE_SIZE);
 	}
 
 	StubPageUntemporary(pp);
