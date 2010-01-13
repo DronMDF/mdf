@@ -51,7 +51,7 @@ struct commands sCommands[] __initdata__ = {
 };
 
 static
-bool __init__ StubFindCommand (const char * const cl)
+bool __init__ StubFindCommand (const char *cl)
 {
 	for (int i = 0; sCommands[i].cmd != nullptr; i++) {
 		const size_t len = StubStringLength (sCommands[i].cmd);
@@ -65,15 +65,22 @@ bool __init__ StubFindCommand (const char * const cl)
 }
 
 static
-void __init__ StubParseCommandLine (const char * const cl)
+void __init__ StubParseCommandLine (const char *cl)
 {
-	for (int i = 0; cl[i] != '\0'; i++) {
-		if (cl[i] == ' ') continue;
-
-		if (!StubFindCommand (cl + i)) {
-			// TODO: Писать содержимое команды небезопасно.
-			CorePrint ("Unknown command '%s'.\n", cl + i);
+	while (*cl != '\0') {
+		if (*cl != ' ') {
+			if (StubFindCommand(cl)) {
+				while (*cl != '\0' && *cl != ' ') {
+					cl++;
+				}
+				continue;
+			} else {
+				// TODO: Писать содержимое команды небезопасно.
+				CorePrint ("Unknown command '%s'.\n", cl);
+			}
 		}
+
+		cl++;
 	}
 
 	StubSetConsole(nullptr);	// Актифируем дефолтную консоль
