@@ -188,6 +188,7 @@ BOOST_AUTO_TEST_CASE(activate)
 	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread);
 }
 
+// TODO: Отдельно надо потестить Копиин в стек, копиин в TXA и копиин в процесс
 BOOST_AUTO_TEST_CASE(testCopyIn)
 {
 	testThread thread;

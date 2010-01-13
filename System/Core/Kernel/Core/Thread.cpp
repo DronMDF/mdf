@@ -319,33 +319,15 @@ bool ResourceThread::createRequestArea(ResourceThread *caller,
 
 bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 {
-	// TODO: Кароче, надо найти регион, который включает данную область
-	//	и вызвать Copy на него, А пока очень костыльно.
-
-	// TODO: Причем в процессе стоит подходить к copyIn более творчески, ибо
-	//	блок может пересекать несколько регионов.
-	
-	const char *ssrc = reinterpret_cast<const char *>(src);
-	
-	for (offset_t soff = 0; soff < size && soff < size; )
-	{
-		uint32_t access = 0;	// А это вообще косстыль
-		const PageInstance *instance = PageFault(dst + soff, &access);
-		if (instance == 0) return false;
-
-		PageInfo *page = StubGetPageByInstance(instance);
-		const laddr_t addr = StubPageTemporary(page);
-		const offset_t poff = (dst + soff) % PAGE_SIZE;
-		// TODO: На этом уровне трудно контролировать размер региона. а надо.
-		// 	Значит эта функция просится в регион (она там уже есть - Copy)
-		const size_t psize = min(PAGE_SIZE - poff, size - soff/*, m_size - offset - soff*/);
-		StubMemoryCopy (reinterpret_cast<void *>(addr + poff), ssrc + soff, psize);
-		StubPageUntemporary(page);
-
-		soff += psize;
+	if (m_stack.inBounds(USER_STACK_BASE, dst)) {
+		return m_stack.copyIn(dst - USER_STACK_BASE, src, size);
 	}
 
-	return true;
+	if (m_txa != 0 && m_txa->inBounds(USER_TXA_BASE, dst)) {
+		return m_txa->copyIn(dst - USER_TXA_BASE, src, size);
+	}
+
+	return m_process->copyIn(dst, src, size);
 }
 
 void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
