@@ -1,9 +1,10 @@
 
 Description "Библиотека для обращения к серверу имен";
 
-Release 0.0.4.1 {
+Release 0.0.5 {
 	Depend MDF-Env-0.0.4.1;
-	Depend Kernel-IA32-0.0.35.10;
+	Depend Core;
+	Depend MDF-libc;
 
 	Source Repository System/Core/NamerLib;
 }

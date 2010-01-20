@@ -1,9 +1,6 @@
 //
-// Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
-// All rights reserved.
-//
-// Created: 11 September 2003 23:08:36
-// Но реальное содержимое: Пнд Июн 13 22:23:41 2005
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
 #include <MDF/Kernel2.h>

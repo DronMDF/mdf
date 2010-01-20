@@ -1,11 +1,12 @@
 //
-// Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
-// All rights reserved.
-//
-// Создано: Втр Июн 14 21:29:28 2005
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include <MDF/Kernel2.h>
+#include <MDF/Types.h>
+#include <MDF/Kernel.h>
+#include <MDF/KernelImp.h>
+
 #include <MDF/IOPorts.h>
 #include <MDF/Locks.h>
 
@@ -23,12 +24,56 @@ void PrintCharacter(int ch);
 void PrintString (const char *str);
 
 static
-unsigned short *vbuf =
-	(unsigned short *)NULL;
+volatile unsigned short *vbuf = NULL;
 
 static char tmpmsg[256];
 
 lock_t OutputLock;
+
+static
+volatile void *getVideoMemory ()
+{
+	id_t rid = INVALID_ID;
+
+	const struct KernelCreateRegionParam cpar = {
+		.offset = 0,
+		.size = 4000,
+		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
+	};
+
+	if (KernelCreate(RESOURCE_TYPE_REGION, &cpar, sizeof(cpar), &rid) != SUCCESS)
+		return NULL;
+
+	if (rid == INVALID_ID)
+		return NULL;
+
+	// Биндим на физическую видеопамять
+	const struct KernelModifyRegionBindParam mpar = {
+		.id = 0,
+		.offset = 0xb8000,
+		.size = 4000,
+		.shift = 0,
+	};
+
+	if (KernelModify(rid, RESOURCE_MODIFY_REGION_PHYSICALBIND, &mpar, sizeof(mpar)) != SUCCESS) {
+		KernelDetach(rid, 0);
+		return NULL;
+	}
+
+	laddr_t addr = 0;
+	if (KernelModify(rid, RESOURCE_MODIFY_REGION_MAP, &addr, sizeof(laddr_t)) != SUCCESS) {
+		KernelDetach(rid, 0);
+		return NULL;
+	}
+
+	size_t addr_size = sizeof(laddr_t);
+	if (KernelInfo(rid, RESOURCE_INFO_REGION_INSTANCE_ADDR, &addr, &addr_size) != SUCCESS) {
+		KernelDetach(rid, 0);
+		return NULL;
+	}
+
+	return (volatile void *)addr;
+}
 
 static result GetPortAccess (int first_port, int last_port)
 {

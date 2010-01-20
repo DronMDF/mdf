@@ -1,37 +1,39 @@
 //
-// Copyright (c) 2000-2006 Andrey Valyaev (dron@infosec.ru)
-// All rights reserved.
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#ifndef __MDF_NAMER_H_
-#define __MDF_NAMER_H_
+#pragma once
 
 #include <MDF/Kernel.h>
 
-#define NAMER_OK		0
-#define NAMER_NO_SERVICE	1
-#define NAMER_INVALID_PARAM	2
-#define NAMER_BUSY		3
-#define NAMER_FAIL		4
-
-union namer_message
-{
-	struct {
-		int Status;
-		char Reply[];
-	} Reply;
-
-	struct {
-		size Offset;
-		size Size;
-		char Request[];
-	} Request;
+enum {
+	NAMER_OK = 0,
+	NAMER_NO_SERVICE = 1,
+	NAMER_INVALID_PARAM = 2,
+	NAMER_BUSY = 3,
+	NAMER_FAIL = 4,
 };
 
+// TODO: Заменить на прообраз протокола
+//	Или во! Сделать библиотеку NamerProto
+// union namer_message
+// {
+// 	struct {
+// 		int Status;
+// 		char Reply[];
+// 	} Reply;
+// 
+// 	struct {
+// 		size Offset;
+// 		size Size;
+// 		char Request[];
+// 	} Request;
+// };
+
 // NamerSelfServiceName
-#define NSSN "Namer://"
+static const char NamerName[] = "NAMER";
+static const char NamerPrefix[] = "namer://";
 
-result NamerCall (const void * const Buffer, const size BufferSize, const uint32 Flags);
-handle NamerProcess (void);
-
-#endif // __MDF_NAMER_H_
+int NamerCall(void *buffer, size_t size, uint32_t flags);
+id_t NamerProcess();

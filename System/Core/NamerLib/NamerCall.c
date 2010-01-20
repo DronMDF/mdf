@@ -1,53 +1,63 @@
 //
-// Copyright (c) 2000-2006 Andrey Valyaev (dron@infosec.ru)
-// All rights reserved.
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
+#include <MDF/Types.h>
 #include <MDF/Kernel.h>
+#include <MDF/KernelImp.h>
+
+#include <string.h>
+
+#include "Namer.h"
 
 // TODO: Надо будет разнести по объектникам... пока мне лень...
 
-// TODO: Вообще здесь должен стоять BAD_HANDLE, Но у нас пока проблемы с bss.
-static handle NamerHandle = 0xffffffff;
+static id_t NamerId = INVALID_ID;
 
-static handle NamerFind (void)
+static id_t NamerFind()
 {
-	if (NamerHandle != 0xffffffff)
-		return NamerHandle;
+	if (NamerId != INVALID_ID) {
+		return NamerId;
+	}
 
 	// Ждем намера
 	// TODO: По идее надо таймаут предусмотреть...
 	while (1) {
-		if (KernelResourceFind ("Namer", 6, &NamerHandle) == KERNEL_OK)
-			return NamerHandle;
+		if (KernelFind (NamerName, strlen(NamerName), &NamerId) == SUCCESS) {
+			return NamerId;
+		}
 
-		KernelSheduleNext (100);
+		KernelWait(0, 0, 100);
 	}
 
-	return BAD_HANDLE;
+	return INVALID_ID;
 }
 
-result NamerCall (const void * const Buffer, const size BufferSize, const uint32 Flags)
+int NamerCall(void *buffer, size_t size, uint32_t flags)
 {
-	handle nh = NamerFind ();
+	const id_t nid = NamerFind();
 
-	if (nh == BAD_HANDLE)
-		return KERNEL_INVALIDHANDLE;
+	if (nid == INVALID_ID) {
+		return ERROR_INVALIDID;
+	}
 
-	return KernelResourceCall (nh, Buffer, BufferSize, Flags);
+	return KernelCall(nid, buffer, size, flags);
 }
 
-handle NamerProcess (void)
+id_t NamerProcess(void)
 {
-	handle nh = NamerFind ();
+	const id_t nid = NamerFind();
 
-	if (nh == BAD_HANDLE)
-		return BAD_HANDLE;
+	if (nid == INVALID_ID) {
+		return INVALID_ID;
+	}
 
-	handle namer_proc;
-	size sz = (size)sizeof (namer_proc);
-	if (KernelResourceInfo (KERNEL_INFO_RESOURCE_OWNER, nh, &namer_proc, &sz) != KERNEL_OK)
-		return BAD_HANDLE;
+	id_t pid = INVALID_ID;
+	size_t pid_size = sizeof(pid);
+	if (KernelInfo(nid, RESOURCE_INFO_OWNER, &pid, &pid_size) != SUCCESS) {
+		return INVALID_ID;
+	}
 
-	return namer_proc;
+	return pid;
 }

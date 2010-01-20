@@ -74,6 +74,7 @@ enum KERNEL_RESOURCE_INFO {
 	RESOURCE_INFO_CORE_VERSION,
 
 	RESOURCE_INFO_MEMORY,	// Статистика памяти
+	RESOURCE_INFO_OWNER,	// Найти хозяина ресурса
 
 	RESOURCE_INFO_REGION	= (RESOURCE_TYPE_REGION << 16),
 	RESOURCE_INFO_REGION_INSTANCE_ADDR,	// Адрес региона в текущей инстанции.

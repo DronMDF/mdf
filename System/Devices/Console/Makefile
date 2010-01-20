@@ -1,8 +1,6 @@
 #
-# Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
-# All rights reserved.
-#
-# Создано: Втр Июн 14 22:07:40 2005
+# Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+# This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
 PREFIX = $(MDF_IMAGE)/System/Device
