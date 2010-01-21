@@ -1,7 +1,8 @@
 
 Description "Библиотека для обращения к серверу имен";
 
-Release 0.0.5 {
+Release 0.0.5.1
+{
 	Depend MDF-Env-0.0.4.1;
 	Depend Core;
 	Depend MDF-libc;

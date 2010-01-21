@@ -136,3 +136,38 @@ int KernelInfo (id_t id, int info_id, void *info, size_t *info_size)
 }
 #endif
 
+static inline
+void write_io_byte(uint16_t port, uint8_t value)
+{
+	__asm__ __volatile__ (
+		"outb %b0, %w1" : :
+		"a"(value), "Nd"(port));
+}
+
+static inline
+uint8_t read_io_byte(uint16_t port)
+{
+        int value;
+        __asm__ __volatile__ (
+		"inb %w1, %b0"
+		: "=a"(value)
+		: "Nd" (port));
+        return value;
+}
+
+static inline
+void lock(lock_t *lock)
+{
+	lock_t oldval = 666;
+	do {
+		__asm__ __volatile__ ( "xchgl %0, %1"
+                	:"=q" (oldval), "=m" (*lock)
+                	:"0" (oldval) : "memory" );
+	} while (oldval != 0);
+}
+
+static inline
+void unlock(lock_t *lock)
+{
+	*lock = 0;
+}

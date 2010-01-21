@@ -5,7 +5,7 @@
 
 #include <MDF/Types.h>
 #include <MDF/Kernel.h>
-#include <MDF/KernelImp.h>
+//#include <MDF/KernelImp.h>
 
 #include <string.h>
 

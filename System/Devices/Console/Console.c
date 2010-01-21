@@ -7,9 +7,6 @@
 #include <MDF/Kernel.h>
 #include <MDF/KernelImp.h>
 
-#include <MDF/IOPorts.h>
-#include <MDF/Locks.h>
-
 #include <MDF/Namer.h>
 
 #include <stdio.h>
@@ -19,19 +16,17 @@
 
 char id[] = "MDFVER: System-Device/Console-" VERSION;
 
-void ConsoleService (handle tid, void *Buffer, size BufferSize, uint32 Flags);
+void ConsoleService(id_t tid, void *buffer, size_t size, uint32_t flags);
 void PrintCharacter(int ch);
-void PrintString (const char *str);
+void PrintString(const char *str);
+
+static volatile uint16_t *vbuf = NULL;
+static lock_t console_lock;
+
+static bool port_enable = false;
 
 static
-volatile unsigned short *vbuf = NULL;
-
-static char tmpmsg[256];
-
-lock_t OutputLock;
-
-static
-volatile void *getVideoMemory ()
+volatile uint16_t *getVideoMemory()
 {
 	id_t rid = INVALID_ID;
 
@@ -72,125 +67,123 @@ volatile void *getVideoMemory ()
 		return NULL;
 	}
 
-	return (volatile void *)addr;
+	return (volatile uint16_t *)addr;
 }
 
-static result GetPortAccess (int first_port, int last_port)
+static int GetPortAccess (uint16_t first_port, uint16_t last_port)
 {
-	result rv;
-	handle ph;
+// 	result rv;
+// 	handle ph;
+// 
+// 	struct ResourceCreatePortParam p = {
+// 		first_port,
+// 		last_port,
+// 		ACCESS_WRITE
+// 	};
+// 
+// 	if ((rv = KernelResourceCreate (RESOURCE_PORT, &p,
+// 		sizeof (struct ResourceCreatePortParam), &ph)) != KERNEL_OK)
+// 		return rv;
 
-	struct ResourceCreatePortParam p = {
-		first_port,
-		last_port,
-		ACCESS_WRITE
-	};
-
-	if ((rv = KernelResourceCreate (RESOURCE_PORT, &p,
-		sizeof (struct ResourceCreatePortParam), &ph)) != KERNEL_OK)
-		return rv;
-
-	return KERNEL_OK;
+	port_enable = true;
+	return SUCCESS;
 }
 
-bool RegisterService ()
+bool RegisterService()
 {
-	handle namer_proc, id;
+	id_t namer_pid = NamerProcess();
 
-	namer_proc = NamerProcess ();
+	char tmpmsg[256];
+	sprintf(tmpmsg, "Console: Namer process id - %u.\n", namer_pid);
+	PrintString(tmpmsg);
 
-	sprintf (tmpmsg, "Console: Namer process id - %u.\n",
-		(unsigned int)namer_proc);
-	PrintString (tmpmsg);
-
-	if (KernelTPCCreate (0, ConsoleService, 0, &id) != KERNEL_OK)
-		return false;
-
-	PrintString ("Console: TPC entry created.\n");
-
-	// Надо разрешить намеру вызывать TPC
-	if (KernelResourceAttach (id, namer_proc, KERNEL_ACCESS_CALL, 0) != KERNEL_OK) {
-		PrintString ("Console: KernelResourceAttach failed!\n");
-		return false;
-	}
-
-	char req[256];
-	union namer_message *msg = (union namer_message *)req;
-
-	sprintf (msg->Request.Request,
-		NSSN "Register?prefix='Console://'&tpc=%u",
-		(unsigned int)id);
-	msg->Request.Offset = offsetof (union namer_message, Request.Request);
-	msg->Request.Size = strlen (msg->Request.Request) + 1;
-
-	sprintf (tmpmsg, "Console: registration request - '%s'\n",
-		msg->Request.Request);
-	PrintString (tmpmsg);
-
-	if (NamerCall (msg, msg->Request.Offset + msg->Request.Size, 0)
-		!= KERNEL_OK ||
-	    msg->Reply.Status != NAMER_OK)
-	{
-		PrintString ("Console: KernelResourceCall failed!\n");
-		return false;
-	}
+// 	if (KernelTPCCreate(0, ConsoleService, 0, &id) != KERNEL_OK)
+// 		return false;
+// 
+// 	PrintString ("Console: TPC entry created.\n");
+// 
+// 	// Надо разрешить намеру вызывать TPC
+// 	if (KernelResourceAttach (id, namer_proc, KERNEL_ACCESS_CALL, 0) != KERNEL_OK) {
+// 		PrintString ("Console: KernelResourceAttach failed!\n");
+// 		return false;
+// 	}
+// 
+// 	char req[256];
+// 	union namer_message *msg = (union namer_message *)req;
+// 
+// 	sprintf (msg->Request.Request,
+// 		NSSN "Register?prefix='Console://'&tpc=%u",
+// 		(unsigned int)id);
+// 	msg->Request.Offset = offsetof (union namer_message, Request.Request);
+// 	msg->Request.Size = strlen (msg->Request.Request) + 1;
+// 
+// 	sprintf (tmpmsg, "Console: registration request - '%s'\n",
+// 		msg->Request.Request);
+// 	PrintString (tmpmsg);
+// 
+// 	if (NamerCall (msg, msg->Request.Offset + msg->Request.Size, 0)
+// 		!= KERNEL_OK ||
+// 	    msg->Reply.Status != NAMER_OK)
+// 	{
+// 		PrintString ("Console: KernelResourceCall failed!\n");
+// 		return false;
+// 	}
 
 	return true;
 }
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
-	Unlock (&OutputLock);
+	unlock(&console_lock);
 
-	// TODO: Функцию надо переделывать!
-	if (KernelRegionPhysicalGet (0xb8000, 4000, &vbuf, (handle *)NULL) != KERNEL_OK)
-	{
-		return -1;
-	}
-
-	if (GetPortAccess (0x3d4, 0x3d5) != KERNEL_OK) {
-		return -1;
-	}
-
+	vbuf = getVideoMemory();
 	PrintString ("\nConsole: Video memory mapped.\n");
 
-	if (RegisterService () == false) {
+	if (GetPortAccess(0x3d4, 0x3d5) != SUCCESS) {
+		return -1;
+	}
+	PrintString ("\nConsole: Port access granted.\n");
+
+	if (RegisterService() == false) {
 		return -1;
 	}
 
+	PrintString ("\nConsole: Initialization done.\n");
 	return 0;
 }
 
-void ConsoleService (handle tid, void *Buffer, size BufferSize, uint32 Flags)
+void ConsoleService(id_t tid, void *buffer, size_t size, uint32_t flags)
 {
-	if (BufferSize < sizeof (union namer_message))
-		return;
-
-	union namer_message *msg = (union namer_message *)Buffer;
-
-	if (msg->Request.Offset + msg->Request.Size > BufferSize)
-		return;
-
-	// Консоль пока тупая до безобразия.
-	Lock(&OutputLock);
-
-	if (memchr ((char *)msg + msg->Request.Offset, 0, msg->Request.Size)
-		!= NULL)
-	{
-		PrintString ((char *)msg + msg->Request.Offset);
-	}
-
-	Unlock(&OutputLock);
+// 	if (BufferSize < sizeof (union namer_message))
+// 		return;
+// 
+// 	union namer_message *msg = (union namer_message *)Buffer;
+// 
+// 	if (msg->Request.Offset + msg->Request.Size > BufferSize)
+// 		return;
+// 
+// 	// Консоль пока тупая до безобразия.
+// 	Lock(&OutputLock);
+// 
+// 	if (memchr ((char *)msg + msg->Request.Offset, 0, msg->Request.Size)
+// 		!= NULL)
+// 	{
+// 		PrintString ((char *)msg + msg->Request.Offset);
+// 	}
+// 
+// 	Unlock(&OutputLock);
 
 	return;
 }
 
 int GetCursorPosition ()
 {
-	out (0x3d4, 14);
-	int hi = in (0x3d5);
-	out (0x3d4, 15);
-	int lo = in (0x3d5);
+	if (!port_enable) return 160;
+	
+	write_io_byte(0x3d4, 14);
+	int hi = read_io_byte(0x3d5);
+	write_io_byte(0x3d4, 15);
+	int lo = read_io_byte(0x3d5);
 
 	hi &= 0xff;
 	lo &= 0xff;
@@ -200,15 +193,17 @@ int GetCursorPosition ()
 
 void SetCursorPosition (int p)
 {
-	out (0x3d4, 15);
-	out (0x3d5, p & 0xff);
-	out (0x3d4, 14);
-	out (0x3d5, (p >> 8) & 0xff);
+	if (!port_enable) return;
+	
+	write_io_byte(0x3d4, 15);
+	write_io_byte(0x3d5, p & 0xff);
+	write_io_byte(0x3d4, 14);
+	write_io_byte(0x3d5, (p >> 8) & 0xff);
 }
 
 void PrintCharacter(int ch)
 {
-	int vptr = GetCursorPosition ();
+	int vptr = GetCursorPosition();
 
 	ch &= 0x7f;
 
@@ -231,13 +226,13 @@ void PrintCharacter(int ch)
 			break;
 	}
 
-	SetCursorPosition (vptr);
+	SetCursorPosition(vptr);
 }
 
-void PrintString (const char *str)
+void PrintString(const char *str)
 {
 	while (*str != 0) {
-		PrintCharacter (*str);
+		PrintCharacter(*str);
 		str++;
 	}
 }
