@@ -11,7 +11,7 @@ GRUB2_ROOT=${CURDIR}/grub2
 GRUB2_MODULES=normal sh ls cat help multiboot elf configfile
 
 MDF_ROOT=${CURDIR}/MDF.Root
-MDF_PACKAGES=Stub-IA32 Hello KernelInfo SchedulerTest TPCTest
+MDF_PACKAGES=Stub-IA32 Hello KernelInfo SchedulerTest TPCTest Console
 release : MDF_PACKAGES_CLEANUP=MDF-libc Kernel-IA32 KernelLib Core Stub-IA32-Types
 
 DATE=${shell date +%Y%m%d}

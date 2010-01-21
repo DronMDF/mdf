@@ -24,6 +24,7 @@ static volatile uint16_t *vbuf = NULL;
 static lock_t console_lock;
 
 static bool port_enable = false;
+static int vpemu = 80 * 24;
 
 static
 volatile uint16_t *getVideoMemory()
@@ -70,7 +71,7 @@ volatile uint16_t *getVideoMemory()
 	return (volatile uint16_t *)addr;
 }
 
-static int GetPortAccess (uint16_t first_port, uint16_t last_port)
+static int GetPortAccess(uint16_t first_port, uint16_t last_port)
 {
 // 	result rv;
 // 	handle ph;
@@ -85,7 +86,7 @@ static int GetPortAccess (uint16_t first_port, uint16_t last_port)
 // 		sizeof (struct ResourceCreatePortParam), &ph)) != KERNEL_OK)
 // 		return rv;
 
-	port_enable = true;
+//	port_enable = true;
 	return SUCCESS;
 }
 
@@ -135,20 +136,23 @@ bool RegisterService()
 int main(int argc, char **argv)
 {
 	unlock(&console_lock);
+	// TODO: ошибка, .bss так и не очищается для модулей.
+	port_enable = false;
 
 	vbuf = getVideoMemory();
-	PrintString ("\nConsole: Video memory mapped.\n");
+	vpemu = 80 * 24;
+	PrintString("Console: Video memory mapped.\n");
 
 	if (GetPortAccess(0x3d4, 0x3d5) != SUCCESS) {
 		return -1;
 	}
-	PrintString ("\nConsole: Port access granted.\n");
+	PrintString("Console: Port access granted.\n");
 
 	if (RegisterService() == false) {
 		return -1;
 	}
 
-	PrintString ("\nConsole: Initialization done.\n");
+	PrintString("Console: Initialization done.\n");
 	return 0;
 }
 
@@ -178,7 +182,9 @@ void ConsoleService(id_t tid, void *buffer, size_t size, uint32_t flags)
 
 int GetCursorPosition ()
 {
-	if (!port_enable) return 160;
+	if (!port_enable) {
+		return vpemu;
+	}
 	
 	write_io_byte(0x3d4, 14);
 	int hi = read_io_byte(0x3d5);
@@ -193,7 +199,10 @@ int GetCursorPosition ()
 
 void SetCursorPosition (int p)
 {
-	if (!port_enable) return;
+	if (!port_enable) {
+		vpemu = p;
+		return;
+	};
 	
 	write_io_byte(0x3d4, 15);
 	write_io_byte(0x3d5, p & 0xff);
@@ -205,8 +214,6 @@ void PrintCharacter(int ch)
 {
 	int vptr = GetCursorPosition();
 
-	ch &= 0x7f;
-
 	if (vptr >= 80 * 25) {
 		// Scroll
 		for (int i = 0; i < 80 * 24; i++)
@@ -215,6 +222,8 @@ void PrintCharacter(int ch)
 			vbuf[i] = 0;
 		vptr -= 80;
 	}
+
+	ch &= 0x7f;
 
 	switch (ch) {
 		default:

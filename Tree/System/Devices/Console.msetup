@@ -1,7 +1,8 @@
 
 Description "Драйвер текстового вывода"
 
-Release 0.0.27 {
+Release 0.0.27.6
+{
 	Depend Core;
 	Depend KernelLib-0.0.8;
 	Depend NamerLib-0.0.4.1;
