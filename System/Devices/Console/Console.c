@@ -73,20 +73,24 @@ volatile uint16_t *getVideoMemory()
 
 static int GetPortAccess(uint16_t first_port, uint16_t last_port)
 {
-// 	result rv;
-// 	handle ph;
-// 
-// 	struct ResourceCreatePortParam p = {
-// 		first_port,
-// 		last_port,
-// 		ACCESS_WRITE
-// 	};
-// 
-// 	if ((rv = KernelResourceCreate (RESOURCE_PORT, &p,
-// 		sizeof (struct ResourceCreatePortParam), &ph)) != KERNEL_OK)
-// 		return rv;
+	const struct KernelCreateRegionParam cpar = {
+		.offset = 0,
+		.size = last_port - first_port + 1,
+		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
+	};
 
-//	port_enable = true;
+	id_t rid = INVALID_ID;
+	
+	int rv = KernelCreate(RESOURCE_TYPE_REGION, &cpar, sizeof(cpar), &rid);
+	if (rv != SUCCESS) return rv;
+
+	rv = KernelModify(rid, RESOURCE_MODIFY_REGION_PORTBIND, &first_port, sizeof(uint16_t));
+	if (rv != SUCCESS) {
+		KernelDetach(rid, 0);
+		return rv;
+	}
+
+	port_enable = true;
 	return SUCCESS;
 }
 
@@ -144,6 +148,7 @@ int main(int argc, char **argv)
 	PrintString("Console: Video memory mapped.\n");
 
 	if (GetPortAccess(0x3d4, 0x3d5) != SUCCESS) {
+		PrintString("Console: Port access failed.\n");
 		return -1;
 	}
 	PrintString("Console: Port access granted.\n");

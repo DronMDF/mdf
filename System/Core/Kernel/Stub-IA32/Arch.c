@@ -818,7 +818,7 @@ int StubCreate (const int type, const uaddr_t param_ptr,
 	int rv = CoreCreate (task, type, l2vptr(param), param_size, l2vptr(id));
 
 	if (rv != SUCCESS) {
-		CorePrint ("CoreCreate has failed %u\n", rv);
+		CorePrint ("CoreCreate fail: %u\n", rv);
 	}
 
 	return rv;
@@ -837,7 +837,7 @@ int StubCall (id_t id, uaddr_t param, size_t size, int flags)
 	int rv = CoreCall(task, id, l2vptr(paddr), size, flags);
 
 	if (rv != SUCCESS) {
-		CorePrint ("CoreCall has failed %u\n", rv);
+		CorePrint ("CoreCall fail: %u\n", rv);
 	}
 
 	return rv;
@@ -851,15 +851,21 @@ int StubAttach (const id_t rid, const id_t pid, const int access, const uint32_t
 	int rv = CoreAttach (task, rid, pid, access, specific);
 
 	if (rv != SUCCESS)
-		CorePrint ("CoreAttach has failed %u\n", rv);
+		CorePrint ("CoreAttach fail: %u\n", rv);
 
 	return rv;
 }
 
-int StubDetach (const id_t id __unused__, const int flags __unused__)
+int StubDetach (const id_t id, const int flags)
 {
-	STUB_FATAL ("Under constructed");
-	return -1;
+	const Task *task = StubGetCurrentTask();
+	
+	const int rv = CoreDetach(task, id, flags);
+	if (rv != SUCCESS) {
+		CorePrint("CoreDetach fail: %u\n", rv);
+	}
+	
+	return rv;
 }
 
 int StubModify (const id_t id, const int modify_id,
@@ -879,7 +885,7 @@ int StubModify (const id_t id, const int modify_id,
 	// Вывод информации о сбое
 	const int rv = CoreModify(task, id, modify_id, l2vptr(param), param_size);
 	if (rv != SUCCESS) {
-		CorePrint("KernelModify 0x%08x return %u\n", modify_id, rv);
+		CorePrint("CoreModify(0x%08x) fail: %u\n", modify_id, rv);
 	}
 
 	return rv;
@@ -939,7 +945,7 @@ int StubInfo (id_t id, int info_id, uaddr_t info_ptr, uaddr_t info_size_ptr)
 
 	int rv = CoreInfo(task, id, info_id, info, info_size);
 	if (rv != SUCCESS) {
-		CorePrint ("CoreInfo(0x%08x) has failed %u\n", info_id, rv);
+		CorePrint ("CoreInfo(0x%08x) fail: %u\n", info_id, rv);
 	}
 
 	return rv;
