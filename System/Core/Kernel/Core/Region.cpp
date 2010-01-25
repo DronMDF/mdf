@@ -11,20 +11,6 @@
 
 namespace Core {
 
-// -----------------------------------------------------------------------------
-// Базовый адрес региона должен быть выровнен на страницу, так будет логичнее
-// А смещение это некоторое внутреннее понятие.
-
-ResourceRegion::ResourceRegion (const struct KernelCreateRegionParam * const params)
-	: m_memory(params->offset + params->size, Memory::ALLOC),
-	  m_offset(params->offset),
-	  m_access(params->access),
-	  m_binded(false),
-	  m_parent(0),
-	  m_parent_offset(0)
-{
-}
-
 ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
 	: m_memory(offset + size, Memory::ALLOC),
 	  m_offset(offset),

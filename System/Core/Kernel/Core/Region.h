@@ -41,8 +41,7 @@ private:
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 
 public:
-	explicit ResourceRegion(const KernelCreateRegionParam *params);
-	explicit ResourceRegion(offset_t offset, size_t size, uint32_t access);
+	ResourceRegion(offset_t offset, size_t size, uint32_t access);
 	virtual ~ResourceRegion();
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);
