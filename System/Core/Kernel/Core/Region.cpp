@@ -19,7 +19,7 @@ ResourceRegion::ResourceRegion (const struct KernelCreateRegionParam * const par
 	: m_memory(params->offset + params->size, Memory::ALLOC),
 	  m_offset(params->offset),
 	  m_access(params->access),
-	  m_flags(0),
+	  m_binded(false),
 	  m_parent(0),
 	  m_parent_offset(0)
 {
@@ -29,7 +29,7 @@ ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
 	: m_memory(offset + size, Memory::ALLOC),
 	  m_offset(offset),
 	  m_access(access),
-	  m_flags(0),
+	  m_binded(false),
 	  m_parent(0),
 	  m_parent_offset(0)
 {
@@ -60,7 +60,7 @@ ResourceRegion *ResourceRegion::asRegion ()
 
 int ResourceRegion::ModifyBindPhysical (const KernelModifyRegionBindParam * const param)
 {
-	if (isSet(m_flags, REGION_BINDED)) {
+	if (m_binded) {
 		CorePrint ("Region is binded\n");
 		return ERROR_BUSY;
 	}
@@ -70,7 +70,7 @@ int ResourceRegion::ModifyBindPhysical (const KernelModifyRegionBindParam * cons
 		return ERROR_BUSY;
 	}
 
-	m_flags |= REGION_BINDED;
+	m_binded = true;
 	return SUCCESS;
 }
 
@@ -91,8 +91,7 @@ int ResourceRegion::ModifyBindPhysical (const KernelModifyRegionBindParam * cons
 
 int ResourceRegion::ModifyBindRegion (const KernelModifyRegionBindParam * const param)
 {
-	if ((m_flags & REGION_BINDED) != 0)
-		return ERROR_BUSY;
+	if (m_binded) return ERROR_BUSY;
 
 	Resource *resource = FindResource (param->id);
 	if (resource == 0)
@@ -113,8 +112,7 @@ int ResourceRegion::ModifyBindRegion (const KernelModifyRegionBindParam * const 
 	// И все... подкачка будет работать с родительского региона.
 	// TODO: только я что-то shift нигде не зафиксировал.
 
-	m_flags |= REGION_BINDED;
-
+	m_binded = true;
 	return SUCCESS;
 }
 

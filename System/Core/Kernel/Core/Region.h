@@ -19,15 +19,11 @@ namespace Core {
 class ResourceRegion : public Resource
 {
 private:
-	enum FLAGS {
-		REGION_BINDED = 1,
-	};
-
 	Memory 	m_memory;
 	offset_t m_offset;
 
 	uint32_t m_access;	// Ограничение ресурса на доступ.
-	uint32_t m_flags;
+	bool m_binded;		// Регион забинден
 
 	ResourceRegion *m_parent;
 	offset_t m_parent_offset;
