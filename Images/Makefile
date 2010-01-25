@@ -3,7 +3,7 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-GRUB2_VERSION=1.97.1
+GRUB2_VERSION=1.97.2
 GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.gz
 
 GRUB2_ROOT=${CURDIR}/grub2
@@ -95,22 +95,20 @@ root:
 rootclean:
 	rm -rf MDF.Root
 
-.PHONY: grub2 grubclean
+.PHONY: grub2 grub2sig grubclean 
 grub2 : ${GRUB2_ROOT}/grub-${GRUB2_VERSION}
 
-${GRUB2_ROOT}/grub-${GRUB2_VERSION} :
-	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE} ];  then \
-		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE} \
-			-O ${MDF_FILES}/${GRUB2_ARCHIVE}; \
-	fi
-	if [ ! -e ${MDF_FILES}/${GRUB2_ARCHIVE}.sig ]; then \
-		wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig \
-			-O ${MDF_FILES}/${GRUB2_ARCHIVE}.sig; \
-	fi
+${MDF_FILES}/${GRUB2_ARCHIVE} :
+	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE} -O $@
 
+${MDF_FILES}/${GRUB2_ARCHIVE}.sig:
+	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig -O $@
+
+grub2sig: ${MDF_FILES}/${GRUB2_ARCHIVE} ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 	gpg --keyserver keys.gnupg.net --recv-keys DEA2C38E
 	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 
+${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE}
 	rm -rf ${MDF_TEMP}/grub-${GRUB2_VERSION} ${GRUB2_ROOT}
 	tar -xz -C ${MDF_TEMP} -f ${MDF_FILES}/${GRUB2_ARCHIVE} 
 	patch -d ${MDF_TEMP}/grub-${GRUB2_VERSION} -p0 < ${CURDIR}/mb_elf_sym.patch
