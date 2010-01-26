@@ -8,14 +8,14 @@
 #include "Resource.h"
 #include "Memory.h"
 
-struct KernelCreateRegionParam;
-struct KernelModifyRegionBindParam;
-
 namespace Core {
 
-// -----------------------------------------------------------------------------
-// Конечные ресурсы
-
+// Соглашение о именовании параметров:
+// poffset - смещение родительской сущности (физической памяти, региона
+//	или номер первого порта ввода-вывода)
+// psize - размер подкючаемой области родительской сущности
+// skip - расстояние от начала региона
+	
 class ResourceRegion : public Resource
 {
 private:
@@ -35,8 +35,8 @@ private:
 
 	virtual ResourceRegion *asRegion ();
 
-	int ModifyBindPhysical (const KernelModifyRegionBindParam *param);
-	int ModifyBindRegion (const KernelModifyRegionBindParam *param);
+	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
+	int bindRegion(id_t parent, offset_t poffset, size_t psize, offset_t skip);
 
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 

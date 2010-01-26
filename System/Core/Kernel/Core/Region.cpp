@@ -30,28 +30,23 @@ ResourceRegion *ResourceRegion::asRegion ()
 	return this;
 }
 
-// offset и size всегда задают смещение и размер от родительской сущности.
-
 // Схема физического биндинга
-// Pages:		000000001111111122222222
+// memory		000000001111111122222222
+// poffset		-----------|	  |
+// psize			   +------+	<- область будет импортирована в регион
+// m_offset		-----	   |	  |
+// m_size		     ------+------+---	<- область региона
+// skip			     ------|	  |	<- смещение в регионе
 
-// Phys:		ooooooooooossssssss
-// param->offset:	-----------
-// param->size:			   --------
-
-// Region:		ooooossssssPPPPPPPPsss
-// m_size		     -----------------
-// m_offset:		-----
-// param->shift:	     ------
-
-int ResourceRegion::ModifyBindPhysical (const KernelModifyRegionBindParam * const param)
+int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) {
 		CorePrint ("Region is binded\n");
 		return ERROR_BUSY;
 	}
 
-	if (!m_memory.PhysicalBind (param->offset, param->size, param->shift)) {
+	// TODO: Должно быть m_offset + skip
+	if (!m_memory.PhysicalBind(poffset, psize, /*m_offset +*/ skip)) {
 		CorePrint ("Memory not binded\n");
 		return ERROR_BUSY;
 	}
@@ -61,25 +56,20 @@ int ResourceRegion::ModifyBindPhysical (const KernelModifyRegionBindParam * cons
 }
 
 // Схема регионного биндинга.
+// memory		000000001111111122222222
+// parent->m_offset	-----      |    |
+// Parent->m_size	     ------+----+--
+// poffset		     ------|	|
+// psize			   +----+	<- Будет забиндена в регион
+// m_offset		-----      |	|
+// m_size		     ------+----+-----	<- область региона
+// skip			     ------|	|	<- смещение в регионе.
 
-// Pages:		000000001111111122222222
-
-// Parent:		ooooossssssssssssss
-// Parent->m_offset:	-----
-// Parent->m_size:	     --------------
-// param->offset:	     ------
-// param->size:			   --------
-
-// Region:		ooooosssxxxPPPPPPPPxxx
-// m_size:		     -----------------
-// m_offset:		-----
-// param->shift:	     ------
-
-int ResourceRegion::ModifyBindRegion (const KernelModifyRegionBindParam * const param)
+int ResourceRegion::bindRegion(id_t parent, offset_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
 
-	Resource *resource = FindResource (param->id);
+	Resource *resource = FindResource (parent);
 	if (resource == 0)
 		return ERROR_INVALIDID;
 
@@ -87,13 +77,17 @@ int ResourceRegion::ModifyBindRegion (const KernelModifyRegionBindParam * const 
 	if (m_parent == 0)
 		return ERROR_INVALIDID;
 
-	if (param->offset < m_offset)
+	// TODO: странное соглашение, ИМХО poffset надо сравнивать с m_size
+	if (poffset < m_offset)
 		return ERROR_INVALIDPARAM;
 
-	m_parent_offset = param->offset - m_offset;
+	// TODO: И это тоже странное соглашение. Надо перепахивать.
+	m_parent_offset = poffset - m_offset;
+	
 	STUB_ASSERT (m_parent_offset % PAGE_SIZE != 0, "Unaligned parent region");
-	STUB_ASSERT (m_offset + param->shift + param->size > m_memory.getSize(), "Overload region");
-	STUB_ASSERT (m_parent_offset + m_offset + param->size > m_parent->m_memory.getSize(), "Small parent region");
+	STUB_ASSERT (m_offset + skip + psize > m_memory.getSize(), "Overload region");
+	// И этот тест крайне непонятен. Некорректен вернее.
+	STUB_ASSERT (m_offset + m_parent_offset + psize > m_parent->m_memory.getSize(), "Small parent region");
 
 	// И все... подкачка будет работать с родительского региона.
 	// TODO: только я что-то shift нигде не зафиксировал.
@@ -113,13 +107,13 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 			if (bindparam == 0)
 				return ERROR_INVALIDPARAM;
 
-			return ModifyBindPhysical (bindparam);
+			return bindPhysical(bindparam->offset, bindparam->size, bindparam->shift);
 
 		case RESOURCE_MODIFY_REGION_REGIONBIND:
 			if (bindparam == 0)
 				return ERROR_INVALIDPARAM;
 
-			return ModifyBindRegion (bindparam);
+			return bindRegion(bindparam->id, bindparam->offset, bindparam->size, bindparam->shift);
 
 		default:
 			break;
