@@ -6,6 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
+#include "../Kernel.h"
 #include "../Region.h"
 
 #include "TestHelpers.h"
@@ -49,6 +50,20 @@ BOOST_FIXTURE_TEST_CASE(testCopyInOverload, RegionFixture1)
 {
 	ResourceRegion region(reg_offset, reg_size, 0);
 	BOOST_REQUIRE(!region.copyIn(reg_offset + 1, data, reg_size));
+}
+
+BOOST_AUTO_TEST_CASE(testBindPhysicalUnaligned)
+{
+	const offset_t offset = 1234;
+	const size_t size = 5432;
+	
+	struct testRegion : public ResourceRegion {
+		testRegion(offset_t offset, size_t size) : ResourceRegion(offset, size, 0) {}
+		using ResourceRegion::bindPhysical;
+	} region(offset, size);
+	
+	BOOST_REQUIRE_EQUAL(region.bindPhysical(0, size, 0), ERROR_UNALIGN);
+	BOOST_REQUIRE_EQUAL(region.bindPhysical(offset, size, 100), ERROR_UNALIGN);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

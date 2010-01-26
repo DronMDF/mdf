@@ -40,13 +40,10 @@ ResourceRegion *ResourceRegion::asRegion ()
 
 int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 {
-	if (m_binded) {
-		CorePrint ("Region is binded\n");
-		return ERROR_BUSY;
-	}
+	if (m_binded) return ERROR_BUSY;
+	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
 
-	// TODO: Должно быть m_offset + skip
-	if (!m_memory.PhysicalBind(poffset, psize, /*m_offset +*/ skip)) {
+	if (!m_memory.PhysicalBind(poffset, psize, m_offset + skip)) {
 		CorePrint ("Memory not binded\n");
 		return ERROR_BUSY;
 	}

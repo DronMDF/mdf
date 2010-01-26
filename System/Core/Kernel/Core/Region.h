@@ -35,11 +35,13 @@ private:
 
 	virtual ResourceRegion *asRegion ();
 
-	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
 	int bindRegion(id_t parent, offset_t poffset, size_t psize, offset_t skip);
 
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 
+protected:
+	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
+	
 public:
 	ResourceRegion(offset_t offset, size_t size, uint32_t access);
 	virtual ~ResourceRegion();
