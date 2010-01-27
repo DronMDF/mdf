@@ -40,6 +40,8 @@ private:
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 
 protected:
+	virtual Memory *getMemory();
+	
 	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
 	
 public:

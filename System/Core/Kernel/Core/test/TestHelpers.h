@@ -5,9 +5,9 @@
 
 #pragma once
 
-template<int callcount>
+template<int callcount> 
 class order_mock {
-private:
+protected:
 	mutable int m_order;
 public:
 	explicit order_mock() : m_order(0) {}
@@ -19,7 +19,7 @@ public:
 
 class visit_mock : private order_mock<1> {
 public:
-	void visit() const { order(1); }
+	void visit() const { m_order = 1; }
 };
 
 static inline void fill_random (void *ptr, size_t size)

@@ -30,6 +30,12 @@ ResourceRegion *ResourceRegion::asRegion ()
 	return this;
 }
 
+Memory *ResourceRegion::getMemory()
+{
+	return &m_memory;
+}
+
+
 // Схема физического биндинга
 // memory		000000001111111122222222
 // poffset		-----------|	  |
@@ -42,9 +48,10 @@ int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
 	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
+	if (skip + psize > m_memory.getSize()) return ERROR_OVERSIZE;
 
-	if (!m_memory.PhysicalBind(poffset, psize, m_offset + skip)) {
-		CorePrint ("Memory not binded\n");
+	if (!getMemory()->PhysicalBind(poffset, psize, m_offset + skip)) {
+		// Страницы могут быть заняты...
 		return ERROR_BUSY;
 	}
 
