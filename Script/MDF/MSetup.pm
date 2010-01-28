@@ -11,11 +11,16 @@ use MDF::Config;
 use MDF::Version;
 use MDF::File;
 
-use File::Basename qw/ basename /;
+use File::Basename qw/basename/;
 
-@EXPORT = qw/ FindRule FindMSetup /;
+@EXPORT = qw/FindMSetup FindRule/;
 
-# Разборки с .msetup
+#-------------------------------------------------------------------------------
+# Поиск скриптов и формирование имен пакетов.
+
+sub LocateScripts {
+}
+
 sub FindMSetup {
 	my (undef, $name) = @_;
 
@@ -40,6 +45,8 @@ sub FindMSetup {
 	return ($nm, $msetup);
 }
 
+#-------------------------------------------------------------------------------
+# Разбор содержимого скрипта
 
 sub FindRule {
 	my (undef, $name) = @_;
@@ -64,4 +71,16 @@ sub FindRule {
 	return ($nm, $version, $rules);
 }
 
-1;
+# ------------------------------------------------------------------------------
+# Тестирование
+
+# use Test::More;
+# 
+# # Формируем тестовое окружение
+# `mkdir -p "$ENV{'MDF_TEMP'}/msetup/group/subgroup"`;
+# `touch "$ENV{'MDF_TEMP'}/msetup/group/subgroup/test.msetup"`;
+# 
+# ok(eq_array(LocateScripts("$ENV{'MDF_TEMP'}/msetup"), ("group/subgroup/test.msetup")));
+# 
+# `rm -rf $ENV{'MDF_TEMP'}/msetup`;
+# done_testing();
