@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2000-2005 Andrey Valyaev (dron@infosec.ru)
-# All rights reserved.
+# Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+# This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
 package	MDF::MSetup;
@@ -19,6 +19,8 @@ use File::Basename qw/basename/;
 # Поиск скриптов и формирование имен пакетов.
 
 sub LocateScripts {
+	my (undef, $base, $name) = @_;
+	return MDF::File->Find($base, basename $name . ".msetup", 0);
 }
 
 sub FindMSetup {
@@ -74,13 +76,15 @@ sub FindRule {
 # ------------------------------------------------------------------------------
 # Тестирование
 
-# use Test::More;
-# 
-# # Формируем тестовое окружение
-# `mkdir -p "$ENV{'MDF_TEMP'}/msetup/group/subgroup"`;
-# `touch "$ENV{'MDF_TEMP'}/msetup/group/subgroup/test.msetup"`;
-# 
-# ok(eq_array(LocateScripts("$ENV{'MDF_TEMP'}/msetup"), ("group/subgroup/test.msetup")));
-# 
-# `rm -rf $ENV{'MDF_TEMP'}/msetup`;
-# done_testing();
+use MDF::Test;
+
+# Формируем тестовое окружение
+system('mkdir', '-p', "$ENV{'MDF_TEMP'}/msetup/group/subgroup/project");
+system('touch', "$ENV{'MDF_TEMP'}/msetup/group/subgroup/test.msetup");
+
+my @scripts = LocateScripts(undef, "$ENV{'MDF_TEMP'}/msetup", "test");
+is($scripts[0], "group/subgroup/test.msetup");
+
+system('rm', '-rf', "$ENV{'MDF_TEMP'}/msetup");
+
+1;
