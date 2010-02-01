@@ -3,7 +3,10 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-package	MDF::MSetup;
+use strict;
+use warnings;
+
+package MDF::MSetup;
 
 use lib $ENV{'MDF_REPOS'} . '/Script';
 
@@ -13,22 +16,37 @@ use MDF::File;
 
 use File::Basename qw/basename/;
 
-@EXPORT = qw/FindMSetup FindRule/;
+our @EXPORT = qw/FindMSetup FindRule/;
 
 #-------------------------------------------------------------------------------
 # Поиск скриптов и формирование имен пакетов.
 
-sub LocateScripts {
-	my (undef, $base, $name) = @_;
-	return MDF::File->Find($base, basename $name . ".msetup", 0);
+# Возвращает хеш. - ключем хеша является которкое имя - которое будет 
+# преобразовано в имя пакета, значением является полный путь к файлу.
+sub LocateScripts($$) {
+	my ($bases, $name) = @_;
+	my %scripts;
+	foreach my $base (@$bases) {
+		my @files = (
+			MDF::File->Find($base, basename $name . ".msetup", 0),
+			#MDF::File->Find($base, basename $name . "\/.msetup", 0)
+		);
+		foreach my $file (@files) {
+			# TODO: Сразу отбросить ненужные
+			die "Duplicate tree entryes $file" if exists $scripts{$file};
+			$scripts{$file} = "$base/$file" 
+		}
+	}
+	return %scripts;
 }
 
 sub FindMSetup {
-	my (undef, $name) = @_;
+	my ($self, $name) = @_;
 
 	return () unless (defined $name);
 
-	my @msetup = MDF::File->Find ($ENV{'MDF_TREE'}, basename $name . ".msetup", 0);
+	my %scripts = LocateScripts([$ENV{'MDF_TREE'}], $name);
+	my @msetup = keys %scripts;
 	my ($nm, $msetup);
 
  	foreach my $ms_org (@msetup) {
@@ -73,18 +91,31 @@ sub FindRule {
 	return ($nm, $version, $rules);
 }
 
-# ------------------------------------------------------------------------------
-# Тестирование
-
-use MDF::Test;
-
-# Формируем тестовое окружение
-system('mkdir', '-p', "$ENV{'MDF_TEMP'}/msetup/group/subgroup/project");
-system('touch', "$ENV{'MDF_TEMP'}/msetup/group/subgroup/test.msetup");
-
-my @scripts = LocateScripts(undef, "$ENV{'MDF_TEMP'}/msetup", "test");
-is($scripts[0], "group/subgroup/test.msetup");
-
-system('rm', '-rf', "$ENV{'MDF_TEMP'}/msetup");
+#-------------------------------------------------------------------------------
+# UNITCHECK {
+# 	use MDF::Test;
+# 
+# 	# Формируем тестовое окружение
+# 	my $root = "$ENV{'MDF_TEMP'}/msetup";
+# 	system('mkdir', '-p', "$root/group/subgroup/project");
+# 	system('touch', "$root/group/subgroup/test.msetup");
+# 	system('touch', "$root/group/subgroup/project/.msetup");
+# 
+# 	# Скрипт по старому расположению
+# 	my %scripts = LocateScripts([$root], 'test');
+# 	my @script_name = keys %scripts;
+# 	&assert_equal($script_name[0], 'group/subgroup/test.msetup');
+# 	&assert_equal($scripts{'group/subgroup/test.msetup'}, "$root/group/subgroup/test.msetup");
+# 
+# 	# Скрипт по новому расположению (В работе пока не используется)
+# 	# %scripts = LocateScripts(["$ENV{'MDF_TEMP'}/msetup"], 'project');
+# 	# @script_name = keys %scripts;
+# 	# is($script_name[0], 'group/subgroup/project/.msetup');
+# 	# is($scripts{'group/subgroup/project/.msetup'}, "$ENV{'MDF_TEMP'}/msetup/group/subgroup/project/.msetup");
+# 
+# 	# чистка.
+# 	system('rm', '-rf', $root);
+# 	return 0;
+# }
 
 1;

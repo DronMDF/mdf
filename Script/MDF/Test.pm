@@ -3,25 +3,21 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-package	MDF::MSetup;
+use strict;
+use warnings;
 
-use Test::Builder;
+package	MDF::Test;
 
-@EXPORT = qw(ok is);
+our @EXPORT = qw/&assert &assert_equal/;
 
-my $builder = Test::Builder->new;
-$builder->output("/dev/null");
-
-END {
-	$builder->done_testing();
+sub assert {
+	my ($expr) = @_;
+	die "assert failed" if (!$expr);
 }
 
-sub ok($;$) {
-	$builder->ok(@_) or exit(-1);
-}
-
-sub is($$;$) {
-	$builder->is_eq(@_) or exit(-1);
+sub assert_equal {
+	my ($a, $b) = @_;
+	die "assert failed" if ($a ne $b);
 }
 
 1;
