@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE(testBindPhysicalErrors)
 	const offset_t offset = 1234;
 	const size_t size = 5432;
 	
-	struct testRegion : public ResourceRegion, private visit_mock {
+	struct testRegion : public ResourceRegion, private order_mock<3> {
 		testRegion(offset_t offset, size_t size) : ResourceRegion(offset, size, 0) {}
 		virtual Memory *getMemory() { 
-			visit(); 
+			order_next(); 
 			throw runtime_error("called"); 
 		}
 		using ResourceRegion::bindPhysical;

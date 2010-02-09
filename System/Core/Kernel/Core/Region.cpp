@@ -14,6 +14,7 @@ namespace Core {
 ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
 	: m_memory(offset + size, Memory::ALLOC),
 	  m_offset(offset),
+	  m_size(size),
 	  m_access(access),
 	  m_binded(false),
 	  m_parent(0),
@@ -48,7 +49,7 @@ int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
 	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
-	if (skip + psize > m_memory.getSize()) return ERROR_OVERSIZE;
+	if (skip + psize > m_size) return ERROR_OVERSIZE;
 
 	if (!getMemory()->PhysicalBind(poffset, psize, m_offset + skip)) {
 		// Страницы могут быть заняты...
@@ -89,9 +90,9 @@ int ResourceRegion::bindRegion(id_t parent, offset_t poffset, size_t psize, offs
 	m_parent_offset = poffset - m_offset;
 	
 	STUB_ASSERT (m_parent_offset % PAGE_SIZE != 0, "Unaligned parent region");
-	STUB_ASSERT (m_offset + skip + psize > m_memory.getSize(), "Overload region");
+	STUB_ASSERT (m_offset + skip + psize > m_size, "Overload region");
 	// И этот тест крайне непонятен. Некорректен вернее.
-	STUB_ASSERT (m_offset + m_parent_offset + psize > m_parent->m_memory.getSize(), "Small parent region");
+	STUB_ASSERT (m_offset + m_parent_offset + psize > m_parent->m_size, "Small parent region");
 
 	// И все... подкачка будет работать с родительского региона.
 	// TODO: только я что-то shift нигде не зафиксировал.
@@ -126,10 +127,13 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 	return Resource::Modify(param_id, param, param_size);
 }
 
-bool ResourceRegion::inBounds (laddr_t addr, laddr_t base) const
+bool ResourceRegion::inBounds(laddr_t addr, laddr_t base) const
 {
 	STUB_ASSERT (base % PAGE_SIZE != 0, "Region is not aligned");
-	return m_memory.inBounds (base, addr, m_offset);
+	
+	if (addr < base + m_offset) return false;
+	if (base + m_size <= addr) return false;
+	return true;
 }
 
 const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInstance *page)
@@ -142,17 +146,16 @@ const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInsta
 
 	if (offset < PAGE_SIZE) {
 		// Первая страница копируется не полностью
-		m_memory.copyIn(m_offset, reinterpret_cast<void *>(pa + m_offset),
+		getMemory()->copyIn(m_offset, reinterpret_cast<void *>(pa + m_offset),
 			PAGE_SIZE - m_offset);
 	} else {
 		// Последняя тоже не полностью, но за этим проследит Memory
-		m_memory.copyIn(offset & ~(PAGE_SIZE - 1),
+		getMemory()->copyIn(offset & ~(PAGE_SIZE - 1),
 				reinterpret_cast<void *>(pa), PAGE_SIZE);
 	}
 
 	StubPageUntemporary(pp);
-
-	return m_memory.getPage(offset);
+	return getMemory()->getPage(offset);
 }
 
 // TODO: При биндинге на регионы необходимо указывать еще и права доступа
@@ -168,7 +171,7 @@ const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 
 	// Сперва необходимо проверить есть ли страница в этом регионе.
 	// Если есть - отдаем ее.
-	const PageInstance *page = m_memory.getPage(offset);
+	const PageInstance *page = getMemory()->getPage(offset);
 	if (page != 0)
 		return page;
 
@@ -192,9 +195,8 @@ const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 	}
 
 	// А если родительского нету - то делаем свой PageFault;
-	return m_memory.PageFault(offset);
+	return getMemory()->PageFault(offset);
 }
-
 
 offset_t ResourceRegion::getOffset() const
 {
@@ -205,13 +207,13 @@ offset_t ResourceRegion::getOffset() const
 // Может быть сайз от начала страницы?
 size_t ResourceRegion::getSize() const
 {
-	return m_memory.getSize() - m_offset;
+	return m_size;
 }
 
 bool ResourceRegion::copyIn(offset_t offset, const void *src, size_t size)
 {
 	if (offset < m_offset) return false;
-	return m_memory.copyIn(offset, src, size);
+	return getMemory()->copyIn(offset, src, size);
 }
 
 } // namespace Core

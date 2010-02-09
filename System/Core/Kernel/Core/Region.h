@@ -19,8 +19,9 @@ namespace Core {
 class ResourceRegion : public Resource
 {
 private:
-	Memory 	m_memory;
-	offset_t m_offset;
+	Memory m_memory;
+	const offset_t m_offset;
+	const size_t m_size;
 
 	uint32_t m_access;	// Ограничение ресурса на доступ.
 	bool m_binded;		// Регион забинден
