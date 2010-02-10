@@ -18,8 +18,10 @@ namespace Core {
 	
 class ResourceRegion : public Resource
 {
+protected:
+	Memory *m_memory;
+		
 private:
-	Memory m_memory;
 	const offset_t m_offset;
 	const size_t m_size;
 

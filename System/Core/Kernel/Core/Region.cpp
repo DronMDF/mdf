@@ -12,7 +12,7 @@
 namespace Core {
 
 ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
-	: m_memory(offset + size, Memory::ALLOC),
+	: m_memory(0),
 	  m_offset(offset),
 	  m_size(size),
 	  m_access(access),
@@ -24,6 +24,7 @@ ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
 
 ResourceRegion::~ResourceRegion ()
 {
+	delete m_memory;
 }
 
 ResourceRegion *ResourceRegion::asRegion ()
@@ -33,7 +34,10 @@ ResourceRegion *ResourceRegion::asRegion ()
 
 Memory *ResourceRegion::getMemory()
 {
-	return &m_memory;
+	if (m_memory == 0) {
+		m_memory = new Memory(m_offset + m_size, Memory::ALLOC);
+	}
+	return m_memory;
 }
 
 
@@ -51,13 +55,9 @@ int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
 	if (skip + psize > m_size) return ERROR_OVERSIZE;
 
-	if (!getMemory()->PhysicalBind(poffset, psize, m_offset + skip)) {
-		// Страницы могут быть заняты...
-		return ERROR_BUSY;
-	}
-
-	m_binded = true;
-	return SUCCESS;
+	const int rv = getMemory()->bindPhysical(poffset, psize, m_offset + skip);
+	if (rv == SUCCESS) m_binded = true;
+	return rv;
 }
 
 // Схема регионного биндинга.

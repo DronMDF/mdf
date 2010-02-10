@@ -3,6 +3,7 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
+#include "Kernel.h"
 #include "Memory.h"
 #include "Stub.h"
 
@@ -108,6 +109,36 @@ bool Memory::PhysicalBind (paddr_t poffset, size_t size, offset_t shift)
 
 	return true;
 }
+
+int Memory::bindPhysical(offset_t poffset, size_t size, offset_t skip)
+{
+	if (poffset % PAGE_SIZE != skip % PAGE_SIZE) return ERROR_UNALIGN;
+	if (skip + size > m_size) return ERROR_OVERSIZE;
+
+	// TODO: В случае ошибки необходимо сделать откат занятых страниц в пул.
+
+	for (offset_t coff = skip & PADDR_MASK; coff < skip + size; coff += PAGE_SIZE)
+	{
+		const paddr_t paddr = poffset - skip + coff;
+		PageInfo * const page = StubGetPageByPAddr(paddr);
+
+		if (page == 0) {
+			CorePrint ("No Page for paddr 0x%16lx\n", paddr);
+			return ERROR_BUSY;
+		}
+
+		// TODO: проанализировать использование страницы.
+		//	 для чего необходимы методы обхода PageInstances...
+
+		if (!setPage (page, coff)) {
+			CorePrint ("Unable to SetPage(0x%08x, 0x%08x)\n", page, coff);
+			return ERROR_BUSY;
+		}
+	}
+
+	return SUCCESS;
+}
+
 
 void Memory::Map (const void *ptr, size_t size, offset_t offset)
 {

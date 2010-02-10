@@ -78,4 +78,32 @@ BOOST_AUTO_TEST_CASE(testBindPhysicalErrors)
 	BOOST_REQUIRE_THROW(region.bindPhysical(PAGE_SIZE, offset + size - PAGE_SIZE, PAGE_SIZE - offset), runtime_error);
 }
 
+BOOST_AUTO_TEST_CASE(testBindPhysicalMemory)
+{
+	// TODO: очень много хардкодед чисел.
+	struct testMemory : public Memory, private visit_mock {
+		testMemory() : Memory(1234 + 5432) {}
+		int bindPhysical(offset_t poffset, size_t psize, offset_t skip) {
+			visit();
+			BOOST_REQUIRE_EQUAL(psize, 5432);
+			BOOST_REQUIRE_EQUAL(skip, 1234);
+			BOOST_REQUIRE_EQUAL(poffset, 1234);
+			return SUCCESS;
+		}
+	};
+	
+	struct testRegion : public ResourceRegion, private visit_mock {
+		testRegion() : ResourceRegion(1234, 5432, 0) {}
+		Memory *getMemory() { 
+			visit();
+			BOOST_ASSERT(m_memory == 0);
+			m_memory = new testMemory();
+			return m_memory;
+		}
+		using ResourceRegion::bindPhysical;
+	} region;
+	
+	BOOST_REQUIRE_EQUAL(region.bindPhysical(1234, 5432, 0), SUCCESS);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
