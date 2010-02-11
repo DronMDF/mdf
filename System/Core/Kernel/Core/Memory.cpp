@@ -64,52 +64,11 @@ size_t Memory::getSize() const
 	return m_size;
 }
 
-// offset и size всегда задают смещение и размер от родительской сущности.
-
-// Схема физического биндинга
-// Pages:		000000001111111122222222
-
-// Phys:		ooooooooooossssssss
-// param->offset:	-----------
-// param->size:			   --------
-
-// Region:		ooooossssssPPPPPPPPsss
-// m_size		     -----------------
-// m_offset:		-----
-// param->shift:	     ------
-
-// Здесь эта функция выглядит заметно проще.
-bool Memory::PhysicalBind (paddr_t poffset, size_t size, offset_t shift)
-{
-	const offset_t loffset = shift;
-
-	STUB_ASSERT (poffset % PAGE_SIZE != loffset % PAGE_SIZE, "Unaligned paddr for physical bind");
-	STUB_ASSERT (shift + size > m_size, "Overload region");
-
-	// TODO: В случае ошибки необходимо сделать откат занятых страниц в пул.
-
-	for (offset_t coff = loffset & PADDR_MASK; coff < loffset + size; coff += PAGE_SIZE)
-	{
-		const paddr_t paddr = poffset - loffset + coff;
-		PageInfo * const page = StubGetPageByPAddr(paddr);
-
-		if (page == 0) {
-			CorePrint ("No Page for paddr 0x%16lx\n", paddr);
-			return false;
-		}
-
-		// TODO: проанализировать использование страницы.
-		//	 для чего необходимы методы обхода PageInstances...
-
-		if (!setPage (page, coff)) {
-			CorePrint ("Unable to SetPage(0x%08x, 0x%08x)\n", page, coff);
-			return false;
-		}
-	}
-
-	return true;
-}
-
+// реальная память	000000001111111122222222
+// poffset		-----------|	  |
+// psize			   +------+	<- область будет импортирована в memory
+// m_size		-----------+------+---	<- область memory
+// skip			-----------|	  |	<- смещение
 int Memory::bindPhysical(offset_t poffset, size_t size, offset_t skip)
 {
 	if (poffset % PAGE_SIZE != skip % PAGE_SIZE) return ERROR_UNALIGN;
