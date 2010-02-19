@@ -80,30 +80,33 @@ BOOST_AUTO_TEST_CASE(testBindPhysicalErrors)
 
 BOOST_AUTO_TEST_CASE(testBindPhysicalMemory)
 {
-	// TODO: очень много хардкодед чисел.
+	const int offset = 1234;
+	const int size = 5432;
+
 	struct testMemory : public Memory, private visit_mock {
-		testMemory() : Memory(1234 + 5432) {}
+		int m_offset, m_size;
+		testMemory(int offset, int size)
+			: Memory(offset + size), m_offset(offset), m_size(size)
+		{}
 		int bindPhysical(offset_t poffset, size_t psize, offset_t skip) {
 			visit();
-			BOOST_REQUIRE_EQUAL(psize, 5432);
-			BOOST_REQUIRE_EQUAL(skip, 1234);
-			BOOST_REQUIRE_EQUAL(poffset, 1234);
+			BOOST_REQUIRE_EQUAL(poffset, m_offset);
+			BOOST_REQUIRE_EQUAL(psize, m_size);
+			BOOST_REQUIRE_EQUAL(skip, m_offset);
 			return SUCCESS;
 		}
 	};
-	
-	struct testRegion : public ResourceRegion, private visit_mock {
-		testRegion() : ResourceRegion(1234, 5432, 0) {}
-		Memory *getMemory() { 
-			visit();
-			BOOST_ASSERT(m_memory == 0);
-			m_memory = new testMemory();
-			return m_memory;
+
+	struct testRegion : public ResourceRegion {
+		testRegion(int offset, int size)
+			: ResourceRegion(offset, size, 0)
+		{
+			m_memory = new testMemory(offset, size);
 		}
 		using ResourceRegion::bindPhysical;
-	} region;
-	
-	BOOST_REQUIRE_EQUAL(region.bindPhysical(1234, 5432, 0), SUCCESS);
+	} region(offset, size);
+
+	BOOST_REQUIRE_EQUAL(region.bindPhysical(offset, size, 0), SUCCESS);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
