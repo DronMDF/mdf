@@ -1,7 +1,7 @@
 Index: loader/i386/multiboot.c
 ===================================================================
---- loader/i386/multiboot.c	(revision 2466)
-+++ loader/i386/multiboot.c	(working copy)
+--- loader/i386/multiboot_mbi.c
++++ loader/i386/multiboot_mbi.c
 @@ -152,6 +152,17 @@
  }
  
@@ -30,81 +30,3 @@ Index: loader/i386/multiboot.c
    grub_loader_set (grub_multiboot_boot, grub_multiboot_unload, 1);
  
   fail:
-Index: loader/i386/multiboot_elfxx.c
-===================================================================
---- loader/i386/multiboot_elfxx.c	(revision 2466)
-+++ loader/i386/multiboot_elfxx.c	(working copy)
-@@ -22,12 +22,16 @@
- # define ELFCLASSXX	ELFCLASS32
- # define Elf_Ehdr	Elf32_Ehdr
- # define Elf_Phdr	Elf32_Phdr
-+# define Elf_Shdr	Elf32_Shdr
-+# define Elf_Addr	Elf32_Addr
- #elif defined(MULTIBOOT_LOAD_ELF64)
- # define XX		64
- # define E_MACHINE	EM_X86_64
- # define ELFCLASSXX	ELFCLASS64
- # define Elf_Ehdr	Elf64_Ehdr
- # define Elf_Phdr	Elf64_Phdr
-+# define Elf_Shdr	Elf64_Shdr
-+# define Elf_Addr	Elf64_Addr
- #else
- #error "I'm confused"
- #endif
-@@ -148,8 +152,56 @@
-   return grub_errno;
- }
- 
-+static int
-+CONCAT(grub_multiboot_load_elfsym, XX) (grub_file_t file, const void *buffer, grub_uint32_t *data)
-+{
-+  int i;
-+  Elf_Ehdr *ehdr = (Elf_Ehdr *) buffer;
-+
-+  Elf_Shdr *shdr = (Elf_Shdr *) grub_malloc (ehdr->e_shentsize * ehdr->e_shnum);
-+
-+  if (grub_file_seek (file, ehdr->e_shoff) == (grub_off_t) -1)
-+    return 0;
-+
-+  if (grub_file_read (file, shdr, ehdr->e_shentsize * ehdr->e_shnum) != ehdr->e_shentsize * ehdr->e_shnum)
-+    return 0;
-+
-+  /* FIXME: does this belong here? */
-+  grub_printf (", shtab=0x%x\n", (grub_uint32_t) shdr);
-+
-+  for (i = 0; i < ehdr->e_shnum; i++)
-+    {
-+      /* This section is a loaded section, so we don't care.  */
-+      if (shdr[i].sh_addr != 0)
-+	continue;
-+
-+      /* This section is empty, so we don't care.  */
-+      if (shdr[i].sh_size == 0)
-+	continue;
-+
-+      shdr[i].sh_addr = (Elf_Addr) grub_memalign (shdr[i].sh_addralign, shdr[i].sh_size);
-+
-+      if (grub_file_seek (file, shdr[i].sh_offset) == (grub_off_t) -1)
-+	return 0;
-+
-+      if (grub_file_read (file, (void *)(shdr[i].sh_addr), shdr[i].sh_size) != shdr[i].sh_size)
-+	return 0;
-+    }
-+
-+  /* FIXME: need struct declarations */
-+  data[0] = (grub_uint32_t) ehdr->e_shnum;	/* mbi->syms.elf.num */
-+  data[1] = (grub_uint32_t) ehdr->e_shentsize;	/* mbi->syms.elf.size */
-+  data[2] = (grub_uint32_t) shdr; /* mbi->syms.elf.addr */
-+  data[3] = (grub_uint32_t) ehdr->e_shstrndx;	/* mbi->syms.elf.shndx */
-+
-+  return 1;
-+}
-+
- #undef XX
- #undef E_MACHINE
- #undef ELFCLASSXX
- #undef Elf_Ehdr
- #undef Elf_Phdr
-+#undef Elf_Shdr
-+#undef Elf_Addr
-+

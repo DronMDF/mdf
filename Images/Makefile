@@ -3,7 +3,7 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-GRUB2_VERSION=1.97.2
+GRUB2_VERSION=1.98
 GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.gz
 
 GRUB2_ROOT=${CURDIR}/grub2
@@ -105,7 +105,7 @@ ${MDF_FILES}/${GRUB2_ARCHIVE}.sig:
 	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig -O $@
 
 grub2sig: ${MDF_FILES}/${GRUB2_ARCHIVE} ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
-	gpg --keyserver keys.gnupg.net --recv-keys DEA2C38E
+	gpg --keyserver keys.gnupg.net --recv-keys E82E4209
 	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 
 ${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE}
