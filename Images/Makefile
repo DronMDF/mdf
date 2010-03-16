@@ -42,7 +42,7 @@ iso2 mdf-current.iso : root grub2
 
 	# Исходники для сборки имиджей
 	cp -a Makefile qemu .bochsrc ${MDF_TEMP}/iso2/MDF/Images/
-	cp -a grub.cfg mb_elf_sym.patch ${MDF_TEMP}/iso2/MDF/Images/
+	cp -a grub.cfg ${MDF_TEMP}/iso2/MDF/Images/
 	#cp -a qemu.disk ${MDF_TEMP}/iso2/MDF/Images/
 
 	mkisofs -b boot/grub/grub-image -no-emul-boot -boot-load-size 4 \
@@ -104,14 +104,19 @@ ${MDF_FILES}/${GRUB2_ARCHIVE} :
 ${MDF_FILES}/${GRUB2_ARCHIVE}.sig:
 	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig -O $@
 
+${MDF_FILES}/grub-newreloc.patch.bz2:
+	wget http://mdf.googlecode.com/files/grub-newreloc.patch.bz2 -O $@
+
 grub2sig: ${MDF_FILES}/${GRUB2_ARCHIVE} ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 	gpg --keyserver keys.gnupg.net --recv-keys E82E4209
 	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 
-${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE}
+${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE} \
+		${MDF_FILES}/grub-newreloc.patch.bz2
 	rm -rf ${MDF_TEMP}/grub-${GRUB2_VERSION} ${GRUB2_ROOT}
 	tar -xz -C ${MDF_TEMP} -f ${MDF_FILES}/${GRUB2_ARCHIVE} 
-	patch -d ${MDF_TEMP}/grub-${GRUB2_VERSION} -p0 < ${CURDIR}/mb_elf_sym.patch
+	bzcat ${MDF_FILES}/grub-newreloc.patch.bz2 | \
+		patch -d ${MDF_TEMP}/grub-${GRUB2_VERSION} -p1
 	cd ${MDF_TEMP}/grub-${GRUB2_VERSION}; ./configure \
 		--prefix=${GRUB2_ROOT} --disable-largefile --disable-werror
 	make -C ${MDF_TEMP}/grub-${GRUB2_VERSION} all install

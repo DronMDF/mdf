@@ -94,6 +94,21 @@ void * __init__ StubMultibootGetFreeMemory(const MultibootInfo * const info,
 			continue;
 		}
 
+		// Проверим по Multiboot info
+		if (base < v2laddr(info) + sizeof(MultibootInfo) && base + size > v2laddr(info)) {
+			base = v2laddr(info) + sizeof(MultibootInfo);
+			continue;
+		}
+		
+		if (isSet(info->flags, MULTIBOOT_FLAG_SYMS)) {
+			if (base < info->elf_shoff + info->elf_shnum * info->elf_shentsize
+				&& base + size > info->elf_shoff) 
+			{
+				base = info->elf_shoff + info->elf_shnum * info->elf_shentsize;
+				continue;
+			}
+		}
+
 		// Теперь проверить по модулям.
 		if (!isSet(info->flags, MULTIBOOT_FLAG_MODS)) break;
 		if (info->mods_addr == 0) break;

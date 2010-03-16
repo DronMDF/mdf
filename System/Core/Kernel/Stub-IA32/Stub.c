@@ -178,8 +178,6 @@ void __init__ StubInit (const MultibootInfo * const info)
 	// Организуем списки страниц
 	StubMultibootMemoryInit (info);
 
-	//STUB_FATAL ("Look for memory map...");
-
 	// резервируем код ядра
 	// В ините могут оказаться модифицируемые данные.
 	paddr_t kptr = v2paddr(&__init_begin) & PADDR_MASK;
