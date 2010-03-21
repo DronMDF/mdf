@@ -262,8 +262,6 @@ void __init__ StubMultibootModuleLoad (const laddr_t base, const size_t size,
 	bindp.offset = StubPageGetPAddr(base);
 	bindp.size = size;
 
-	STUB_ASSERT(bindp.shift != 0, "Invalid shift after init");
-
 	rv = CoreModify (0, id, RESOURCE_MODIFY_REGION_PHYSICALBIND, &bindp, sizeof (bindp));
 	STUB_ASSERT (rv != SUCCESS, "Unable to bind module entire region");
 

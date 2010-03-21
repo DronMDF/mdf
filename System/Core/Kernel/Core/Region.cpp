@@ -40,7 +40,6 @@ Memory *ResourceRegion::getMemory()
 	return m_memory;
 }
 
-
 // Схема физического биндинга
 // memory		000000001111111122222222
 // poffset		-----------|	  |
@@ -90,9 +89,8 @@ int ResourceRegion::bindRegion(id_t parent, offset_t poffset, size_t psize, offs
 	m_parent_offset = poffset - m_offset;
 	
 	STUB_ASSERT (m_parent_offset % PAGE_SIZE != 0, "Unaligned parent region");
-	STUB_ASSERT (m_offset + skip + psize > m_size, "Overload region");
-	// И этот тест крайне непонятен. Некорректен вернее.
-	STUB_ASSERT (m_offset + m_parent_offset + psize > m_parent->m_size, "Small parent region");
+	STUB_ASSERT (skip + psize > m_size, "Overload region");
+	STUB_ASSERT (m_parent_offset + psize > m_parent->m_size, "Small parent region");
 
 	// И все... подкачка будет работать с родительского региона.
 	// TODO: только я что-то shift нигде не зафиксировал.
@@ -132,7 +130,7 @@ bool ResourceRegion::inBounds(laddr_t addr, laddr_t base) const
 	STUB_ASSERT (base % PAGE_SIZE != 0, "Region is not aligned");
 	
 	if (addr < base + m_offset) return false;
-	if (base + m_size <= addr) return false;
+	if (base + m_offset + m_size <= addr) return false;
 	return true;
 }
 

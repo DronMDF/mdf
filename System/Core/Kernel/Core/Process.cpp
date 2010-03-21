@@ -153,13 +153,6 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 	ResourceInstance *instance = resource->CreateInstance (access, base);
 	STUB_ASSERT (instance == 0, "Unable to create instance");
 
-// 	if (resource->asRegion() != 0) {
-// 		CorePrint ("Region from 0x%08x to 0x%08x in process 0x%08x\n",
-// 			base + resource->asRegion()->getOffset(),
-// 			base + resource->asRegion()->getOffset() + resource->asRegion()->getSize(),
-// 			getId());
-// 	}
-
 	m_instance_list.Insert (instance);
 	return SUCCESS;
 }
