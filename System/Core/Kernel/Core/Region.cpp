@@ -11,10 +11,21 @@
 
 namespace Core {
 
+ResourceRegion::ResourceRegion(size_t size, uint32_t access)
+	: m_memory(0),
+	  m_size(size),
+	  m_offset(0),
+	  m_access(access),
+	  m_binded(false),
+	  m_parent(0),
+	  m_parent_offset(0)
+{
+}
+
 ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
 	: m_memory(0),
-	  m_offset(offset),
 	  m_size(size),
+	  m_offset(offset),
 	  m_access(access),
 	  m_binded(false),
 	  m_parent(0),
@@ -196,14 +207,13 @@ const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 	return getMemory()->PageFault(offset);
 }
 
-offset_t ResourceRegion::getOffset() const
+offset_t ResourceRegion::offset() const
 {
 	return m_offset;
 }
 
-// Не совсем ясно что возвращать в качестве сайза...
-// Может быть сайз от начала страницы?
-size_t ResourceRegion::getSize() const
+/// Чистый размер региона
+size_t ResourceRegion::size() const
 {
 	return m_size;
 }

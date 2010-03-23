@@ -17,6 +17,15 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteRegion)
 
+BOOST_AUTO_TEST_CASE(testCreateBySize)
+{
+	// Это правильный вариант создания, offset явно не задается.
+	const size_t size = 1234;
+	ResourceRegion region(size, 0);
+	BOOST_REQUIRE_EQUAL(region.size(), size);
+	BOOST_REQUIRE_EQUAL(region.offset(), 0);
+}
+
 struct RegionFixture1 {
 	enum { reg_offset = PAGE_SIZE / 2, reg_size = PAGE_SIZE };
 	char data[reg_size];

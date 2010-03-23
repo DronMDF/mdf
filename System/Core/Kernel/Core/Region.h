@@ -22,8 +22,8 @@ protected:
 	Memory *m_memory;
 		
 private:
-	const offset_t m_offset;
 	const size_t m_size;
+	const offset_t m_offset;
 
 	uint32_t m_access;	// Ограничение ресурса на доступ.
 	bool m_binded;		// Регион забинден
@@ -48,7 +48,8 @@ protected:
 	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
 	
 public:
-	ResourceRegion(offset_t offset, size_t size, uint32_t access);
+	ResourceRegion(size_t size, uint32_t access);
+	ResourceRegion(offset_t offset, size_t size, uint32_t access) __attribute__((deprecated));
 	virtual ~ResourceRegion();
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);
@@ -57,8 +58,8 @@ public:
 
 	const PageInstance *PageFault(offset_t offset, uint32_t *access);
 
-	offset_t getOffset() const;
-	size_t getSize() const;
+	size_t size() const;
+	offset_t offset() const;
 
 	virtual bool copyIn(offset_t offset, const void *src, size_t size);
 };

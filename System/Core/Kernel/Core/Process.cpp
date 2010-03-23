@@ -71,7 +71,7 @@ ResourceThread *ResourceProcess::Call ()
 
 bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t base) const
 {
-	const laddr_t hibound = base + region->getOffset() + region->getSize();
+	const laddr_t hibound = base + region->offset() + region->size();
 
 	// Нижняя граница пользовательской памяти
 	if (base < USER_MEMORY_BASE + PAGE_SIZE)
@@ -93,10 +93,10 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 			continue;
 
 		laddr_t raddr = instance->getAddr();
-		if (hibound <= raddr + exregion->getOffset())
+		if (hibound <= raddr + exregion->offset())
 			continue;
 
-		if (base >= raddr + exregion->getOffset() + exregion->getSize())
+		if (base >= raddr + exregion->offset() + exregion->size())
 			continue;
 
 		return false;
@@ -121,7 +121,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 	}
 
 	// Адрес определен - проверим.
-	if (ubase % PAGE_SIZE != region->getOffset())
+	if (ubase % PAGE_SIZE != region->offset())
 		return 0;
 
 	laddr_t base = USER_MEMORY_BASE + (ubase & ~(PAGE_SIZE - 1));
@@ -252,7 +252,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 		ResourceRegion *region = resource->asRegion();
 		if (region == 0) continue;
 
-		const laddr_t limit = instance->getAddr() + region->getOffset() + region->getSize();
+		const laddr_t limit = instance->getAddr() + region->offset() + region->size();
 		size_t validsize = size;
 
 		if (offset + size > limit) {

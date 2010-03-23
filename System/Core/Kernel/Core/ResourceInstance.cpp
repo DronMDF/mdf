@@ -54,7 +54,7 @@ int ResourceInstance::Info (int infoid, void *info, size_t *size) const
 				const ResourceRegion *region = m_resource->asRegion();
 
 				// Адрес преобразовывается в юзерспейс
-				const laddr_t uaddr = m_addr + region->getOffset() - USER_MEMORY_BASE;
+				const laddr_t uaddr = m_addr + region->offset() - USER_MEMORY_BASE;
 				return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
 			}
 
@@ -96,8 +96,8 @@ const PageInstance *ResourceInstance::PageFault(laddr_t addr, uint32_t *access)
 	ResourceRegion *region = m_resource->asRegion();
 	STUB_ASSERT (region == 0, "Instance not for region");
 	STUB_ASSERT (m_addr == 0, "Region not attached");
-	STUB_ASSERT (addr < m_addr + region->getOffset() ||
-		m_addr + region->getOffset() + region->getSize() <= addr,
+	STUB_ASSERT (addr < m_addr + region->offset() ||
+		m_addr + region->offset() + region->size() <= addr,
 		"Addr out of region bounds");
 
 	if ((m_access & *access) != *access)
