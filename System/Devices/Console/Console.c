@@ -32,7 +32,6 @@ volatile uint16_t *getVideoMemory()
 	id_t rid = INVALID_ID;
 
 	const struct KernelCreateRegionParam cpar = {
-		.offset = 0,
 		.size = 4000,
 		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
 	};
@@ -74,7 +73,6 @@ volatile uint16_t *getVideoMemory()
 static int GetPortAccess(uint16_t first_port, uint16_t last_port)
 {
 	const struct KernelCreateRegionParam cpar = {
-		.offset = 0,
 		.size = last_port - first_port + 1,
 		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
 	};

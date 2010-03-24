@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(detach)
 struct testRegion : public ResourceRegion, private visit_mock {
 	bool m_first, m_last;
 	testRegion(bool first, bool last)
-		: ResourceRegion(0, PAGE_SIZE, 0), m_first(first), m_last(last) 
+		: ResourceRegion(PAGE_SIZE, 0), m_first(first), m_last(last) 
 	{ 
 		Register(); 
 	}
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(testCopyIn)
 	process.Attach(region, 0, PAGE_SIZE);	// USER_MEMORY_BASE + PAGE_SIZE
 
 	char data[PAGE_SIZE];
-	fill_random(data, PAGE_SIZE);
+	generate(data, data + PAGE_SIZE, rand);
 
 	BOOST_REQUIRE(process.copyIn(USER_MEMORY_BASE + PAGE_SIZE, data, PAGE_SIZE));
 }
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(testCopyInInterReg)
 	process.Attach(region3, 0, PAGE_SIZE + PAGE_SIZE * 2);
 
 	char data[PAGE_SIZE * 2];
-	fill_random(data, PAGE_SIZE * 2);
+	generate(data, data + PAGE_SIZE * 2, rand);
 
 	BOOST_REQUIRE(process.copyIn(USER_MEMORY_BASE + PAGE_SIZE + PAGE_SIZE / 2, 
 				     data, PAGE_SIZE * 2));
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE(testCopyInInterReg)
 
 // TODO: А так же сбои по отсутствию инстанций или по дыркам между регионами.
 struct testHoleRegion : public ResourceRegion {
-	testHoleRegion(offset_t offset, size_t size) 
-		: ResourceRegion(offset, size, 0) 
+	testHoleRegion(size_t size) 
+		: ResourceRegion(size, 0) 
 	{ 
 		Register(); 
 	}
@@ -123,15 +123,15 @@ BOOST_AUTO_TEST_CASE(testCopyInHoleReg)
 {
 	testProcess process;
 	
-	ResourceRegion *region1 = new testHoleRegion(0, PAGE_SIZE - 1);
-	ResourceRegion *region2 = new testHoleRegion(0, PAGE_SIZE);
+	ResourceRegion *region1 = new testHoleRegion(PAGE_SIZE - 1);
+	ResourceRegion *region2 = new testHoleRegion(PAGE_SIZE);
 	
 	process.Attach(region1, 0, PAGE_SIZE);	// from USER_MEMORY_BASE
 	// Здесь между регионамы - дырка... размером один байт
 	process.Attach(region2, 0, PAGE_SIZE + PAGE_SIZE);
 
 	char data[PAGE_SIZE];
-	fill_random(data, PAGE_SIZE);
+	generate(data, data + PAGE_SIZE, rand);
 
 	BOOST_REQUIRE(!process.copyIn(USER_MEMORY_BASE + PAGE_SIZE + PAGE_SIZE / 2, 
 				     data, PAGE_SIZE));

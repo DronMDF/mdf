@@ -251,16 +251,18 @@ void __init__ StubMultibootModuleLoad (const laddr_t base, const size_t size,
 {
 	id_t id = INVALID_ID;
 
-	struct KernelCreateRegionParam createp = {0, 0, 0};
-	createp.size = size;
-	createp.access = RESOURCE_ACCESS_READ;
+	struct KernelCreateRegionParam createp = {
+		.size = size,
+		.access = RESOURCE_ACCESS_READ,
+	};
 
 	int rv = CoreCreate (0, RESOURCE_TYPE_REGION, &createp, sizeof (createp), &id);
 	STUB_ASSERT (rv != SUCCESS, "Unable to create module entire region");
 
-	struct KernelModifyRegionBindParam bindp = { 0, 0, 0, 0, 0 };
-	bindp.offset = StubPageGetPAddr(base);
-	bindp.size = size;
+	struct KernelModifyRegionBindParam bindp = {
+		.offset = StubPageGetPAddr(base),
+		.size = size, 
+	};
 
 	rv = CoreModify (0, id, RESOURCE_MODIFY_REGION_PHYSICALBIND, &bindp, sizeof (bindp));
 	STUB_ASSERT (rv != SUCCESS, "Unable to bind module entire region");

@@ -19,7 +19,6 @@ volatile void *getVideoMemory ()
 	id_t rid = INVALID_ID;
 
 	const struct KernelCreateRegionParam cpar = {
-		.offset = 0,
 		.size = 4000,
 		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
 	};

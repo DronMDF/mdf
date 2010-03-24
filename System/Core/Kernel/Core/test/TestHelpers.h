@@ -21,11 +21,3 @@ class visit_mock : private order_mock<1> {
 public:
 	void visit() const { m_order = 1; }
 };
-
-static inline void fill_random (void *ptr, size_t size)
-{
-	char *p = static_cast<char *>(ptr);
-	for (size_t i = 0; i < size; i++) {
-		p[i] = rand() & 0xff;
-	}
-}

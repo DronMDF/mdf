@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(suiteMemory)
 struct MemFixture1 {
 	enum { mem_size = PAGE_SIZE * 3 - PAGE_SIZE / 2 }; // 2.5 страницы;
 	char data[mem_size];
-	MemFixture1() { fill_random(data, mem_size); }
+	MemFixture1() { generate(data, data + mem_size, rand); }
 };
 
 BOOST_FIXTURE_TEST_CASE(testCopyIn, MemFixture1)

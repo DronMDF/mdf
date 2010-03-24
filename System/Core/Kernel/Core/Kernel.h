@@ -111,7 +111,7 @@ enum KERNEL_RESOURCE_EVENT {
 
 struct KernelCreateRegionParam {
 	size_t size;
-	offset_t offset;
+	offset_t offset __attribute__((deprecated));
 	uint32_t access;	// ограничения на права региона
 };
 

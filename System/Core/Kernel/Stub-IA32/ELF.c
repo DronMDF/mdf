@@ -109,7 +109,6 @@ void __init__ StubELFLoadSection (const id_t pid, const id_t rid, const Elf32_Ph
 
 	const struct KernelCreateRegionParam createp = {
 		.size = phdr->p_memsz,
-		.offset = phdr->p_offset % PAGE_SIZE,
 		.access = access,
 	};
 
