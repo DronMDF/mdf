@@ -22,17 +22,6 @@ ResourceRegion::ResourceRegion(size_t size, uint32_t access)
 {
 }
 
-ResourceRegion::ResourceRegion(offset_t offset, size_t size, uint32_t access)
-	: m_memory(0),
-	  m_size(size),
-	  m_offset(offset),
-	  m_access(access),
-	  m_binded(false),
-	  m_parent(0),
-	  m_parent_offset(0)
-{
-}
-
 ResourceRegion::~ResourceRegion ()
 {
 	delete m_memory;
@@ -80,57 +69,49 @@ int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
 // m_size		     ------+----+-----	<- область региона
 // skip			     ------|	|	<- смещение в регионе.
 
-int ResourceRegion::bindRegion(id_t parent, offset_t poffset, size_t psize, offset_t skip)
+int ResourceRegion::bindRegion(ResourceRegion *parent, offset_t poffset, 
+			       size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
+	if (skip + psize > m_size) return ERROR_INVALIDPARAM;
+	if (poffset + psize > parent->size()) return ERROR_INVALIDPARAM;
 
-	Resource *resource = FindResource (parent);
-	if (resource == 0)
-		return ERROR_INVALIDID;
-
-	m_parent = resource->asRegion();
-	if (m_parent == 0)
-		return ERROR_INVALIDID;
-
-	// TODO: странное соглашение, ИМХО poffset надо сравнивать с m_size
-	if (poffset < m_offset)
-		return ERROR_INVALIDPARAM;
-
-	// TODO: И это тоже странное соглашение. Надо перепахивать.
-	m_parent_offset = poffset - m_offset;
+	m_offset = (parent->offset() + poffset) % PAGE_SIZE;
 	
-	STUB_ASSERT (m_parent_offset % PAGE_SIZE != 0, "Unaligned parent region");
-	STUB_ASSERT (skip + psize > m_size, "Overload region");
-	STUB_ASSERT (m_parent_offset + psize > m_parent->m_size, "Small parent region");
-
-	// И все... подкачка будет работать с родительского региона.
-	// TODO: только я что-то shift нигде не зафиксировал.
-
+	// Лучше прикапывать идентификатор, а то ресурс удалят и все, или вязать 
+	// через инстанции (адрес инстанции можно использовать как смещение!)
+	m_parent = parent;
+	m_parent_offset = poffset;
 	m_binded = true;
+	
 	return SUCCESS;
 }
 
 int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 {
-	const KernelModifyRegionBindParam *bindparam = 0;
-	if (param_size == sizeof (KernelModifyRegionBindParam))
-		bindparam = reinterpret_cast<const KernelModifyRegionBindParam *>(param);
+	if (param_size != sizeof (KernelModifyRegionBindParam)) {
+		return ERROR_INVALIDPARAM;
+	}
 
-	switch (param_id) {
-		case RESOURCE_MODIFY_REGION_PHYSICALBIND:
-			if (bindparam == 0)
-				return ERROR_INVALIDPARAM;
+	if (param == 0) return ERROR_INVALIDPARAM;
 
-			return bindPhysical(bindparam->offset, bindparam->size, bindparam->shift);
-
-		case RESOURCE_MODIFY_REGION_REGIONBIND:
-			if (bindparam == 0)
-				return ERROR_INVALIDPARAM;
-
-			return bindRegion(bindparam->id, bindparam->offset, bindparam->size, bindparam->shift);
-
-		default:
-			break;
+	const KernelModifyRegionBindParam *bindparam = 
+		reinterpret_cast<const KernelModifyRegionBindParam *>(param);
+	
+	if (param_id == RESOURCE_MODIFY_REGION_PHYSICALBIND) {
+		return bindPhysical(bindparam->offset, bindparam->size, 
+				    bindparam->shift);
+	}
+	
+	if (param_id == RESOURCE_MODIFY_REGION_REGIONBIND) {
+		Resource *resource = FindResource(bindparam->id);
+		if (resource == 0) return ERROR_INVALIDID;
+	
+		ResourceRegion *parent = resource->asRegion();
+		if (parent == 0) return ERROR_INVALIDID;
+			
+		return bindRegion(parent, bindparam->offset, bindparam->size, 
+				  bindparam->shift);
 	}
 
 	return Resource::Modify(param_id, param, param_size);
