@@ -71,10 +71,12 @@ ResourceThread *ResourceProcess::Call ()
 
 bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t base) const
 {
-	const laddr_t hibound = base + region->offset() + region->size();
+	// Границы подгоняем до границ страниц
+	const laddr_t lowbound = base & PADDR_MASK;
+	const laddr_t hibound = (base + region->size() + PAGE_SIZE - 1) & PADDR_MASK;
 
 	// Нижняя граница пользовательской памяти
-	if (base < USER_MEMORY_BASE + PAGE_SIZE)
+	if (lowbound < USER_MEMORY_BASE + PAGE_SIZE)
 		return false;
 
 	// Верхняя граница пользовательской памяти
@@ -93,10 +95,10 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 			continue;
 
 		laddr_t raddr = instance->getAddr();
-		if (hibound <= raddr + exregion->offset())
+		if (hibound <= raddr)
 			continue;
 
-		if (base >= raddr + exregion->offset() + exregion->size())
+		if (base >= raddr + exregion->size())
 			continue;
 
 		return false;
@@ -113,7 +115,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 	if (ubase == 0) {
 		// Адрес не определен - определяем
 		for (laddr_t base = 0; ; base = 0) {
-			base = CoreRandom() & ~(PAGE_SIZE - 1);
+			base = (CoreRandom() & PADDR_MASK) + region->offset();
 
 			if (CheckRegionPlace (region, base))
 				return base;
@@ -124,7 +126,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 	if (ubase % PAGE_SIZE != region->offset())
 		return 0;
 
-	laddr_t base = USER_MEMORY_BASE + (ubase & ~(PAGE_SIZE - 1));
+	laddr_t base = USER_MEMORY_BASE + ubase;
 	if (!CheckRegionPlace (region, base))
 		return 0;
 
@@ -185,7 +187,7 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 		instance = m_instance_list.getNext (instance))
 	{
 		if (instance->inBounds(addr)) {
-			return instance->PageFault (addr, access);
+			return instance->PageFault(addr, access);
 		}
 	}
 

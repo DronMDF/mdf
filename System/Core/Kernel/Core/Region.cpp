@@ -119,10 +119,10 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 
 bool ResourceRegion::inBounds(laddr_t addr, laddr_t base) const
 {
-	STUB_ASSERT (base % PAGE_SIZE != 0, "Region is not aligned");
+	STUB_ASSERT ((base - m_offset) % PAGE_SIZE != 0, "Region is not aligned");
 	
-	if (addr < base + m_offset) return false;
-	if (base + m_offset + m_size <= addr) return false;
+	if (addr < base) return false;
+	if (base + m_size <= addr) return false;
 	return true;
 }
 
@@ -154,14 +154,11 @@ const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInsta
 
 const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 {
-	if (offset < m_offset)
-		return 0;
-
 	*access &= m_access;
 
 	// Сперва необходимо проверить есть ли страница в этом регионе.
 	// Если есть - отдаем ее.
-	const PageInstance *page = getMemory()->getPage(offset);
+	const PageInstance *page = getMemory()->getPage(m_offset + offset);
 	if (page != 0)
 		return page;
 
@@ -185,7 +182,7 @@ const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 	}
 
 	// А если родительского нету - то делаем свой PageFault;
-	return getMemory()->PageFault(offset);
+	return getMemory()->PageFault(m_offset + offset);
 }
 
 offset_t ResourceRegion::offset() const
@@ -193,7 +190,6 @@ offset_t ResourceRegion::offset() const
 	return m_offset;
 }
 
-/// Чистый размер региона
 size_t ResourceRegion::size() const
 {
 	return m_size;
@@ -201,8 +197,8 @@ size_t ResourceRegion::size() const
 
 bool ResourceRegion::copyIn(offset_t offset, const void *src, size_t size)
 {
-	if (offset < m_offset) return false;
-	return getMemory()->copyIn(offset, src, size);
+	STUB_ASSERT(size > m_size, "Overload region");
+	return getMemory()->copyIn(m_offset + offset, src, size);
 }
 
 } // namespace Core

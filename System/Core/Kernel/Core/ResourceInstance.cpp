@@ -18,10 +18,11 @@ ResourceInstance::ResourceInstance (Resource *resource, uint32_t access, uint32_
 	  m_addr(0),
 	  ProcessLink()
 {
-	if (m_resource->asRegion()) {
+	if (const ResourceRegion *region = m_resource->asRegion()) {
 		// Регионы используют парам в качестве адреса маппинга к процессу.
 		m_addr = param;
-		STUB_ASSERT (m_addr % PAGE_SIZE != 0, "Unaligned region base");
+		STUB_ASSERT ((m_addr - region->offset()) % PAGE_SIZE != 0, 
+			     "Unaligned region base");
 	}
 }
 
@@ -41,29 +42,23 @@ int ResourceInstance::Modify (int paramid, const void *param, size_t param_size)
 	return m_resource->Modify(paramid, param, param_size);
 }
 
-int ResourceInstance::Info (int infoid, void *info, size_t *size) const
+int ResourceInstance::Info(int infoid, void *info, size_t *size) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 
 	if (!isSet(m_access, RESOURCE_ACCESS_INFO))
 		return ERROR_ACCESS;
 
-	switch (infoid) {
-		case RESOURCE_INFO_REGION_INSTANCE_ADDR:
-			if (m_resource->asRegion() != 0) {
-				const ResourceRegion *region = m_resource->asRegion();
-
-				// Адрес преобразовывается в юзерспейс
-				const laddr_t uaddr = m_addr + region->offset() - USER_MEMORY_BASE;
-				return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
-			}
-
+	if (infoid == RESOURCE_INFO_REGION_INSTANCE_ADDR) {
+		if (m_resource->asRegion() == 0) {
 			return ERROR_INVALIDPARAM;
-
-		default:
-			break;
+		}
+		
+		// Адрес преобразовывается в юзерспейс
+		const laddr_t uaddr = m_addr - USER_MEMORY_BASE;
+		return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
 	}
-
+	
 	return m_resource->Info(infoid, info, size);
 }
 
@@ -96,8 +91,7 @@ const PageInstance *ResourceInstance::PageFault(laddr_t addr, uint32_t *access)
 	ResourceRegion *region = m_resource->asRegion();
 	STUB_ASSERT (region == 0, "Instance not for region");
 	STUB_ASSERT (m_addr == 0, "Region not attached");
-	STUB_ASSERT (addr < m_addr + region->offset() ||
-		m_addr + region->offset() + region->size() <= addr,
+	STUB_ASSERT (addr < m_addr || m_addr + region->size() <= addr,
 		"Addr out of region bounds");
 
 	if ((m_access & *access) != *access)
