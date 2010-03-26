@@ -20,11 +20,9 @@ com1: enabled=1, mode=file, dev="serial.out"
 com2: enabled=0
 com3: enabled=0
 com4: enabled=0
-usb1: enabled=0
 i440fxsupport: enabled=0
 vga_update_interval: 100000
 vga: extension=vbe
-cpu: count=1:1:1, ips=3000000, quantum=5, reset_on_triple_fault=1
 text_snapshot_check: enabled=0
 private_colormap: enabled=0
 clock: sync=none, time0=local

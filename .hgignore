@@ -2,3 +2,6 @@ syntax: glob
 Images/mdf-*
 Images/grub2
 Images/MDF.Root
+Images/bochs.log
+Images/serial.out
+
