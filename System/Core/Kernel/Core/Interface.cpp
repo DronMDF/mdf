@@ -213,7 +213,7 @@ int CoreAttach (const Task *task, id_t rid, id_t pid, int access, uint32_t spec)
 }
 
 extern "C"
-int CoreDetach(id_t id __unused__, int flags __unused__)
+int CoreDetach(const Task *task __unused__, id_t id __unused__, int flags __unused__)
 {
 	return ERROR_NOTIMPLEMENT;
 }
