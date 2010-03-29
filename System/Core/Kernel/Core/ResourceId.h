@@ -23,8 +23,8 @@ protected:
 public:
 	Link<ResourceId> StorageLink;
 
-	void setId (id_t id);
-	id_t getId () const;
+	void setId(id_t id);
+	id_t id() const;
 
 	virtual Resource *asResource() = 0;
 

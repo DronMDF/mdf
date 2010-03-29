@@ -141,7 +141,7 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
-		if (instance->getId() == resource->getId()) {
+		if (instance->getId() == resource->id()) {
 			STUB_FATAL ("Resource already attached");
 			return ERROR_BUSY;
 		}
@@ -164,7 +164,7 @@ int ResourceProcess::Detach(Resource *resource)
 	for (ResourceInstance *instance = m_instance_list.getFirst();
 		instance != 0; instance = m_instance_list.getNext(instance))
 	{
-		if (instance->getId() == resource->getId()) {
+		if (instance->getId() == resource->id()) {
 			m_instance_list.Remove(instance);
 			delete instance;
 			return SUCCESS;
@@ -192,7 +192,7 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 	}
 
 	CorePrint ("Unhandled pagefault in process 0x%8x at 0x%8x, mode 0x%3x\n",
-		getId(), addr, *access);
+		id(), addr, *access);
 
 	*access = 0;
 	return 0;

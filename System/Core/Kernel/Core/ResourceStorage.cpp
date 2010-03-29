@@ -24,7 +24,7 @@ ResourceId *ResourceStorage::_Find(id_t id) const
 	for (ResourceId *resource = m_resources_list->getFirst();
 	     resource != 0; resource = m_resources_list->getNext(resource))
 	{
-		if (resource->getId() == id)
+		if (resource->id() == id)
 			return resource;
 	}
 

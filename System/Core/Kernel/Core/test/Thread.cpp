@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 
 	Resource *resource = instance->getResource();
 	BOOST_REQUIRE(resource != 0);
-	BOOST_REQUIRE_EQUAL(resource->getId(), id);
+	BOOST_REQUIRE_EQUAL(resource->id(), id);
 
 	ResourceThread *thread = resource->asThread();
 	BOOST_REQUIRE(thread != 0);
@@ -107,14 +107,14 @@ BOOST_AUTO_TEST_CASE(info_current)
 	const int rv = thread.Info(RESOURCE_INFO_THREAD_CURRENT, &id, &id_size);
 	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 	BOOST_REQUIRE_EQUAL(id_size, sizeof(id_t));
-	BOOST_REQUIRE_EQUAL(id, thread.getId());
+	BOOST_REQUIRE_EQUAL(id, thread.id());
 
 	id = INVALID_ID;
 	const int rv2 = CoreInfo(reinterpret_cast<Task *>(&thread),
 		0, RESOURCE_INFO_THREAD_CURRENT, &id, &id_size);
 	BOOST_REQUIRE_EQUAL(rv2, SUCCESS);
 	BOOST_REQUIRE_EQUAL(id_size, sizeof(id_t));
-	BOOST_REQUIRE_EQUAL(id, thread.getId());
+	BOOST_REQUIRE_EQUAL(id, thread.id());
 }
 
 BOOST_AUTO_TEST_CASE(modify_priority)
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 	const laddr_t address = 0xADD0000;
 	thread.setCopyBack(&thread, address);
 
-	BOOST_REQUIRE_EQUAL(thread.m_copyback_id, thread.getId());
+	BOOST_REQUIRE_EQUAL(thread.m_copyback_id, thread.id());
 	BOOST_REQUIRE_EQUAL(thread.m_copyback_addr, address);
 }
 
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(testCreateRequestArea)
 	BOOST_REQUIRE_EQUAL(frame->flags, access);
 	BOOST_REQUIRE_EQUAL(frame->txa_size, size);
 	BOOST_REQUIRE_EQUAL(frame->txa_ptr, USER_TXA_BASE - USER_MEMORY_BASE + offset);
-	BOOST_REQUIRE_EQUAL(frame->caller, thread.getId());
+	BOOST_REQUIRE_EQUAL(frame->caller, thread.id());
 	BOOST_REQUIRE_EQUAL(frame->retmagic, RETMAGIC);
 }
 

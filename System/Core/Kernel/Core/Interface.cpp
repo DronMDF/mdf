@@ -146,7 +146,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 
 	STUB_ASSERT (resource == 0, "Unable to create resource");
 	resource->Register();
-	*id = resource->getId();
+	*id = resource->id();
 
 	if (process != 0) {
 		// Создадим инстанцию в текущем процессе

@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(finding)
 	{
 		TestResource resource;
 		resource.Register();
-		id = resource.getId();
+		id = resource.id();
 		BOOST_REQUIRE_NE(id, 0);
 		BOOST_REQUIRE_EQUAL(FindResource(id), reinterpret_cast<Resource *>(&resource));
 	}
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(finding2)
 		BOOST_REQUIRE_EQUAL(resource.m_id, 0);
 
 		resource.Register();
-		id = resource.getId();
+		id = resource.id();
 		BOOST_REQUIRE_NE(id, 0);
 		BOOST_REQUIRE_EQUAL(FindResource(id), reinterpret_cast<Resource *>(&resource));
 	}

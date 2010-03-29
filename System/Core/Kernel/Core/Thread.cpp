@@ -275,7 +275,7 @@ int ResourceThread::Modify(int param_id, const void *param, size_t param_size)
 int ResourceThread::Info(int info_id, void *info, size_t *info_size) const
 {
 	if (info_id == RESOURCE_INFO_THREAD_CURRENT) {
-		const id_t id = getId();
+		const id_t id = this->id();
 		STUB_ASSERT(id == INVALID_ID, "invalid id");
 		return StubInfoValue(info, info_size, &id, sizeof(id_t));
 	}
@@ -309,7 +309,7 @@ bool ResourceThread::createRequestArea(ResourceThread *caller,
 	m_txa_offset = offset;
 	m_txa_access = access;
 
-	const id_t caller_id = (caller != 0) ? caller->getId() : 0;
+	const id_t caller_id = (caller != 0) ? caller->id() : 0;
 	
 	StubStackFrame stack_frame;
 	StubSetStackFrame(&stack_frame, caller_id, m_txa_offset, size, m_txa_access);
@@ -334,7 +334,7 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 
 void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 {
-	m_copyback_id = thread->getId();
+	m_copyback_id = thread->id();
 	m_copyback_addr = buffer;
 }
 

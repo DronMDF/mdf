@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncWithoutCaller)
 	const laddr_t entry = 6666;
 	testProcess process(entry);
 	
-	BOOST_REQUIRE_EQUAL(CoreCall(0, process.getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+	BOOST_REQUIRE_EQUAL(CoreCall(0, process.id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	ResourceThread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(testCallThreadAsyncByProcessInstance)
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(thread),
-			thread->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+			thread->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	ResourceThread *st = scheduler.getThread();
 	BOOST_REQUIRE_EQUAL(st, thread);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncByProcessInstance)
 
 	testThread task(&process);
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
-			call->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+			call->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	ResourceThread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 	
 	testThread task(&process);
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
-			calledprocess->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+			calledprocess->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	ResourceThread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(testCallParametersDeliver)
 	testProcess process(0);
 	
 	string test_msg = "test";
-	BOOST_REQUIRE_EQUAL(CoreCall(0, process.getId(), 
+	BOOST_REQUIRE_EQUAL(CoreCall(0, process.id(), 
 		test_msg.c_str(), test_msg.size(), 
 		RESOURCE_CALL_ASYNC | RESOURCE_CALL_COPY), SUCCESS);
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(testCallSync)
 // 	task.setProcess(&process);
 // 	
 // 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
-// 			process.getId(), 0, 0, 0), SUCCESS);
+// 			process.id(), 0, 0, 0), SUCCESS);
 // 
 // //	TODO: Обработчик уже вызван... и я не могу это отследить... пока...
 // // 	ResourceThread *thread = scheduler.getThread();
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(testCallUncallable)
 {
 	testResource uncallable;
 	uncallable.Register();
-	BOOST_REQUIRE_EQUAL(CoreCall(0, uncallable.getId(), 0, 0, RESOURCE_CALL_ASYNC), ERROR_INVALIDID);
+	BOOST_REQUIRE_EQUAL(CoreCall(0, uncallable.id(), 0, 0, RESOURCE_CALL_ASYNC), ERROR_INVALIDID);
 }
 
 // -----------------------------------------------------------------------------
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(testCallUncallable)
 BOOST_AUTO_TEST_CASE(testCallThreadAsyncWithoutCaller)
 {
 	testThread thread;
-	BOOST_REQUIRE_EQUAL(CoreCall(0, thread.getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+	BOOST_REQUIRE_EQUAL(CoreCall(0, thread.id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	testScheduler scheduler;
 	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread);
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncWithoutCaller)
 	Resource *call = ResourceCall::Create(&process, &entry, sizeof(laddr_t));
 	call->Register();
 
-	BOOST_REQUIRE_EQUAL(CoreCall(0, call->getId(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
+	BOOST_REQUIRE_EQUAL(CoreCall(0, call->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
 	ResourceThread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);

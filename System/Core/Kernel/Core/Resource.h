@@ -51,7 +51,7 @@ protected:
 public:
 	virtual ~Resource ();
 
-	using ResourceId::getId;
+	using ResourceId::id;
 	using ResourceId::Register;
 
 	virtual Resource * asResource();

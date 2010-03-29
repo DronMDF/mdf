@@ -31,7 +31,7 @@ void ResourceId::setId(id_t id)
 	m_id = id;
 }
 
-id_t ResourceId::getId (void) const
+id_t ResourceId::id (void) const
 {
 	STUB_ASSERT(m_id == 0, "Resource not registered");
 	return m_id;
