@@ -100,7 +100,7 @@ const PageInstance *ResourceInstance::PageFault(laddr_t addr, uint32_t *access)
 	return region->PageFault (addr - m_addr, access);
 }
 
-id_t ResourceInstance::getId() const
+id_t ResourceInstance::id() const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 	return m_resource->id();

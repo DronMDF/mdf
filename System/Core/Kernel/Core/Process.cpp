@@ -141,7 +141,7 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
-		if (instance->getId() == resource->id()) {
+		if (instance->id() == resource->id()) {
 			STUB_FATAL ("Resource already attached");
 			return ERROR_BUSY;
 		}
@@ -164,7 +164,7 @@ int ResourceProcess::Detach(Resource *resource)
 	for (ResourceInstance *instance = m_instance_list.getFirst();
 		instance != 0; instance = m_instance_list.getNext(instance))
 	{
-		if (instance->getId() == resource->id()) {
+		if (instance->id() == resource->id()) {
 			m_instance_list.Remove(instance);
 			delete instance;
 			return SUCCESS;
@@ -205,7 +205,7 @@ ResourceInstance *ResourceProcess::FindInstance (id_t id) const
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
-		if (instance->getId() == id)
+		if (instance->id() == id)
 			return instance;
 	}
 

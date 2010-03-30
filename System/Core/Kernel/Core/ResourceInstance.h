@@ -31,7 +31,7 @@ public:
 	~ResourceInstance();
 
 	Resource *getResource() const;
-	id_t getId() const;
+	id_t id() const;
 	uint32_t getAccess() const;
 
 	laddr_t getAddr() const;
