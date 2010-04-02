@@ -13,11 +13,11 @@
 #include "../Resource.h"
 #include "../Thread.h"
 #include "../SubScheduler.h"
-#include "../ActiveScheduler.h"
+#include "../SchedulerActive.h"
 
 using namespace Core;
 
-BOOST_AUTO_TEST_SUITE(active_scheduler)
+BOOST_AUTO_TEST_SUITE(suiteSchedulerActive)
 
 class testThread : public ResourceThread {
 public:
@@ -31,8 +31,8 @@ public:
 
 BOOST_AUTO_TEST_CASE(thread_index)
 {
-	class testScheduler : public ActiveScheduler {
-		public: using ActiveScheduler::getThreadIndex;
+	class testScheduler : public SchedulerActive {
+		public: using SchedulerActive::getThreadIndex;
 	} scheduler;
 
 	testThread thread(StubGetCurrentClock(), 0);
@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE(thread_index)
 
 BOOST_AUTO_TEST_CASE(thread_order_function)
 {
-	class testScheduler : public ActiveScheduler {
-		public: using ActiveScheduler::checkThreadUrgency;
+	class testScheduler : public SchedulerActive {
+		public: using SchedulerActive::checkThreadUrgency;
 	} scheduler;
 
 	testThread thread1(StubGetCurrentClock(), 0);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(thread_order_function)
 
 BOOST_AUTO_TEST_CASE(normal_priority)
 {
-	ActiveScheduler scheduler;
+	SchedulerActive scheduler;
 
 	// Пустой планировщик естественно ничего не возвращает.
 	BOOST_REQUIRE(scheduler.getThread() == 0);

@@ -10,7 +10,7 @@
 #include "Thread.h"
 #include "Scheduler.h"
 #include "SubScheduler.h"
-#include "ActiveScheduler.h"
+#include "SchedulerActive.h"
 #include "InactiveScheduler.h"
 #include "KillScheduler.h"
 
@@ -35,7 +35,7 @@ Scheduler::~Scheduler()
 void Scheduler::addActiveThread(ResourceThread *thread)
 {
 	if (m_actives == 0) {
-		m_actives = new ActiveScheduler();
+		m_actives = new SchedulerActive();
 	}
 
 	m_actives->addThread(thread);

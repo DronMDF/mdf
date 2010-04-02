@@ -5,13 +5,13 @@
 
 #include "List.h"
 #include "Link.h"
-#include "Resource.h"
 #include "Memory.h"
-#include "Thread.h"
 #include "SubScheduler.h"
-#include "ActiveScheduler.h"
-
+#include "SchedulerActive.h"
 #include "CoreLocal.h"
+
+#include "Resource.h"
+#include "Thread.h"
 
 namespace Core {
 
@@ -22,17 +22,17 @@ namespace Core {
 // Пассивные нити - это те нити, которые работают только тогда,
 // когда других дел нет.
 
-ActiveScheduler::ActiveScheduler()
+SchedulerActive::SchedulerActive()
 	: m_queue(&ResourceThread::ScheduleLink)
 {
 }
 
-ActiveScheduler::~ActiveScheduler()
+SchedulerActive::~SchedulerActive()
 {
 	STUB_ASSERT(m_queue.getSize() > 0, "Destroy full scheduler");
 }
 
-uint32_t ActiveScheduler::getThreadIndex(const ResourceThread *thread) const
+uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
 {
 	STUB_ASSERT(StubGetCurrentClock() < thread->getTimestamp(),
 		"Thread timestamp in the future");
@@ -48,7 +48,7 @@ uint32_t ActiveScheduler::getThreadIndex(const ResourceThread *thread) const
 	return index;
 }
 
-bool ActiveScheduler::checkThreadUrgency(const ResourceThread *thread,
+bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,
 		const ResourceThread *exist) const
 {
 	STUB_ASSERT(StubGetCurrentClock() < thread->getTimestamp(),
@@ -73,7 +73,7 @@ bool ActiveScheduler::checkThreadUrgency(const ResourceThread *thread,
 	return false;
 }
 
-void ActiveScheduler::addThread(ResourceThread *thread)
+void SchedulerActive::addThread(ResourceThread *thread)
 {
 	STUB_ASSERT(thread == 0, "thread invalid");
 
@@ -86,7 +86,7 @@ void ActiveScheduler::addThread(ResourceThread *thread)
 //	CorePrint("\n");
 }
 
-ResourceThread *ActiveScheduler::getThread()
+ResourceThread *SchedulerActive::getThread()
 {
 	if (ResourceThread *thread = m_queue.getFirst()) {
 		m_queue.Remove(thread);

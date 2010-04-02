@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "SubScheduler.h"
+
 namespace Core {
 
-class ActiveScheduler : public SubScheduler
+class SchedulerActive : public SubScheduler
 {
 private:
 	// Очереди пока хватит одной, в окончательной версии сделаю три.
@@ -22,8 +24,8 @@ protected:
 		const ResourceThread *exist) const;
 
 public:
-	ActiveScheduler();
-	virtual ~ActiveScheduler();
+	SchedulerActive();
+	virtual ~SchedulerActive();
 
 	virtual void addThread(ResourceThread *thread);
 	virtual ResourceThread *getThread();
