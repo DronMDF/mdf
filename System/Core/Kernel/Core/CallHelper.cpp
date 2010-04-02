@@ -6,13 +6,13 @@
 #include "CallHelper.h"
 
 #include "Kernel.h"
+#include "Scheduler.h"
+#include "CoreLocal.h"
+
+#include "Instance.h"
 #include "Resources.h"
-#include "ResourceInstance.h"
 #include "Thread.h"
 #include "Process.h"
-#include "Scheduler.h"
-
-#include "CoreLocal.h"
 
 namespace Core {
 

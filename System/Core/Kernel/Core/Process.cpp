@@ -9,13 +9,13 @@
 
 #include "List.h"
 #include "Memory.h"
+#include "Resources.h"	// TODO: Надо поделить на классы.
+
+#include "Instance.h"
 #include "Resource.h"
-#include "ResourceInstance.h"
 #include "Region.h"
 #include "Process.h"
 #include "Thread.h"
-
-#include "Resources.h"	// TODO: Надо поделить на классы.
 
 namespace Core {
 

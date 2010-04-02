@@ -13,7 +13,8 @@
 #include "../List.h"
 #include "../Memory.h"
 #include "../Resource.h"
-#include "../ResourceInstance.h"
+
+#include "../Instance.h"
 #include "../Region.h"
 #include "../Thread.h"
 #include "../Process.h"

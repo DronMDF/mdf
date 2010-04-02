@@ -6,7 +6,7 @@
 #include "Kernel.h"
 #include "CoreLocal.h"
 
-#include "ResourceInstance.h"
+#include "Instance.h"
 #include "Resource.h"
 #include "Region.h"
 

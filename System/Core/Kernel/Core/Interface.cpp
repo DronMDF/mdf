@@ -5,16 +5,15 @@
 
 #include "Kernel.h"
 #include "CoreLocal.h"
+#include "Scheduler.h"
+#include "CallHelper.h"
+#include "Resources.h"	// Для Core::FindResource
 
-#include "ResourceInstance.h"
+#include "Instance.h"
 #include "Region.h"
 #include "Process.h"
 #include "Thread.h"
 #include "Call.h"
-#include "Scheduler.h"
-#include "CallHelper.h"
-
-#include "Resources.h"	// Для Core::FindResource
 
 using namespace Core;
 

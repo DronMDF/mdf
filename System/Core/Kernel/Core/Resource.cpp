@@ -5,12 +5,13 @@
 
 #include "Kernel.h"
 
-#include "ResourceId.h"
-#include "Resource.h"
-#include "ResourceInstance.h"
 #include "Memory.h"
-#include "Thread.h"
 #include "Event.h"
+#include "ResourceId.h"
+
+#include "Instance.h"
+#include "Resource.h"
+#include "Thread.h"
 
 #include "CoreLocal.h"
 

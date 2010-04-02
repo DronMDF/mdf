@@ -7,16 +7,15 @@
 #include "Kernel.h"
 
 #include "CoreLocal.h"	// TODO: Делить на классы
-
 #include "List.h"
 #include "Memory.h"
+#include "Scheduler.h"
+#include "Resources.h"	// TODO: Устаревающее
+
+#include "Instance.h"
 #include "Resource.h"
-#include "ResourceInstance.h"
 #include "Thread.h"
 #include "Process.h"
-#include "Scheduler.h"
-
-#include "Resources.h"	// TODO: Устаревающее
 
 namespace Core {
 

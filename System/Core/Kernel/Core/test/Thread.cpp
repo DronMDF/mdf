@@ -9,10 +9,12 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
+
 #include "../List.h"
 #include "../Memory.h"
 #include "../Resource.h"
-#include "../ResourceInstance.h"
+
+#include "../Instance.h"
 #include "../Thread.h"
 #include "../Process.h"
 #include "../Core.h"

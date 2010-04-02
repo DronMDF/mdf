@@ -8,14 +8,13 @@
 #include "Types.h"
 #include "../Kernel.h"
 #include "../CallHelper.h"
+#include "../Instance.h"
 
 #include "testResource.h"
 #include "testThread.h"
 #include "testProcess.h"
 #include "testScheduler.h"
 #include "testSubScheduler.h"
-
-#include "../ResourceInstance.h"
 
 #include "TestHelpers.h"
 
