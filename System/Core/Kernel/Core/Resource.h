@@ -9,7 +9,7 @@
 
 namespace Core {
 
-class ResourceInstance;
+class Instance;
 
 class ResourceRegion;
 class ResourceProcess;
@@ -71,7 +71,7 @@ public:
 	virtual int Info(int info_id, void *info, size_t *info_size) const;
 
 	// Работа с инстанциями.
-	ResourceInstance *CreateInstance (int capability, unsigned long param = 0);
+	Instance *CreateInstance (int capability, unsigned long param = 0);
 	// TODO: Эту функцию надо переименовать не знаю во что, но инстанции она не удаляет.
 	void DeleteInstance();
 

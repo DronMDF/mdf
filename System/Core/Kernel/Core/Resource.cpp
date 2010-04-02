@@ -115,9 +115,9 @@ int Resource::Info (int info_id, void *info, size_t *info_size) const
 	return InfoIndependent(info_id, info, info_size);
 }
 
-ResourceInstance *Resource::CreateInstance (int capability, unsigned long param)
+Instance *Resource::CreateInstance (int capability, unsigned long param)
 {
-	ResourceInstance *instance = new ResourceInstance (this, capability, param);
+	Instance *instance = new Instance(this, capability, param);
 	++m_instances_count;
 	return instance;
 }

@@ -52,7 +52,7 @@ struct create_fixture {
 
 BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 {
-	ResourceInstance *instance = process.FindInstance(id);
+	Instance *instance = process.FindInstance(id);
 	BOOST_REQUIRE(instance != 0);
 
 	Resource *resource = instance->getResource();

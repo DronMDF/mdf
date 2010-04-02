@@ -12,14 +12,14 @@
 namespace Core {
 
 class ResourceRegion;
-class ResourceInstance;
 class ResourceThread;
+class Instance;
 
 class ResourceProcess : public Resource
 {
 private:
 	laddr_t m_entry;
-	List<ResourceInstance> m_instance_list;
+	List<Instance> m_instance_list;
 
 	Memory m_pagetable;
 
@@ -38,7 +38,7 @@ public:
 
 	const PageInstance *PageFault (laddr_t addr, uint32_t *access);
 
-	ResourceInstance *FindInstance (id_t id) const;
+	Instance *FindInstance (id_t id) const;
 
 	int ModifyResource(id_t id, int param_id, const void *param, size_t param_size);
 

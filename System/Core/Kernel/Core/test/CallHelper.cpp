@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 	ResourceThread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
-	ResourceInstance *inst = helper.getCalledInstance(thread, thread->id());
+	Instance *inst = helper.getCalledInstance(thread, thread->id());
 	BOOST_REQUIRE(inst != 0);
 	BOOST_REQUIRE(inst->getResource() == thread);
 	BOOST_REQUIRE_EQUAL(inst->Call(), thread);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
 
 	struct testCallHelper : public CallHelper, private visit_mock {
 		testCallHelper() : CallHelper(0) {}
-		ResourceInstance *getCalledInstance(ResourceThread *thread, id_t id) const {
+		Instance *getCalledInstance(ResourceThread *thread, id_t id) const {
 			visit();
 			return CallHelper::getCalledInstance(thread, id);
 		}

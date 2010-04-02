@@ -267,7 +267,7 @@ int CoreInfo (const Task *task, id_t id, int info_id, void *info, size_t *info_s
 
 	// TODO: Память должна быть доступна процессу для записи чтобы не вызывать фолтов.
 
-	const Core::ResourceInstance *instance = process->FindInstance(id);
+	const Instance *instance = process->FindInstance(id);
 	if (instance == 0) {
 		// Возможно здесь налажу поиск по всем ресурсам, если понадобится.
 		return ERROR_INVALIDID;

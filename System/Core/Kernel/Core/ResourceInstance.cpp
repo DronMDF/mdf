@@ -12,7 +12,7 @@
 
 namespace Core {
 
-ResourceInstance::ResourceInstance (Resource *resource, uint32_t access, uint32_t param)
+Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
 	: m_resource(resource),
 	  m_access(access),
 	  m_addr(0),
@@ -26,13 +26,13 @@ ResourceInstance::ResourceInstance (Resource *resource, uint32_t access, uint32_
 	}
 }
 
-ResourceInstance::~ResourceInstance()
+Instance::~Instance()
 {
 	if (m_resource != 0)
 		m_resource->DeleteInstance();
 }
 
-int ResourceInstance::Modify (int paramid, const void *param, size_t param_size)
+int Instance::Modify (int paramid, const void *param, size_t param_size)
 {
 	if (!isSet(m_access, RESOURCE_ACCESS_MODIFY))
 		return ERROR_ACCESS;
@@ -42,7 +42,7 @@ int ResourceInstance::Modify (int paramid, const void *param, size_t param_size)
 	return m_resource->Modify(paramid, param, param_size);
 }
 
-int ResourceInstance::Info(int infoid, void *info, size_t *size) const
+int Instance::Info(int infoid, void *info, size_t *size) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 
@@ -62,7 +62,7 @@ int ResourceInstance::Info(int infoid, void *info, size_t *size) const
 	return m_resource->Info(infoid, info, size);
 }
 
-ResourceThread *ResourceInstance::Call()
+ResourceThread *Instance::Call()
 {
 	if (!isSet(m_access, RESOURCE_ACCESS_CALL))
 		return 0;
@@ -70,7 +70,7 @@ ResourceThread *ResourceInstance::Call()
 	return m_resource->Call();
 }
 
-bool ResourceInstance::inBounds(laddr_t addr) const
+bool Instance::inBounds(laddr_t addr) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 
@@ -86,7 +86,7 @@ bool ResourceInstance::inBounds(laddr_t addr) const
 	return region->inBounds(addr, m_addr);
 }
 
-const PageInstance *ResourceInstance::PageFault(laddr_t addr, uint32_t *access)
+const PageInstance *Instance::PageFault(laddr_t addr, uint32_t *access)
 {
 	ResourceRegion *region = m_resource->asRegion();
 	STUB_ASSERT (region == 0, "Instance not for region");
@@ -100,30 +100,30 @@ const PageInstance *ResourceInstance::PageFault(laddr_t addr, uint32_t *access)
 	return region->PageFault (addr - m_addr, access);
 }
 
-id_t ResourceInstance::id() const
+id_t Instance::id() const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 	return m_resource->id();
 }
 
-uint32_t ResourceInstance::getAccess() const
+uint32_t Instance::getAccess() const
 {
 	return m_access;
 }
 
-Resource *ResourceInstance::getResource() const
+Resource *Instance::getResource() const
 {
 	return m_resource;
 }
 
-laddr_t ResourceInstance::getAddr() const
+laddr_t Instance::getAddr() const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
 	STUB_ASSERT(m_resource->asRegion() == 0, "getAddr from no region instance");
 	return m_addr;
 }
 
-void ResourceInstance::setAddr(laddr_t addr)
+void Instance::setAddr(laddr_t addr)
 {
 	STUB_ASSERT(m_addr != 0, "region already Mapped");
 	STUB_ASSERT(m_resource->asRegion() == 0, "setAddr from no region instance");

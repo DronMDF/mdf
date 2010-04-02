@@ -21,23 +21,25 @@ namespace Core {
 
 ResourceProcess::ResourceProcess (laddr_t entry)
 	: m_entry(entry),
-	  m_instance_list(&ResourceInstance::ProcessLink),
+	  m_instance_list(&Instance::ProcessLink),
 	  m_pagetable(USER_PAGETABLE_SIZE, Memory::ALLOC | Memory::ZEROING)
 {
 	// TODO: Все способности в инстанции доступны
-	ResourceInstance *self_instance = this->CreateInstance(RESOURCE_ACCESS_OWNER);
+	Instance *self_instance = CreateInstance(RESOURCE_ACCESS_OWNER);
 
 	m_instance_list.Insert (self_instance);
 }
 
 ResourceProcess::~ResourceProcess ()
 {
-	for (ResourceInstance *instance = m_instance_list.getFirst(); instance != 0; )
+	for (Instance *instance = m_instance_list.getFirst(); instance != 0; )
 	{
-		ResourceInstance *instance_to_delete = instance;
+		Instance *instance_to_delete = instance;
 		instance = m_instance_list.getNext (instance);
 
 		if (instance_to_delete->getResource() != this) {
+			// TODO: Вот эта неудобная бяка могла бы исчезнуть с
+			//	применением наблюдающих указателей
 			m_instance_list.Remove(instance_to_delete);
 			delete instance_to_delete;
 		}
@@ -84,7 +86,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		return false;
 
 	// Проверяем на пересечение с имеющимися регионами.
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -137,7 +139,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -152,7 +154,7 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 		base = selectRegionBase (resource->asRegion(), ubase);
 	}
 
-	ResourceInstance *instance = resource->CreateInstance (access, base);
+	Instance *instance = resource->CreateInstance (access, base);
 	STUB_ASSERT (instance == 0, "Unable to create instance");
 
 	m_instance_list.Insert (instance);
@@ -161,7 +163,7 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 
 int ResourceProcess::Detach(Resource *resource)
 {
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0; instance = m_instance_list.getNext(instance))
 	{
 		if (instance->id() == resource->id()) {
@@ -182,7 +184,7 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 		return m_pagetable.PageFault(addr - USER_PAGETABLE_BASE);
 	}
 
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -199,9 +201,9 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 }
 
 
-ResourceInstance *ResourceProcess::FindInstance (id_t id) const
+Instance *ResourceProcess::FindInstance (id_t id) const
 {
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -214,7 +216,7 @@ ResourceInstance *ResourceProcess::FindInstance (id_t id) const
 
 int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, size_t param_size)
 {
-	Core::ResourceInstance *instance = FindInstance(id);
+	Instance *instance = FindInstance(id);
 	if (instance == 0) return ERROR_INVALIDID;
 
 	if (param_id == RESOURCE_MODIFY_REGION_MAP) {
@@ -243,7 +245,7 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 
 bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 {
-	for (ResourceInstance *instance = m_instance_list.getFirst();
+	for (Instance *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
