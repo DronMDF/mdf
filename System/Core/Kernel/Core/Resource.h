@@ -78,8 +78,6 @@ public:
 
 	virtual void addObserver(ResourceThread *thread, uint32_t event);
 	void setEvent(uint32_t event);
-
-	InstanceProcess *createProcessInstance(int, uint32_t) { return 0; }
 };
 
 } // namespace Core

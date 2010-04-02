@@ -13,7 +13,7 @@ namespace Core {
 
 class ResourceRegion;
 class ResourceThread;
-class Instance;
+class InstanceProcess;
 
 class ResourceProcess : public Resource
 {
@@ -26,6 +26,9 @@ private:
 	bool CheckRegionPlace (const ResourceRegion *region, laddr_t base) const;
 	laddr_t selectRegionBase (const ResourceRegion *region, uint32_t ubase) const;
 
+	/// Создаем инстанцию на ресурс
+	InstanceProcess *createInstance(Resource *resource, int access, uint32_t base);
+	
 public:
 	explicit ResourceProcess (laddr_t entry);
 	virtual ~ResourceProcess ();

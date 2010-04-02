@@ -11,6 +11,7 @@
 
 #include "../Kernel.h"
 #include "../Event.h"
+#include "../Instance.h"
 
 #include "testResource.h"
 #include "testThread.h"
@@ -70,6 +71,28 @@ BOOST_AUTO_TEST_CASE(event_action)
 	eventedResource resource(event);
 	resource.setEvent(0);
 	BOOST_REQUIRE(event->action_visited);
+}
+
+BOOST_AUTO_TEST_CASE(testDropInstances)
+{
+	int instances;
+	
+	struct testInstance : public Instance {
+		int *m_counter;
+		testInstance(Resource *resource, int *counter) 
+			: Instance(resource, 0, 0), m_counter(counter) 
+			{ m_counter++; }
+		~testInstance() { m_counter--; }
+	};
+	
+	Resource *resource = new testResource;
+	new testInstance(resource, &instances);
+	new testInstance(resource, &instances);
+	new testInstance(resource, &instances);
+	BOOST_REQUIRE_EQUAL(instances, 3);
+	
+	delete resource;
+	BOOST_REQUIRE_EQUAL(instances, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
