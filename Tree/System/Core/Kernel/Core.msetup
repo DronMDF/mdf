@@ -1,7 +1,7 @@
 
 Description "Переносимое ядро";
 
-Release 0.0.124.40
+Release 0.0.124.41
 {
 	Depend System-Core/MDF-Env-0.0.16;
 	Depend System-Core-Kernel/Stub-$(ARCH)-Types;
