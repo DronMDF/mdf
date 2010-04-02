@@ -10,8 +10,11 @@ namespace Core {
 	class Resource;
 
 	class InstanceProcess {
+	private:
+		Resource *m_resource;
 	public:
-		const Resource *resource() const { return 0; };
+		explicit InstanceProcess(Resource *resource) : m_resource(resource) {}
+		const Resource *resource() const { return m_resource; };
 	};
 
 } // namespace Core

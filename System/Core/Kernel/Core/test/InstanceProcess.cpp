@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_SUITE(suiteInstanceProcess)
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
 	testResource resource;
-	scoped_ptr<InstanceProcess> instance(resource.createProcessInstance(0, 0));
-	BOOST_REQUIRE_EQUAL(instance->resource(), &resource);
+	InstanceProcess instance(&resource);
+	BOOST_REQUIRE_EQUAL(instance.resource(), &resource);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
