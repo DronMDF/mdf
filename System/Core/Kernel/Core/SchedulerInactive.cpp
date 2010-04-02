@@ -9,23 +9,23 @@
 #include "Memory.h"
 #include "Thread.h"
 #include "SubScheduler.h"
-#include "InactiveScheduler.h"
+#include "SchedulerInactive.h"
 
 namespace Core {
 
-InactiveScheduler::InactiveScheduler()
+SchedulerInactive::SchedulerInactive()
 	: m_imminent(&ResourceThread::ScheduleLink),
 	  m_infinity(&ResourceThread::ScheduleLink)
 {
 }
 
-InactiveScheduler::~InactiveScheduler()
+SchedulerInactive::~SchedulerInactive()
 {
 	STUB_ASSERT(m_imminent.getSize() > 0, "Destroy full scheduler");
 	STUB_ASSERT(m_infinity.getSize() > 0, "Destroy full scheduler");
 }
 
-bool InactiveScheduler::checkThreadUrgency(const ResourceThread *thread,
+bool SchedulerInactive::checkThreadUrgency(const ResourceThread *thread,
 		const ResourceThread *exist) const
 {
 	if (thread->getWakeupstamp() <= exist->getWakeupstamp())
@@ -34,7 +34,7 @@ bool InactiveScheduler::checkThreadUrgency(const ResourceThread *thread,
 	return false;
 }
 
-void InactiveScheduler::addThread(ResourceThread *thread)
+void SchedulerInactive::addThread(ResourceThread *thread)
 {
 	STUB_ASSERT(thread == 0, "thread invalid");
 
@@ -46,7 +46,7 @@ void InactiveScheduler::addThread(ResourceThread *thread)
 	addThreadOrdered(thread, &m_imminent);
 }
 
-ResourceThread *InactiveScheduler::getThread()
+ResourceThread *SchedulerInactive::getThread()
 {
 	if (ResourceThread *thread = m_imminent.getFirst()) {
 		if (thread->getWakeupstamp() <= StubGetCurrentClock()) {

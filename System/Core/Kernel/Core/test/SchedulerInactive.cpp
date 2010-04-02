@@ -13,7 +13,7 @@
 #include "../Resource.h"
 #include "../Thread.h"
 #include "../SubScheduler.h"
-#include "../InactiveScheduler.h"
+#include "../SchedulerInactive.h"
 
 using namespace Core;
 
@@ -27,9 +27,9 @@ public:
 	}
 };
 
-class testInactiveScheduler : public InactiveScheduler {
+class testSchedulerInactive : public SchedulerInactive {
 public:
-	using InactiveScheduler::checkThreadUrgency;
+	using SchedulerInactive::checkThreadUrgency;
 
 	void Remove(ResourceThread *thread) {
 		BOOST_REQUIRE(thread->ScheduleLink.isLinked(&m_infinity));
@@ -39,7 +39,7 @@ public:
 
 BOOST_AUTO_TEST_CASE(thread_compare_function)
 {
-	testInactiveScheduler scheduler;
+	testSchedulerInactive scheduler;
 
 	testThread thread1(5);
 	testThread thread2(10);
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(order)
 {
 	testThread thread1(5);
 	testThread thread2(10);
-	testInactiveScheduler scheduler;
+	testSchedulerInactive scheduler;
 
 	// Пустой планировщик естественно ничего не возвращает.
 	BOOST_REQUIRE(scheduler.getThread() == 0);

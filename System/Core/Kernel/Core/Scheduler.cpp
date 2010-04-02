@@ -11,7 +11,7 @@
 #include "Scheduler.h"
 #include "SubScheduler.h"
 #include "SchedulerActive.h"
-#include "InactiveScheduler.h"
+#include "SchedulerInactive.h"
 #include "KillScheduler.h"
 
 namespace Core {
@@ -44,7 +44,7 @@ void Scheduler::addActiveThread(ResourceThread *thread)
 void Scheduler::addInactiveThread(ResourceThread *thread)
 {
 	if (m_inactives == 0) {
-		m_inactives = new InactiveScheduler();
+		m_inactives = new SchedulerInactive();
 	}
 
 	m_inactives->addThread(thread);

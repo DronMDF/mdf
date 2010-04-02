@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "SubScheduler.h"
+
 namespace Core {
 
-class InactiveScheduler : public SubScheduler
+class SchedulerInactive : public SubScheduler
 {
 private:
 	ThreadList m_imminent;
@@ -21,8 +23,8 @@ protected:
 		const ResourceThread *exist) const;
 
 public:
-	InactiveScheduler();
-	virtual ~InactiveScheduler();
+	SchedulerInactive();
+	virtual ~SchedulerInactive();
 
 	virtual void addThread(ResourceThread *thread);
 	virtual ResourceThread *getThread();
