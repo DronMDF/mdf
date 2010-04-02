@@ -9,28 +9,28 @@
 #include "Thread.h"
 #include "Process.h"
 #include "SubScheduler.h"
-#include "KillScheduler.h"
+#include "SchedulerKill.h"
 
 #include "CoreLocal.h"
 
 namespace Core {
 
-KillScheduler::KillScheduler()
+SchedulerKill::SchedulerKill()
 	: m_queue(&ResourceThread::ScheduleLink)
 {
 }
 
-KillScheduler::~KillScheduler()
+SchedulerKill::~SchedulerKill()
 {
 	STUB_ASSERT(m_queue.getSize() > 0, "Destroy full scheduler");
 }
 
-void KillScheduler::addThread(ResourceThread *thread)
+void SchedulerKill::addThread(ResourceThread *thread)
 {
 	m_queue.Insert(thread);
 }
 
-ResourceThread *KillScheduler::getThread()
+ResourceThread *SchedulerKill::getThread()
 {
 	for (ResourceThread *thread = m_queue.getFirst(); thread != 0; )
 	{

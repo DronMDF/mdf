@@ -15,7 +15,7 @@
 #include "../Thread.h"
 #include "../Process.h"
 #include "../SubScheduler.h"
-#include "../KillScheduler.h"
+#include "../SchedulerKill.h"
 
 #include "testProcess.h"
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_SUITE(kill_scheduler)
 
 BOOST_AUTO_TEST_CASE(enqueue)
 {
-	KillScheduler scheduler;
+	SchedulerKill scheduler;
 	class testThread : public ResourceThread {
 	public:
 		bool visited;
@@ -53,9 +53,9 @@ BOOST_AUTO_TEST_CASE(destroy)
 {
 	bool deleted = false;
 
-	class testScheduler : public KillScheduler {
+	class testScheduler : public SchedulerKill {
 	public:
-		using KillScheduler::m_queue;
+		using SchedulerKill::m_queue;
 	} scheduler;
 
 	class _testProcess: public testProcess {

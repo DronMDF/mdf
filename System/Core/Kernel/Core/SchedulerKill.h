@@ -9,14 +9,14 @@ namespace Core {
 
 class ResourceThread;
 
-class KillScheduler : public SubScheduler
+class SchedulerKill : public SubScheduler
 {
 protected:
 	ThreadList m_queue;
 
 public:
-	KillScheduler();
-	virtual ~KillScheduler();
+	SchedulerKill();
+	virtual ~SchedulerKill();
 
 	virtual void addThread(ResourceThread *thread);
 	virtual ResourceThread *getThread();
