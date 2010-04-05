@@ -11,10 +11,10 @@
 
 #include "InstanceProcess.h"
 #include "Resources.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
-#include "Process.h"
 
-namespace Core {
+using namespace Core;
 
 CallHelper::CallHelper(const Task *task)
 	: m_caller(getCallerThread(task)), m_called(0)
@@ -120,5 +120,3 @@ void CallHelper::runSinchronized() const
 	// TODO: Нужно установить статус в caller, но пока он всегда SUCCESS,
 	// 	Возможно потом появятся всякие TIMEOUT например.
 }
-
-} // namespace Core

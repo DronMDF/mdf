@@ -12,8 +12,8 @@
 #include "../List.h"
 #include "../Memory.h"
 #include "../Resource.h"
+#include "../ResourceProcess.h"
 #include "../Thread.h"
-#include "../Process.h"
 #include "../SubScheduler.h"
 #include "../SchedulerKill.h"
 

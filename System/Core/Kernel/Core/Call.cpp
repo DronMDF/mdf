@@ -8,11 +8,11 @@
 #include "List.h"
 #include "Memory.h"
 #include "Resource.h"
-#include "Call.h"
-#include "Process.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
+#include "Call.h"
 
-namespace Core {
+using namespace Core;
 
 Resource *ResourceCall::Create(ResourceProcess *process, const void *param, size_t size)
 {
@@ -53,5 +53,3 @@ ResourceThread *ResourceCall::Call()
 
 	return thread;
 }
-
-} // namespace Core

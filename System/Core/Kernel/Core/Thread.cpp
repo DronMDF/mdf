@@ -14,10 +14,10 @@
 
 #include "Instance.h"
 #include "Resource.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
-#include "Process.h"
 
-namespace Core {
+using namespace Core;
 
 // TODO: Этот конструктор вообще уже не нужен.
 ResourceThread::ResourceThread (ResourceProcess *process)
@@ -336,8 +336,6 @@ void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 	m_copyback_id = thread->id();
 	m_copyback_addr = buffer;
 }
-
-} // namespace Core
 
 extern "C"
 const PageInstance *CoreThreadPageFault (const Task *task, laddr_t addr, uint32_t *access)

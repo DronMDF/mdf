@@ -7,14 +7,14 @@
 #include "List.h"
 #include "Memory.h"
 #include "Resource.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
-#include "Process.h"
 #include "SubScheduler.h"
 #include "SchedulerKill.h"
 
 #include "CoreLocal.h"
 
-namespace Core {
+using namespace Core;
 
 SchedulerKill::SchedulerKill()
 	: m_queue(&ResourceThread::ScheduleLink)
@@ -49,5 +49,3 @@ ResourceThread *SchedulerKill::getThread()
 
 	return 0;
 }
-
-} // namespace Core

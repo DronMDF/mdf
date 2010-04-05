@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../Process.h"
+#include "../ResourceProcess.h"
 
 class testProcess : public Core::ResourceProcess
 {

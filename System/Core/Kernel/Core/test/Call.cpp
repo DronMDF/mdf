@@ -11,10 +11,11 @@
 #include "../Core.h"
 #include "../Kernel.h"
 #include "../List.h"
-#include "../Resource.h"
 #include "../Resources.h"
+
+#include "../Resource.h"
+#include "../ResourceProcess.h"
 #include "../Call.h"
-#include "../Process.h"
 #include "../Thread.h"
 
 #include "testProcess.h"

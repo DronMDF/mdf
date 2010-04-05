@@ -11,7 +11,7 @@
 
 #include "InstanceProcess.h"
 #include "ResourceRegion.h"
-#include "Process.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
 #include "Call.h"
 

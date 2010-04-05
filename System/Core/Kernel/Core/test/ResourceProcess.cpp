@@ -16,8 +16,8 @@
 
 #include "../Resource.h"
 #include "../ResourceRegion.h"
+#include "../ResourceProcess.h"
 #include "../Thread.h"
-#include "../Process.h"
 
 #include "testProcess.h"
 #include "TestHelpers.h"

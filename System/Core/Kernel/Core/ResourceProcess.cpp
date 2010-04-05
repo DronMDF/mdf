@@ -14,10 +14,10 @@
 #include "InstanceProcess.h"
 #include "Resource.h"
 #include "ResourceRegion.h"
-#include "Process.h"
+#include "ResourceProcess.h"
 #include "Thread.h"
 
-namespace Core {
+using namespace Core;
 
 ResourceProcess::ResourceProcess (laddr_t entry)
 	: m_entry(entry),
@@ -268,5 +268,3 @@ InstanceProcess *ResourceProcess::createInstance(Resource *resource,
 {
 	return new InstanceProcess(resource, access, base);
 }
-
-} // namespace Core
