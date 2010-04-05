@@ -6,9 +6,10 @@
 #pragma once
 
 #include "List.h"
-#include "Thread.h"
 
 namespace Core {
+	
+class ResourceThread;
 
 class Event {
 private:

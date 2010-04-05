@@ -12,7 +12,7 @@
 #include "InstanceProcess.h"
 #include "ResourceRegion.h"
 #include "ResourceProcess.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 #include "Call.h"
 
 using namespace Core;

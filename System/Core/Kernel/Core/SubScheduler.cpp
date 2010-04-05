@@ -6,10 +6,10 @@
 #include "List.h"
 #include "Memory.h"
 #include "Resource.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 #include "SubScheduler.h"
 
-namespace Core {
+using namespace Core;
 
 SubScheduler::~SubScheduler()
 {
@@ -42,5 +42,3 @@ bool SubScheduler::checkThreadUrgency(const ResourceThread *,
 {
 	return true;
 }
-
-} // namespace Core

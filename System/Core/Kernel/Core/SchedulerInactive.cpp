@@ -5,13 +5,13 @@
 
 #include "List.h"
 #include "Link.h"
-#include "Resource.h"
 #include "Memory.h"
-#include "Thread.h"
+#include "Resource.h"
+#include "ResourceThread.h"
 #include "SubScheduler.h"
 #include "SchedulerInactive.h"
 
-namespace Core {
+using namespace Core;
 
 SchedulerInactive::SchedulerInactive()
 	: m_imminent(&ResourceThread::ScheduleLink),
@@ -57,5 +57,3 @@ ResourceThread *SchedulerInactive::getThread()
 
 	return 0;
 }
-
-} // namespace Core

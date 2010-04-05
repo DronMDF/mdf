@@ -13,11 +13,10 @@
 #include "../List.h"
 #include "../Memory.h"
 #include "../Instance.h"
-
 #include "../Resource.h"
 #include "../ResourceRegion.h"
 #include "../ResourceProcess.h"
-#include "../Thread.h"
+#include "../ResourceThread.h"
 
 #include "testProcess.h"
 #include "TestHelpers.h"

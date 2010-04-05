@@ -8,7 +8,7 @@
 #include "Memory.h"
 #include "Resource.h"
 #include "ResourceProcess.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 #include "SubScheduler.h"
 #include "SchedulerKill.h"
 

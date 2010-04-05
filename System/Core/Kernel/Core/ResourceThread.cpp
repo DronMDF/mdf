@@ -15,7 +15,7 @@
 #include "Instance.h"
 #include "Resource.h"
 #include "ResourceProcess.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 
 using namespace Core;
 

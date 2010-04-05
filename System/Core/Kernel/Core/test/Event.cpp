@@ -10,12 +10,11 @@
 #include "Types.h"
 
 #include "../Kernel.h"
-
 #include "../List.h"
 #include "../Memory.h"
-#include "../Resource.h"
-#include "../Thread.h"
 #include "../Event.h"
+#include "../Resource.h"
+#include "../ResourceThread.h"
 
 #include "testThread.h"
 

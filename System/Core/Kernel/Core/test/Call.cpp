@@ -15,8 +15,8 @@
 
 #include "../Resource.h"
 #include "../ResourceProcess.h"
+#include "../ResourceThread.h"
 #include "../Call.h"
-#include "../Thread.h"
 
 #include "testProcess.h"
 #include "testThread.h"

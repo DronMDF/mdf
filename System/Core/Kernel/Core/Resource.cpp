@@ -11,7 +11,7 @@
 
 #include "Instance.h"
 #include "Resource.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 
 #include "CoreLocal.h"
 

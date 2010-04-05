@@ -11,9 +11,9 @@
 #include "CoreLocal.h"
 
 #include "Resource.h"
-#include "Thread.h"
+#include "ResourceThread.h"
 
-namespace Core {
+using namespace Core;
 
 // Планировщик активыных нитей.
 // Пока он оперирует одной очередью, для тестовых целей этого достаточно.
@@ -95,5 +95,3 @@ ResourceThread *SchedulerActive::getThread()
 
 	return 0;
 }
-
-} // namespace Core

@@ -8,10 +8,10 @@
 
 #include "Types.h"
 
+#include "../List.h"
 #include "../Memory.h"
 #include "../Resource.h"
-#include "../Thread.h"
-#include "../List.h"
+#include "../ResourceThread.h"
 #include "../SubScheduler.h"
 
 using namespace Core;

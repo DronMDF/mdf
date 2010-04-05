@@ -6,17 +6,17 @@
 #include "List.h"
 #include "Memory.h"
 #include "Resource.h"
-// Этому исходнику достаточно forward decls, инклюд только ради зависимости.
-#include "Thread.h"
 #include "Scheduler.h"
 #include "SubScheduler.h"
 #include "SchedulerActive.h"
 #include "SchedulerInactive.h"
 #include "SchedulerKill.h"
 
-namespace Core {
+using namespace Core;
 
-class ResourceThread;
+namespace Core {
+	class ResourceThread;
+}
 
 // -----------------------------------------------------------------------------
 SubScheduler *Scheduler::m_actives = 0;
@@ -80,5 +80,3 @@ ResourceThread *Scheduler::getThread()
 
 	return 0;
 }
-
-} // namespace Core

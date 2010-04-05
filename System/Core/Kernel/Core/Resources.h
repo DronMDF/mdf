@@ -22,5 +22,3 @@ class ResourceCustom : public Resource
 Resource *FindResource (const id_t id);
 
 } // namespace Core
-
-#include "Thread.h"
