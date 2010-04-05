@@ -24,9 +24,9 @@ private:
 
 public:
 	Instance(Resource *resource, uint32_t access, uint32_t param);
-	~Instance();
+	virtual ~Instance();
 
-	Resource *getResource() const;
+	Resource *resource() const;
 	
 	id_t id() const;
 	uint32_t getAccess() const;
@@ -41,6 +41,7 @@ private:
 
 public:
 	Link<Instance> ProcessLink;
+	Link<Instance> ResourceLink;
 
 	laddr_t getAddr() const;
 	void setAddr(laddr_t addr);
@@ -48,6 +49,8 @@ public:
 	int Modify (int paramid, const void *param, size_t param_size);
 	int Info (int infoid, void *info, size_t *info_size) const;
 	ResourceThread *Call();
+
+	void event(uint32_t eid);
 };
 
 } // namespace Core

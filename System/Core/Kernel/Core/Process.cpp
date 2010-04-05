@@ -11,7 +11,7 @@
 #include "Memory.h"
 #include "Resources.h"	// TODO: Надо поделить на классы.
 
-#include "Instance.h"
+#include "InstanceProcess.h"
 #include "Resource.h"
 #include "Region.h"
 #include "Process.h"
@@ -25,9 +25,8 @@ ResourceProcess::ResourceProcess (laddr_t entry)
 	  m_pagetable(USER_PAGETABLE_SIZE, Memory::ALLOC | Memory::ZEROING)
 {
 	// TODO: Все способности в инстанции доступны
-	Instance *self_instance = CreateInstance(RESOURCE_ACCESS_OWNER);
-
-	m_instance_list.Insert (self_instance);
+	InstanceProcess *self = createInstance(this, RESOURCE_ACCESS_OWNER);
+	m_instance_list.Insert(self);
 }
 
 ResourceProcess::~ResourceProcess ()
@@ -37,7 +36,7 @@ ResourceProcess::~ResourceProcess ()
 		Instance *instance_to_delete = instance;
 		instance = m_instance_list.getNext (instance);
 
-		if (instance_to_delete->getResource() != this) {
+		if (instance_to_delete->resource() != this) {
 			// TODO: Вот эта неудобная бяка могла бы исчезнуть с
 			//	применением наблюдающих указателей
 			m_instance_list.Remove(instance_to_delete);
@@ -90,7 +89,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
-		Resource *resource = instance->getResource();
+		Resource *resource = instance->resource();
 		ResourceRegion *exregion = resource->asRegion();
 
 		if (exregion == 0)
@@ -136,7 +135,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 }
 
 // TODO: Эта база - юзерлевела... надо бы переделать в кернеллевел..
-int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
+int ResourceProcess::Attach (Resource *resource, uint32_t access, uint32_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
 	for (Instance *instance = m_instance_list.getFirst();
@@ -154,10 +153,10 @@ int ResourceProcess::Attach (Resource *resource, int access, uint32_t ubase)
 		base = selectRegionBase (resource->asRegion(), ubase);
 	}
 
-	Instance *instance = resource->CreateInstance (access, base);
+	InstanceProcess *instance = createInstance(resource, access, base);
 	STUB_ASSERT (instance == 0, "Unable to create instance");
 
-	m_instance_list.Insert (instance);
+	m_instance_list.Insert(instance);
 	return SUCCESS;
 }
 
@@ -226,7 +225,7 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 		if (instance->getAddr() != 0) return ERROR_BUSY;
 
 		// TODO: Надо выносить в функцию
-		Resource *resource = instance->getResource();
+		Resource *resource = instance->resource();
 		STUB_ASSERT (resource == 0, "No resource in instance");
 
 		if (resource->asRegion() == 0) return ERROR_INVALIDID;
@@ -252,7 +251,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 		if (!instance->inBounds(offset)) continue;
 		
 		// TODO: Всякая вот эта вот рутира просится в ResourceInstance
-		Resource *resource = instance->getResource();
+		Resource *resource = instance->resource();
 		ResourceRegion *region = resource->asRegion();
 		if (region == 0) continue;
 
@@ -271,6 +270,12 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 	}
 
 	return false;
+}
+
+InstanceProcess *ResourceProcess::createInstance(Resource *resource,
+		uint32_t access, uint32_t param) const
+{
+	return new InstanceProcess(resource, access);
 }
 
 } // namespace Core

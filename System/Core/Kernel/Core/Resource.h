@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ResourceId.h"
+#include "List.h"
 
 namespace Core {
 
@@ -28,17 +29,13 @@ private:
 	unsigned char *m_name;
 	size_t m_namelen;
 
-	// Счетчик инстанций. Ресурс не хранит обратные ссылки на инстанции,
-	// Потому что освобождаются они всегда по инициативе процесса, у
-	// которого есть прямые ссылки. За одним исключением. Самостоятельно
-	// отцеплятся от процесса могут нити, но они имеют ссылку на процесс и
-	// могут попросить его отцепить себя.
-	int m_instances_count;
-
 protected:	// для теста
 	Event *m_event;
 
 private:
+	/// Список инстанций
+	List<Instance> m_instances;
+
 	Resource (const Resource &);
 	Resource & operator = (const Resource &);
 
@@ -71,13 +68,12 @@ public:
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info(int info_id, void *info, size_t *info_size) const;
 
-	// Работа с инстанциями.
-	Instance *CreateInstance (int capability, unsigned long param = 0);
-	// TODO: Эту функцию надо переименовать не знаю во что, но инстанции она не удаляет.
-	void DeleteInstance();
-
+	// Этa функции уйдет в небытие после перевода на событийные инстанции.
 	virtual void addObserver(ResourceThread *thread, uint32_t event);
 	void setEvent(uint32_t event);
+
+	void addInstance(Instance *instance);
+	void removeInstance(Instance *instance);
 };
 
 } // namespace Core

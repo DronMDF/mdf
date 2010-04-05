@@ -15,6 +15,7 @@
 
 #include "testResource.h"
 #include "testThread.h"
+#include "TestHelpers.h"
 
 using namespace Core;
 
@@ -75,24 +76,26 @@ BOOST_AUTO_TEST_CASE(event_action)
 
 BOOST_AUTO_TEST_CASE(testDropInstances)
 {
-	int instances;
-	
-	struct testInstance : public Instance {
-		int *m_counter;
-		testInstance(Resource *resource, int *counter) 
-			: Instance(resource, 0, 0), m_counter(counter) 
-			{ m_counter++; }
-		~testInstance() { m_counter--; }
+	// Инстанции не должны удалятся ресурсом. Он просто должен уведомить
+	// инстанции о том, что ресурс, который они контролировали - уже умер.
+	struct testInstance : public Instance, private visit_mock {
+		testInstance(Resource *resource) : Instance(resource, 0, 0) { }
+		void event(uint32_t eid) {
+			BOOST_REQUIRE_EQUAL(eid, RESOURCE_EVENT_DESTROY);
+			visit();
+			Instance::event(eid);
+		}
 	};
 	
 	Resource *resource = new testResource;
-	new testInstance(resource, &instances);
-	new testInstance(resource, &instances);
-	new testInstance(resource, &instances);
-	BOOST_REQUIRE_EQUAL(instances, 3);
+	
+	testInstance instance1(resource);
+	testInstance instance2(resource);
+	testInstance instance3(resource);
 	
 	delete resource;
-	BOOST_REQUIRE_EQUAL(instances, 0);
+
+	// инстанции при удалении проконтролируют - вызывались они или нет.
 }
 
 BOOST_AUTO_TEST_SUITE_END()

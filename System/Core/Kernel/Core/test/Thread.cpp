@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 	Instance *instance = process.FindInstance(id);
 	BOOST_REQUIRE(instance != 0);
 
-	Resource *resource = instance->getResource();
+	Resource *resource = instance->resource();
 	BOOST_REQUIRE(resource != 0);
 	BOOST_REQUIRE_EQUAL(resource->id(), id);
 

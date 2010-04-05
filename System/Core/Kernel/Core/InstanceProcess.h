@@ -5,16 +5,19 @@
 
 #pragma once
 
-namespace Core {
+#include "Instance.h"
 
+namespace Core {
 	class Resource;
 
-	class InstanceProcess {
-	private:
-		Resource *m_resource;
+	class InstanceProcess : public Instance {
+// 	private:
+// 		InstanceProcess(const InstanceProcess &);
+// 		InstanceProcess &operator =(const InstanceProcess &);
+		
 	public:
-		explicit InstanceProcess(Resource *resource) : m_resource(resource) {}
-		const Resource *resource() const { return m_resource; };
+		explicit InstanceProcess(Resource *resource, uint32_t access)
+			: Instance(resource, access, 0) {}
 	};
 
 } // namespace Core

@@ -16,7 +16,8 @@ Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
 	: m_resource(resource),
 	  m_access(access),
 	  m_addr(0),
-	  ProcessLink()
+	  ProcessLink(),
+	  ResourceLink()
 {
 	if (const ResourceRegion *region = m_resource->asRegion()) {
 		// Регионы используют парам в качестве адреса маппинга к процессу.
@@ -24,12 +25,16 @@ Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
 		STUB_ASSERT ((m_addr - region->offset()) % PAGE_SIZE != 0, 
 			     "Unaligned region base");
 	}
+
+	m_resource->addInstance(this);
 }
 
 Instance::~Instance()
 {
-	if (m_resource != 0)
-		m_resource->DeleteInstance();
+	// TODO: удалять нужно инстанцию по указателю. ресурс о них знает.
+	if (m_resource != 0) {
+		m_resource->removeInstance(this);
+	}
 }
 
 int Instance::Modify (int paramid, const void *param, size_t param_size)
@@ -111,7 +116,7 @@ uint32_t Instance::getAccess() const
 	return m_access;
 }
 
-Resource *Instance::getResource() const
+Resource *Instance::resource() const
 {
 	return m_resource;
 }
@@ -128,6 +133,14 @@ void Instance::setAddr(laddr_t addr)
 	STUB_ASSERT(m_addr != 0, "region already Mapped");
 	STUB_ASSERT(m_resource->asRegion() == 0, "setAddr from no region instance");
 	m_addr = addr;
+}
+
+void Instance::event(uint32_t eid)
+{
+	if (eid == RESOURCE_EVENT_DESTROY) {
+		STUB_ASSERT(ResourceLink.isLinked(), "Destroy from linked resource");
+		m_resource = 0;
+	}
 }
 
 } // namespace Core

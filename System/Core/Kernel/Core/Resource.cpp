@@ -21,20 +21,24 @@ Resource::Resource (void)
 	: ResourceId(),
 	  m_name(0),
 	  m_namelen(0),
-	  m_instances_count(0),
-	  m_event(0)
+	  m_event(0),
+	  m_instances(&Instance::ResourceLink)
 {
 }
 
 Resource::~Resource (void)
 {
 	delete[] m_name;
-	delete m_event;
+
+	while (Instance *instance = m_instances.getFirst()) {
+		m_instances.Remove(instance);
+		instance->event(RESOURCE_EVENT_DESTROY);
+	}
 }
 
 int Resource::getInstancesCount() const
 {
-	return m_instances_count;
+	return m_instances.getSize();
 }
 
 Resource *Resource::asResource()
@@ -116,20 +120,6 @@ int Resource::Info (int info_id, void *info, size_t *info_size) const
 	return InfoIndependent(info_id, info, info_size);
 }
 
-Instance *Resource::CreateInstance (int capability, unsigned long param)
-{
-	Instance *instance = new Instance(this, capability, param);
-	++m_instances_count;
-	return instance;
-}
-
-void Resource::DeleteInstance ()
-{
-	--m_instances_count;
-	if (m_instances_count == 0)
-		delete this;
-}
-
 void Resource::addObserver(ResourceThread *thread, uint32_t event)
 {
 	if (m_event == 0) {
@@ -146,6 +136,19 @@ void Resource::setEvent(uint32_t event)
 	}
 
 	m_event->Action(event);
+}
+
+void Resource::addInstance(Instance *instance)
+{
+	m_instances.Insert(instance);
+}
+
+void Resource::removeInstance(Instance *instance)
+{
+	m_instances.Remove(instance);
+	if (m_instances.isEmpty()) {
+		delete this;
+	}
 }
 
 } // namespace Core

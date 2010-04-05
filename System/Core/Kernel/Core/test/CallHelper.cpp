@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 
 	Instance *inst = helper.getCalledInstance(thread, thread->id());
 	BOOST_REQUIRE(inst != 0);
-	BOOST_REQUIRE(inst->getResource() == thread);
+	BOOST_REQUIRE(inst->resource() == thread);
 	BOOST_REQUIRE_EQUAL(inst->Call(), thread);
 }
 

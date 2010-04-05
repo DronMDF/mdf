@@ -27,7 +27,7 @@ private:
 	laddr_t selectRegionBase (const ResourceRegion *region, uint32_t ubase) const;
 
 	/// Создаем инстанцию на ресурс
-	InstanceProcess *createInstance(Resource *resource, int access, uint32_t base);
+	InstanceProcess *createInstance(Resource *resource, uint32_t access, uint32_t param = 0) const;
 	
 public:
 	explicit ResourceProcess (laddr_t entry);
@@ -36,7 +36,7 @@ public:
 	virtual ResourceProcess *asProcess ();
 
 	virtual ResourceThread *Call ();
-	virtual int Attach(Resource *resource, int access, uint32_t spec);
+	virtual int Attach(Resource *resource, uint32_t access, uint32_t spec);
 	virtual int Detach(Resource *resource);
 
 	const PageInstance *PageFault (laddr_t addr, uint32_t *access);

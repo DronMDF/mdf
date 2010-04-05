@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(suiteInstanceProcess)
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
 	testResource resource;
-	InstanceProcess instance(&resource);
+	InstanceProcess instance(&resource, 0);
 	BOOST_REQUIRE_EQUAL(instance.resource(), &resource);
 }
 
