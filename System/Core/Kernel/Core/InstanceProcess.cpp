@@ -17,9 +17,28 @@ InstanceProcess::InstanceProcess(Resource *resource, uint32_t access, uint32_t b
 
 ResourceThread *InstanceProcess::Call()
 {
-	if (!allow(RESOURCE_ACCESS_CALL)) {
-		return 0;
-	}
-
+	if (!allow(RESOURCE_ACCESS_CALL)) return 0;
+	
 	return resource()->Call();
 }
+
+int InstanceProcess::Info(int infoid, void *info, size_t *size) const
+{
+	if (!allow(RESOURCE_ACCESS_INFO)) return ERROR_ACCESS;
+
+	Resource *resource = this->resource();
+	if (resource == 0) return ERROR_INVALIDPARAM;
+
+	if (infoid == RESOURCE_INFO_REGION_INSTANCE_ADDR) {
+		if (resource->asRegion() == 0) return ERROR_INVALIDPARAM;
+
+		// Адрес преобразовывается в юзерспейс
+		const laddr_t uaddr = getAddr() - USER_MEMORY_BASE;
+		return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
+	}
+
+	// TODO: От родительской инстанции никакая информация не требуется?
+	return resource->Info(infoid, info, size);
+}
+
+

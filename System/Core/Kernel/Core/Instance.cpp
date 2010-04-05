@@ -45,26 +45,6 @@ int Instance::Modify (int paramid, const void *param, size_t param_size)
 	return m_resource->Modify(paramid, param, param_size);
 }
 
-int Instance::Info(int infoid, void *info, size_t *size) const
-{
-	STUB_ASSERT(m_resource == 0, "no resource for instance");
-
-	if (!isSet(m_access, RESOURCE_ACCESS_INFO))
-		return ERROR_ACCESS;
-
-	if (infoid == RESOURCE_INFO_REGION_INSTANCE_ADDR) {
-		if (m_resource->asRegion() == 0) {
-			return ERROR_INVALIDPARAM;
-		}
-		
-		// Адрес преобразовывается в юзерспейс
-		const laddr_t uaddr = m_addr - USER_MEMORY_BASE;
-		return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
-	}
-	
-	return m_resource->Info(infoid, info, size);
-}
-
 bool Instance::inBounds(laddr_t addr) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");

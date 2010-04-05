@@ -23,7 +23,7 @@ public:
 	using Instance::setAddr;
 
 	using Instance::Modify;
-	using Instance::Info;
+	int Info(int infoid, void *info, size_t *size) const;
 	ResourceThread *Call();
 };
 

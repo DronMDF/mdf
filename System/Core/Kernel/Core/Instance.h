@@ -50,7 +50,6 @@ protected:
 	void setAddr(laddr_t addr);
 
 	int Modify (int paramid, const void *param, size_t param_size);
-	int Info (int infoid, void *info, size_t *info_size) const;
 };
 
 } // namespace Core
