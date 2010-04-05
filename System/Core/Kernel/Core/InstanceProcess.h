@@ -22,9 +22,9 @@ public:
 	using Instance::getAddr;
 	using Instance::setAddr;
 
-	using Instance::Modify;
-	int Info(int infoid, void *info, size_t *size) const;
 	ResourceThread *Call();
+	int Modify(int paramid, const void *param, size_t size);
+	int Info(int infoid, void *info, size_t *size) const;
 };
 
 } // namespace Core

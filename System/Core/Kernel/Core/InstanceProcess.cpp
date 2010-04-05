@@ -22,6 +22,16 @@ ResourceThread *InstanceProcess::Call()
 	return resource()->Call();
 }
 
+int InstanceProcess::Modify(int paramid, const void *param, size_t size)
+{
+	if (!allow(RESOURCE_ACCESS_MODIFY)) return ERROR_ACCESS;
+
+	Resource *resource = this->resource();
+	if (resource == 0) return ERROR_INVALIDPARAM;
+	
+	return resource->Modify(paramid, param, size);
+}
+
 int InstanceProcess::Info(int infoid, void *info, size_t *size) const
 {
 	if (!allow(RESOURCE_ACCESS_INFO)) return ERROR_ACCESS;

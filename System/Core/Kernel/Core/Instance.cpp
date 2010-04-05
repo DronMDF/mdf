@@ -35,16 +35,6 @@ Instance::~Instance()
 	}
 }
 
-int Instance::Modify (int paramid, const void *param, size_t param_size)
-{
-	if (!isSet(m_access, RESOURCE_ACCESS_MODIFY))
-		return ERROR_ACCESS;
-
-	STUB_ASSERT(m_resource == 0, "no resource for instance");
-
-	return m_resource->Modify(paramid, param, param_size);
-}
-
 bool Instance::inBounds(laddr_t addr) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");

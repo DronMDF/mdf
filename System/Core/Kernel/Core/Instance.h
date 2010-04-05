@@ -49,7 +49,6 @@ protected:
 	laddr_t getAddr() const;
 	void setAddr(laddr_t addr);
 
-	int Modify (int paramid, const void *param, size_t param_size);
 };
 
 } // namespace Core
