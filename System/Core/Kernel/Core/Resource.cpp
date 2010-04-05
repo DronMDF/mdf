@@ -15,7 +15,7 @@
 
 #include "CoreLocal.h"
 
-namespace Core {
+using namespace Core;
 
 Resource::Resource (void)
 	: ResourceId(),
@@ -151,5 +151,3 @@ void Resource::removeInstance(Instance *instance)
 		delete this;
 	}
 }
-
-} // namespace Core

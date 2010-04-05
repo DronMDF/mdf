@@ -13,7 +13,7 @@
 #include "Event.h"
 #include "Scheduler.h"
 
-namespace Core {
+using namespace Core;
 
 Event::Event()
 	: m_observers(&ResourceThread::EventLink)
@@ -51,5 +51,3 @@ void Event::Action(uint32_t event)
 		thread = nthread;
 	}
 }
-
-} // namespace Core

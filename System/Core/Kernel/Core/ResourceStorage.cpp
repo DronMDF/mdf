@@ -8,7 +8,7 @@
 #include "ResourceStorage.h"
 #include "CoreLocal.h"
 
-namespace Core {
+using namespace Core;
 
 List<ResourceId> *ResourceStorage::m_resources_list = 0;
 
@@ -58,5 +58,3 @@ Resource *ResourceStorage::Find(id_t id)
 
 	return 0;
 }
-
-} // namespace Core

@@ -5,7 +5,7 @@
 
 #include "CoreLocal.h"
 
-namespace Core {
+using namespace Core;
 
 static
 void PrintString (const char * const string)
@@ -42,8 +42,6 @@ void PrintByte (const uint64_t value)
 	PrintNum (bv, 10, 1);
 	PrintString (bip[v]);
 }
-
-} // namespace Core
 
 // Поддерживает следующие форматы: %s, %[width][l](n|x|b)
 
@@ -88,7 +86,7 @@ void CorePrint (const char *format, ...)
 			STUB_ASSERT (width > 1, "Width in %s modifiers");
 			STUB_ASSERT (long_arg, "Long long %s argument");
 			const char *str = __builtin_va_arg(args, const char *);
-			Core::PrintString (str);
+			PrintString (str);
 			continue;
 		}
 
@@ -99,16 +97,16 @@ void CorePrint (const char *format, ...)
 		switch (*format) {
 			case 'd':
 			case 'u':
-				Core::PrintNum (num, 10, width);
+				PrintNum (num, 10, width);
 				break;
 
 			case 'x':
-				Core::PrintNum (num, 16, width);
+				PrintNum (num, 16, width);
 				break;
 
 			case 'b':
 				STUB_ASSERT (width > 1, "Width in %b modifiers");
-				Core::PrintByte (num);
+				PrintByte (num);
 				break;
 
 			default:

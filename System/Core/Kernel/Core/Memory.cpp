@@ -9,7 +9,7 @@
 
 #include "CoreLocal.h"
 
-namespace Core {
+using namespace Core;
 
 Memory::Memory (size_t size, uint32_t mode)
 	: m_page_instances(0),
@@ -171,5 +171,3 @@ bool Memory::copyIn(offset_t offset, const void *src, size_t size)
 	
 	return true;
 }
-
-} // namespace Core

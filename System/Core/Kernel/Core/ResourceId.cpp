@@ -6,7 +6,7 @@
 #include "ResourceId.h"
 #include "ResourceStorage.h"
 
-namespace Core {
+using namespace Core;
 
 ResourceId::ResourceId()
 	: m_id(0), StorageLink()
@@ -36,5 +36,3 @@ id_t ResourceId::id (void) const
 	STUB_ASSERT(m_id == 0, "Resource not registered");
 	return m_id;
 }
-
-} // namespace Core

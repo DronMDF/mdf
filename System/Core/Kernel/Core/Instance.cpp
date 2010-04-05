@@ -10,7 +10,7 @@
 #include "Resource.h"
 #include "ResourceRegion.h"
 
-namespace Core {
+using namespace Core;
 
 Instance::Instance (Resource *resource, uint32_t access)
 	: m_resource(resource),
@@ -100,5 +100,3 @@ bool Instance::allow(uint32_t want) const
 {
 	return isSet(m_access, want);
 }
-
-} // namespace Core
