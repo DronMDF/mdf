@@ -10,7 +10,7 @@
 #include "Resources.h"	// Для Core::FindResource
 
 #include "InstanceProcess.h"
-#include "Region.h"
+#include "ResourceRegion.h"
 #include "Process.h"
 #include "Thread.h"
 #include "Call.h"

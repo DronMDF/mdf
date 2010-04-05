@@ -8,7 +8,7 @@
 
 #include "Types.h"
 #include "../Kernel.h"
-#include "../Region.h"
+#include "../ResourceRegion.h"
 
 #include "TestHelpers.h"
 

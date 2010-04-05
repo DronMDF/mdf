@@ -12,10 +12,10 @@
 #include "../Kernel.h"
 #include "../List.h"
 #include "../Memory.h"
-#include "../Resource.h"
-
 #include "../Instance.h"
-#include "../Region.h"
+
+#include "../Resource.h"
+#include "../ResourceRegion.h"
 #include "../Thread.h"
 #include "../Process.h"
 

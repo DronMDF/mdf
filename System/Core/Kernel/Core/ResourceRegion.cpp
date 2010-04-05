@@ -7,9 +7,9 @@
 #include "CoreLocal.h"
 #include "Resources.h"	// только для Core::FindResources
 
-#include "Region.h"
+#include "ResourceRegion.h"
 
-namespace Core {
+using namespace Core;
 
 ResourceRegion::ResourceRegion(size_t size, uint32_t access)
 	: m_memory(0),
@@ -200,5 +200,3 @@ bool ResourceRegion::copyIn(offset_t offset, const void *src, size_t size)
 	STUB_ASSERT(size > m_size, "Overload region");
 	return getMemory()->copyIn(m_offset + offset, src, size);
 }
-
-} // namespace Core
