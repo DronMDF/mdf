@@ -12,19 +12,12 @@
 
 namespace Core {
 
-Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
+Instance::Instance (Resource *resource, uint32_t access)
 	: m_resource(resource),
 	  m_access(access),
-	  ResourceLink(),
-	  m_addr(0)
+	  m_addr(0),
+	  ResourceLink()
 {
-	if (const ResourceRegion *region = m_resource->asRegion()) {
-		// Регионы используют парам в качестве адреса маппинга к процессу.
-		m_addr = param;
-		STUB_ASSERT ((m_addr - region->offset()) % PAGE_SIZE != 0, 
-			     "Unaligned region base");
-	}
-
 	m_resource->addInstance(this);
 }
 
@@ -32,6 +25,25 @@ Instance::~Instance()
 {
 	if (m_resource != 0) {
 		m_resource->removeInstance(this);
+	}
+}
+
+laddr_t Instance::addr() const
+{
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
+	STUB_ASSERT(m_resource->asRegion() == 0, "getAddr from no region instance");
+	return m_addr;
+}
+
+void Instance::setAddr(laddr_t addr)
+{
+	STUB_ASSERT(m_addr != 0, "Adress already defined");
+	STUB_ASSERT(m_resource == 0, "No resource");
+
+	if (const ResourceRegion *region = m_resource->asRegion()) {
+		m_addr = addr;
+		STUB_ASSERT((m_addr - region->offset()) % PAGE_SIZE != 0,
+			    "Unaligned region base");
 	}
 }
 
@@ -71,28 +83,9 @@ id_t Instance::id() const
 	return m_resource->id();
 }
 
-uint32_t Instance::getAccess() const
-{
-	return m_access;
-}
-
 Resource *Instance::resource() const
 {
 	return m_resource;
-}
-
-laddr_t Instance::getAddr() const
-{
-	STUB_ASSERT(m_resource == 0, "no resource for instance");
-	STUB_ASSERT(m_resource->asRegion() == 0, "getAddr from no region instance");
-	return m_addr;
-}
-
-void Instance::setAddr(laddr_t addr)
-{
-	STUB_ASSERT(m_addr != 0, "region already Mapped");
-	STUB_ASSERT(m_resource->asRegion() == 0, "setAddr from no region instance");
-	m_addr = addr;
 }
 
 void Instance::event(uint32_t eid)

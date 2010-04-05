@@ -9,10 +9,11 @@
 
 using namespace Core;
 
-InstanceProcess::InstanceProcess(Resource *resource, uint32_t access, uint32_t base)
-	: Instance(resource, access, base),
+InstanceProcess::InstanceProcess(Resource *resource, uint32_t access, laddr_t base)
+	: Instance(resource, access),
 	  ProcessLink()
 {
+	setAddr(base);
 }
 
 ResourceThread *InstanceProcess::Call()
@@ -43,7 +44,7 @@ int InstanceProcess::Info(int infoid, void *info, size_t *size) const
 		if (resource->asRegion() == 0) return ERROR_INVALIDPARAM;
 
 		// Адрес преобразовывается в юзерспейс
-		const laddr_t uaddr = getAddr() - USER_MEMORY_BASE;
+		const laddr_t uaddr = addr() - USER_MEMORY_BASE;
 		return StubInfoValue(info, size, &uaddr, sizeof(laddr_t));
 	}
 

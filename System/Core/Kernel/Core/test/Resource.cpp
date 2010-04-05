@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(testDropInstances)
 	// Инстанции не должны удалятся ресурсом. Он просто должен уведомить
 	// инстанции о том, что ресурс, который они контролировали - уже умер.
 	struct testInstance : public Instance, private visit_mock {
-		testInstance(Resource *resource) : Instance(resource, 0, 0) { }
+		testInstance(Resource *resource) : Instance(resource, 0) { }
 		void event(uint32_t eid) {
 			BOOST_REQUIRE_EQUAL(eid, RESOURCE_EVENT_DESTROY);
 			visit();

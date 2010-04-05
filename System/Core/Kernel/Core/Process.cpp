@@ -90,17 +90,14 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		instance = m_instance_list.getNext (instance))
 	{
 		Resource *resource = instance->resource();
+		if (resource == 0) continue;
+		
 		ResourceRegion *exregion = resource->asRegion();
+		if (exregion == 0) continue;
 
-		if (exregion == 0)
-			continue;
-
-		laddr_t raddr = instance->getAddr();
-		if (hibound <= raddr)
-			continue;
-
-		if (base >= raddr + exregion->size())
-			continue;
+		laddr_t raddr = instance->addr();
+		if (hibound <= (raddr & PADDR_MASK)) continue;
+		if (raddr + exregion->size() <= (base & PADDR_MASK)) continue;
 
 		return false;
 	}
@@ -216,8 +213,7 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 	if (param_id == RESOURCE_MODIFY_REGION_MAP) {
 		// Устанавливаем точку подключения региона.
 		if (param_size != sizeof(laddr_t)) return ERROR_INVALIDPARAM;
-
-		if (instance->getAddr() != 0) return ERROR_BUSY;
+		if (instance->addr() != 0) return ERROR_BUSY;
 
 		// TODO: Надо выносить в функцию
 		Resource *resource = instance->resource();
@@ -245,12 +241,12 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 	{
 		if (!instance->inBounds(offset)) continue;
 		
-		// TODO: Всякая вот эта вот рутира просится в ResourceInstance
+		// TODO: Всякая вот эта вот рутина просится в ResourceInstance
 		Resource *resource = instance->resource();
 		ResourceRegion *region = resource->asRegion();
 		if (region == 0) continue;
 
-		const laddr_t limit = instance->getAddr() + region->offset() + region->size();
+		const laddr_t limit = instance->addr() + region->offset() + region->size();
 		size_t validsize = size;
 
 		if (offset + size > limit) {
@@ -261,7 +257,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 			}
 		}
 
-		return region->copyIn(offset - instance->getAddr(), src, validsize);
+		return region->copyIn(offset - instance->addr(), src, validsize);
 	}
 
 	return false;

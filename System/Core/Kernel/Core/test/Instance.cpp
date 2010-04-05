@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(suiteInstance)
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
 	Resource *resource = new testResource(); // Ресурс удаляется удалением инстанции
-	Instance instance(resource, 0, 0);
+	Instance instance(resource, 0);
 	BOOST_REQUIRE_EQUAL(instance.resource(), resource);
 }
 

@@ -14,41 +14,34 @@ class ResourceThread;
 class InstanceProcess;	// Временно, пока ProcessLink не перенесу.
 
 class Instance {
-	// Этото код остается в Instance
 private:
-	Resource *m_resource;	// TODO: Следящий ptr?
+	Resource *m_resource;
 	uint32_t m_access;
+	laddr_t m_addr;
 
 private:
 	Instance (const Instance &);
 	Instance & operator = (const Instance &);
 
-public:
-	Link<Instance> ResourceLink;
-	
-	Instance(Resource *resource, uint32_t access, uint32_t param);
-	virtual ~Instance();
-
-	Resource *resource() const;
-	
-	id_t id() const;
-	uint32_t getAccess() const;
+protected:
+	laddr_t addr() const;
+	void setAddr(laddr_t addr);
 
 	// Ресурсные функции (они здесь для того, чтобы паралельно проверить доступ и границы)
 	bool inBounds(laddr_t addr) const;
 	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 
-	virtual void event(uint32_t eid);
-
-	bool allow(uint32_t want) const;
+public:
+	Link<Instance> ResourceLink;
 	
-	// Этото код переходит в InstanceProcess
-protected:
-	laddr_t m_addr;
+	Instance(Resource *resource, uint32_t access);
+	virtual ~Instance();
 
-	laddr_t getAddr() const;
-	void setAddr(laddr_t addr);
+	Resource *resource() const;
+	id_t id() const;
+	bool allow(uint32_t want) const;
 
+	virtual void event(uint32_t eid);
 };
 
 } // namespace Core
