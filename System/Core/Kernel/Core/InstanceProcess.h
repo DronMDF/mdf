@@ -6,22 +6,24 @@
 #pragma once
 
 #include "Instance.h"
+#include "Link.h"
 
 namespace Core {
-	class Resource;
+	
+class Resource;
 
-	class InstanceProcess : public Instance {
-	public:
-		InstanceProcess(Resource *resource, uint32_t access, uint32_t base = 0)
-			: Instance(resource, access, base) {}
+class InstanceProcess : public Instance {
+public:
+	Link<InstanceProcess> ProcessLink;
+	
+	InstanceProcess(Resource *resource, uint32_t access, uint32_t base = 0);
 
-		using Instance::ProcessLink;
-		using Instance::getAddr;
-		using Instance::setAddr;
+	using Instance::getAddr;
+	using Instance::setAddr;
 
-		using Instance::Modify;
-		using Instance::Info;
-		using Instance::Call;
-	};
+	using Instance::Modify;
+	using Instance::Info;
+	using Instance::Call;
+};
 
 } // namespace Core

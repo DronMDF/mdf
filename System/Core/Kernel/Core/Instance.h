@@ -44,8 +44,6 @@ public:
 protected:
 	laddr_t m_addr;
 
-	Link<InstanceProcess> ProcessLink;
-
 	laddr_t getAddr() const;
 	void setAddr(laddr_t addr);
 
