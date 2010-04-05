@@ -11,6 +11,7 @@
 namespace Core {
 	
 class Resource;
+class ResourceThread;
 
 class InstanceProcess : public Instance {
 public:
@@ -23,7 +24,7 @@ public:
 
 	using Instance::Modify;
 	using Instance::Info;
-	using Instance::Call;
+	ResourceThread *Call();
 };
 
 } // namespace Core

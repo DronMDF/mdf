@@ -65,14 +65,6 @@ int Instance::Info(int infoid, void *info, size_t *size) const
 	return m_resource->Info(infoid, info, size);
 }
 
-ResourceThread *Instance::Call()
-{
-	if (!isSet(m_access, RESOURCE_ACCESS_CALL))
-		return 0;
-
-	return m_resource->Call();
-}
-
 bool Instance::inBounds(laddr_t addr) const
 {
 	STUB_ASSERT(m_resource == 0, "no resource for instance");
@@ -139,6 +131,11 @@ void Instance::event(uint32_t eid)
 		STUB_ASSERT(ResourceLink.isLinked(), "Destroy from linked resource");
 		m_resource = 0;
 	}
+}
+
+bool Instance::allow(uint32_t want) const
+{
+	return isSet(m_access, want);
 }
 
 } // namespace Core

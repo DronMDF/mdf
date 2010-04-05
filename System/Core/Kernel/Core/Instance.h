@@ -39,6 +39,8 @@ public:
 	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 
 	virtual void event(uint32_t eid);
+
+	bool allow(uint32_t want) const;
 	
 	// Этото код переходит в InstanceProcess
 protected:
@@ -49,7 +51,6 @@ protected:
 
 	int Modify (int paramid, const void *param, size_t param_size);
 	int Info (int infoid, void *info, size_t *info_size) const;
-	ResourceThread *Call();
 };
 
 } // namespace Core

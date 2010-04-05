@@ -3,6 +3,8 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
+#include "Kernel.h"
+#include "Resource.h"
 #include "InstanceProcess.h"
 
 using namespace Core;
@@ -13,3 +15,11 @@ InstanceProcess::InstanceProcess(Resource *resource, uint32_t access, uint32_t b
 {
 }
 
+ResourceThread *InstanceProcess::Call()
+{
+	if (!allow(RESOURCE_ACCESS_CALL)) {
+		return 0;
+	}
+
+	return resource()->Call();
+}
