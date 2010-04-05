@@ -17,11 +17,12 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteInstanceProcess)
 
+// TODO: перенести в test/Instance.cpp
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
-	testResource resource;
-	InstanceProcess instance(&resource, 0);
-	BOOST_REQUIRE_EQUAL(instance.resource(), &resource);
+	Resource *resource = new testResource(); // Ресурс удаляется удалением инстанции
+	Instance instance(resource, 0, 0);
+	BOOST_REQUIRE_EQUAL(instance.resource(), resource);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

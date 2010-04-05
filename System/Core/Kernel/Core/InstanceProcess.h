@@ -11,13 +11,9 @@ namespace Core {
 	class Resource;
 
 	class InstanceProcess : public Instance {
-// 	private:
-// 		InstanceProcess(const InstanceProcess &);
-// 		InstanceProcess &operator =(const InstanceProcess &);
-		
 	public:
-		explicit InstanceProcess(Resource *resource, uint32_t access)
-			: Instance(resource, access, 0) {}
+		InstanceProcess(Resource *resource, uint32_t access, uint32_t base = 0)
+			: Instance(resource, access, base) {}
 	};
 
 } // namespace Core

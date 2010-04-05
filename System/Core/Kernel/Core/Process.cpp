@@ -273,9 +273,9 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 }
 
 InstanceProcess *ResourceProcess::createInstance(Resource *resource,
-		uint32_t access, uint32_t param) const
+		uint32_t access, uint32_t base) const
 {
-	return new InstanceProcess(resource, access);
+	return new InstanceProcess(resource, access, base);
 }
 
 } // namespace Core

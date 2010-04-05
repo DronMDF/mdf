@@ -31,7 +31,6 @@ Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
 
 Instance::~Instance()
 {
-	// TODO: удалять нужно инстанцию по указателю. ресурс о них знает.
 	if (m_resource != 0) {
 		m_resource->removeInstance(this);
 	}

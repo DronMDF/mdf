@@ -29,7 +29,8 @@ Resource::Resource (void)
 Resource::~Resource (void)
 {
 	delete[] m_name;
-
+	delete m_event;
+	
 	while (Instance *instance = m_instances.getFirst()) {
 		m_instances.Remove(instance);
 		instance->event(RESOURCE_EVENT_DESTROY);

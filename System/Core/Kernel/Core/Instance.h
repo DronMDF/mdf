@@ -50,7 +50,7 @@ public:
 	int Info (int infoid, void *info, size_t *info_size) const;
 	ResourceThread *Call();
 
-	void event(uint32_t eid);
+	virtual void event(uint32_t eid);
 };
 
 } // namespace Core
