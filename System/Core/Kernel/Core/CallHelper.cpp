@@ -9,7 +9,7 @@
 #include "Scheduler.h"
 #include "CoreLocal.h"
 
-#include "Instance.h"
+#include "InstanceProcess.h"
 #include "Resources.h"
 #include "Thread.h"
 #include "Process.h"
@@ -36,7 +36,7 @@ ResourceThread *CallHelper::getCallerThread(const Task *task) const
 	return thread;
 }
 
-Instance *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
+InstanceProcess *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
 {
 	ResourceProcess *process = thread->getProcess();
 	STUB_ASSERT(process == 0, "no current process");
@@ -51,7 +51,7 @@ bool CallHelper::checkCalledAccess(id_t id)
 {
 	if (m_caller == 0) return true;
 
-	if (Instance *inst = getCalledInstance(m_caller, id)) {
+	if (InstanceProcess *inst = getCalledInstance(m_caller, id)) {
 		m_called = inst->Call();
 		if (m_called == 0) return false;
 	}

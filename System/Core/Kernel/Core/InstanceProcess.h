@@ -14,6 +14,14 @@ namespace Core {
 	public:
 		InstanceProcess(Resource *resource, uint32_t access, uint32_t base = 0)
 			: Instance(resource, access, base) {}
+
+		using Instance::ProcessLink;
+		using Instance::getAddr;
+		using Instance::setAddr;
+
+		using Instance::Modify;
+		using Instance::Info;
+		using Instance::Call;
 	};
 
 } // namespace Core

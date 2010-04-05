@@ -15,9 +15,9 @@ namespace Core {
 Instance::Instance (Resource *resource, uint32_t access, uint32_t param)
 	: m_resource(resource),
 	  m_access(access),
+	  ResourceLink(),
 	  m_addr(0),
-	  ProcessLink(),
-	  ResourceLink()
+	  ProcessLink()
 {
 	if (const ResourceRegion *region = m_resource->asRegion()) {
 		// Регионы используют парам в качестве адреса маппинга к процессу.

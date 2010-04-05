@@ -21,7 +21,7 @@ namespace Core {
 
 ResourceProcess::ResourceProcess (laddr_t entry)
 	: m_entry(entry),
-	  m_instance_list(&Instance::ProcessLink),
+	  m_instance_list(&InstanceProcess::ProcessLink),
 	  m_pagetable(USER_PAGETABLE_SIZE, Memory::ALLOC | Memory::ZEROING)
 {
 	// TODO: Все способности в инстанции доступны
@@ -31,9 +31,9 @@ ResourceProcess::ResourceProcess (laddr_t entry)
 
 ResourceProcess::~ResourceProcess ()
 {
-	for (Instance *instance = m_instance_list.getFirst(); instance != 0; )
+	for (InstanceProcess *instance = m_instance_list.getFirst(); instance != 0; )
 	{
-		Instance *instance_to_delete = instance;
+		InstanceProcess *instance_to_delete = instance;
 		instance = m_instance_list.getNext (instance);
 
 		if (instance_to_delete->resource() != this) {
@@ -85,7 +85,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		return false;
 
 	// Проверяем на пересечение с имеющимися регионами.
-	for (Instance *instance = m_instance_list.getFirst();
+	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -138,9 +138,9 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 int ResourceProcess::Attach (Resource *resource, uint32_t access, uint32_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
-	for (Instance *instance = m_instance_list.getFirst();
+	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
-		instance = m_instance_list.getNext (instance))
+		instance = m_instance_list.getNext(instance))
 	{
 		if (instance->id() == resource->id()) {
 			STUB_FATAL ("Resource already attached");
@@ -162,17 +162,12 @@ int ResourceProcess::Attach (Resource *resource, uint32_t access, uint32_t ubase
 
 int ResourceProcess::Detach(Resource *resource)
 {
-	for (Instance *instance = m_instance_list.getFirst();
-		instance != 0; instance = m_instance_list.getNext(instance))
-	{
-		if (instance->id() == resource->id()) {
-			m_instance_list.Remove(instance);
-			delete instance;
-			return SUCCESS;
-		}
-	}
+	InstanceProcess *instance = FindInstance(resource->id());
+	if (instance == 0) return ERROR_INVALIDID;
 
-	return ERROR_INVALIDID;
+	m_instance_list.Remove(instance);
+	delete instance;
+	return SUCCESS;
 }
 
 const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
@@ -183,7 +178,7 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 		return m_pagetable.PageFault(addr - USER_PAGETABLE_BASE);
 	}
 
-	for (Instance *instance = m_instance_list.getFirst();
+	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -200,9 +195,9 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 }
 
 
-Instance *ResourceProcess::FindInstance (id_t id) const
+InstanceProcess *ResourceProcess::FindInstance (id_t id) const
 {
-	for (Instance *instance = m_instance_list.getFirst();
+	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
 		instance = m_instance_list.getNext (instance))
 	{
@@ -215,7 +210,7 @@ Instance *ResourceProcess::FindInstance (id_t id) const
 
 int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, size_t param_size)
 {
-	Instance *instance = FindInstance(id);
+	InstanceProcess *instance = FindInstance(id);
 	if (instance == 0) return ERROR_INVALIDID;
 
 	if (param_id == RESOURCE_MODIFY_REGION_MAP) {
@@ -244,9 +239,9 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 
 bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 {
-	for (Instance *instance = m_instance_list.getFirst();
+	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
-		instance = m_instance_list.getNext (instance))
+		instance = m_instance_list.getNext(instance))
 	{
 		if (!instance->inBounds(offset)) continue;
 		

@@ -14,7 +14,7 @@
 #include "../Memory.h"
 #include "../Resource.h"
 
-#include "../Instance.h"
+#include "../InstanceProcess.h"
 #include "../Thread.h"
 #include "../Process.h"
 #include "../Core.h"
@@ -54,7 +54,7 @@ struct create_fixture {
 
 BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 {
-	Instance *instance = process.FindInstance(id);
+	InstanceProcess *instance = process.FindInstance(id);
 	BOOST_REQUIRE(instance != 0);
 
 	Resource *resource = instance->resource();

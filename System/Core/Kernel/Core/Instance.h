@@ -11,6 +11,7 @@ namespace Core {
 
 class Resource;
 class ResourceThread;
+class InstanceProcess;	// Временно, пока ProcessLink не перенесу.
 
 class Instance {
 	// Этото код остается в Instance
@@ -23,6 +24,8 @@ private:
 	Instance & operator = (const Instance &);
 
 public:
+	Link<Instance> ResourceLink;
+	
 	Instance(Resource *resource, uint32_t access, uint32_t param);
 	virtual ~Instance();
 
@@ -34,14 +37,14 @@ public:
 	// Ресурсные функции (они здесь для того, чтобы паралельно проверить доступ и границы)
 	bool inBounds(laddr_t addr) const;
 	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
+
+	virtual void event(uint32_t eid);
 	
 	// Этото код переходит в InstanceProcess
-private:
+protected:
 	laddr_t m_addr;
 
-public:
-	Link<Instance> ProcessLink;
-	Link<Instance> ResourceLink;
+	Link<InstanceProcess> ProcessLink;
 
 	laddr_t getAddr() const;
 	void setAddr(laddr_t addr);
@@ -49,8 +52,6 @@ public:
 	int Modify (int paramid, const void *param, size_t param_size);
 	int Info (int infoid, void *info, size_t *info_size) const;
 	ResourceThread *Call();
-
-	virtual void event(uint32_t eid);
 };
 
 } // namespace Core

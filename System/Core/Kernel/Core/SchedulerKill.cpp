@@ -3,6 +3,7 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
+#include "Kernel.h"
 #include "List.h"
 #include "Memory.h"
 #include "Resource.h"
@@ -39,7 +40,10 @@ ResourceThread *SchedulerKill::getThread()
 
 		if (dthread->Deactivate()) {
 			m_queue.Remove(dthread);
-			dthread->getProcess()->Detach(dthread);
+			// TODO: Можно было бы просто удалить нить, но инстанция
+			//	подвиснет в процессе.
+			STUB_ASSERT(dthread->getProcess()->Detach(dthread) != SUCCESS,
+				    "Delete nonprocess thread");
 		}
 	}
 

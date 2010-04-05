@@ -8,7 +8,7 @@
 #include "Types.h"
 #include "../Kernel.h"
 #include "../CallHelper.h"
-#include "../Instance.h"
+#include "../InstanceProcess.h"
 
 #include "testResource.h"
 #include "testThread.h"
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 	ResourceThread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
-	Instance *inst = helper.getCalledInstance(thread, thread->id());
+	InstanceProcess *inst = helper.getCalledInstance(thread, thread->id());
 	BOOST_REQUIRE(inst != 0);
 	BOOST_REQUIRE(inst->resource() == thread);
 	BOOST_REQUIRE_EQUAL(inst->Call(), thread);
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
 
 	struct testCallHelper : public CallHelper, private visit_mock {
 		testCallHelper() : CallHelper(0) {}
-		Instance *getCalledInstance(ResourceThread *thread, id_t id) const {
+		InstanceProcess *getCalledInstance(ResourceThread *thread, id_t id) const {
 			visit();
 			return CallHelper::getCalledInstance(thread, id);
 		}
