@@ -10,7 +10,7 @@
 #include "Resource.h"
 #include "ResourceProcess.h"
 #include "ResourceThread.h"
-#include "Call.h"
+#include "ResourceCall.h"
 
 using namespace Core;
 
