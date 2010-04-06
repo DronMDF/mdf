@@ -24,7 +24,7 @@ int CoreWait(const Task *task, id_t id, int evt, timeout_t timeout);
 int CoreFind(const char *name, size_t name_size, id_t *id);
 int CoreCreate(const Task *task, int type, const void *param, size_t size, id_t *id);
 int CoreCall(const Task *task, id_t id, const void *buffer, size_t size, int flags);
-int CoreAttach(const Task *task, id_t rid, id_t pid, int access, uint32_t spec);
+int CoreAttach(const Task *task, id_t rid, id_t pid, uint32_t access, uint32_t spec);
 int CoreDetach(const Task *task, id_t id, int flags);
 int CoreModify(const Task *task, id_t id, int modify_id, const void *param, size_t size);
 int CoreInfo(const Task *task, id_t id, int infoId, void *info, size_t *size);

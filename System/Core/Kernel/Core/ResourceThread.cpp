@@ -166,11 +166,12 @@ laddr_t ResourceThread::getEntry() const
 	return m_entry;
 }
 
-void ResourceThread::Sleep (clock_t timeout)
+void ResourceThread::Sleep (timeout_t timeout)
 {
-	m_wakeupstamp = timeout;
-	if (m_wakeupstamp != CLOCK_MAX) {
-		m_wakeupstamp += StubGetCurrentClock();
+	if (timeout == CLOCK_MAX) {
+		m_wakeupstamp = CLOCK_MAX;
+	} else {
+		m_wakeupstamp = StubGetCurrentClock() + timeout;
 	}
 }
 

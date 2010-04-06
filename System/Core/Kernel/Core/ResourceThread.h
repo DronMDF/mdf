@@ -86,7 +86,7 @@ public:
 	void setProcess(ResourceProcess *process);
 	ResourceProcess *getProcess() const;
 
-	void Sleep(clock_t timeout);
+	void Sleep(timeout_t timeout);
 	void Wait (Resource *resource, int event);
 
 	bool isActive () const;

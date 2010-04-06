@@ -22,8 +22,8 @@ Memory::~Memory ()
 {
 	if (m_page_instances == 0) return;
 
-	const int page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
-	for (int pidx = 0; pidx < page_count; pidx++) {
+	const uint page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
+	for (uint pidx = 0; pidx < page_count; pidx++) {
 		if (m_page_instances[pidx] == 0) continue;
 		StubPageInstanceDelete(m_page_instances[pidx]);
 	}
@@ -37,12 +37,12 @@ const PageInstance *Memory::setPage (PageInfo *page, const offset_t page_offset)
 	STUB_ASSERT (page_offset >= m_size, "Overload region");
 
 	if (m_page_instances == 0) {
-		const int page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
+		const uint page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
 		m_page_instances = new const PageInstance *[page_count];
 		StubMemoryClear (m_page_instances, page_count * sizeof (PageInstance *));
 	}
 
-	const int pidx = page_offset / PAGE_SIZE;
+	const uint pidx = page_offset / PAGE_SIZE;
 	STUB_ASSERT(m_page_instances[pidx] != 0, "Page already exist");
 
 	m_page_instances[pidx] = StubGetPageInstance (page, 0, 0);
@@ -76,7 +76,7 @@ int Memory::bindPhysical(offset_t poffset, size_t size, offset_t skip)
 
 	// TODO: В случае ошибки необходимо сделать откат занятых страниц в пул.
 
-	for (offset_t coff = skip & PADDR_MASK; coff < skip + size; coff += PAGE_SIZE)
+	for (offset_t coff = skip & LADDR_MASK; coff < skip + size; coff += PAGE_SIZE)
 	{
 		const paddr_t paddr = poffset - skip + coff;
 		PageInfo * const page = StubGetPageByPAddr(paddr);
@@ -142,7 +142,7 @@ const PageInstance *Memory::PageFault(offset_t offset)
 		StubPageUntemporary (page);
 	}
 
-	instance = setPage (page, offset & ~(PAGE_SIZE - 1));
+	instance = setPage(page, offset & LADDR_MASK);
 	STUB_ASSERT (instance == 0, "No page");
 
 	return instance;

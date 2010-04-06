@@ -183,7 +183,7 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 }
 
 extern "C"
-int CoreAttach (const Task *task, id_t rid, id_t pid, int access, uint32_t spec)
+int CoreAttach (const Task *task, id_t rid, id_t pid, uint32_t access, uint32_t spec)
 {
 	Core::ResourceThread *thread = 0;
 

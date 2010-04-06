@@ -24,8 +24,9 @@
 #define STUB_ASSERT(exp, msg)	BOOST_ASSERT(!(exp))
 #define STATIC_ASSERT(exp)	BOOST_STATIC_ASSERT(exp)
 
-#define PAGE_SIZE 4096
-#define PADDR_MASK (~(PAGE_SIZE - 1))
+#define PAGE_SIZE 0x00001000UL
+#define LADDR_MASK 0xfffff000UL
+#define PADDR_MASK 0xfffffffffffff000ULL
 
 #define USER_MEMORY_BASE 0x100000
 
