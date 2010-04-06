@@ -215,6 +215,7 @@ bool ResourceThread::Deactivate()
 void ResourceThread::Kill()
 {
 	// TODO: Надо в отдельную функцию.
+	// TODO: А связь с другими нитями ради копибека - это тоже инстанция!
 	if (m_copyback_id != INVALID_ID) {
 		if (Resource *resource = FindResource(m_copyback_id)) {
 			if (ResourceThread *caller = resource->asThread()) {

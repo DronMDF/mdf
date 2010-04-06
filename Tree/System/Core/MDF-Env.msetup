@@ -1,7 +1,7 @@
 
 Description "Окружение MDF";
 
-Release 0.0.16.2
+Release 0.0.16.4
 {
 	Source Repository System/Core/MDF-Env;
 }

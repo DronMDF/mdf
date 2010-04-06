@@ -10,7 +10,7 @@
 #include "../Resource.h"
 #include "testResource.h"
 
-#include "../InstanceProcess.h"
+#include "../Instance.h"
 
 using namespace boost;
 using namespace Core;
