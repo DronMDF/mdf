@@ -34,7 +34,8 @@ protected:
 public:
 	Link<Instance> ResourceLink;
 	
-	Instance(Resource *resource, uint32_t access);
+	// TODO: access - это тоже получается процессная фича? или регионная но не тредовая.
+	explicit Instance(Resource *resource, uint32_t access = 0);
 	virtual ~Instance();
 
 	Resource *resource() const;

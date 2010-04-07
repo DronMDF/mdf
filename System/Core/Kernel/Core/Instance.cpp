@@ -24,7 +24,9 @@ Instance::Instance (Resource *resource, uint32_t access)
 Instance::~Instance()
 {
 	if (m_resource != 0) {
-		m_resource->removeInstance(this);
+		Resource *resource = m_resource;
+		m_resource = 0;
+		resource->removeInstance(this);
 	}
 }
 

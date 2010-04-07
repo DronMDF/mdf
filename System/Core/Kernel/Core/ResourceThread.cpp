@@ -13,6 +13,7 @@
 #include "Resources.h"	// TODO: Устаревающее
 
 #include "Instance.h"
+#include "InstanceThread.h"
 #include "Resource.h"
 #include "ResourceProcess.h"
 #include "ResourceThread.h"
@@ -35,6 +36,7 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	  m_priority(255),
 	  m_entry(0),
 	  m_event(0),
+	  m_event_instance(0),
 	  ScheduleLink(),
 	  EventLink()
 {
@@ -57,6 +59,7 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	  m_priority(255),
 	  m_entry(entry),
 	  m_event(0),
+	  m_event_instance(0),
 	  ScheduleLink(),
 	  EventLink()
 {
@@ -68,10 +71,11 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 
 ResourceThread::~ResourceThread()
 {
+	delete m_event_instance;
 	delete m_txa;
 }
 
-ResourceThread *ResourceThread::asThread ()
+ResourceThread *ResourceThread::asThread()
 {
 	return this;
 }
@@ -177,9 +181,9 @@ void ResourceThread::Sleep (timeout_t timeout)
 	}
 }
 
-void ResourceThread::Wait (Resource *resource __unused__, int event __unused__)
+void ResourceThread::Wait(Resource *resource, int event)
 {
-
+	m_event_instance = createInstance(resource, event);
 }
 
 bool ResourceThread::isActive () const
@@ -339,6 +343,11 @@ void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 {
 	m_copyback_id = thread->id();
 	m_copyback_addr = buffer;
+}
+
+InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t event) const
+{
+	return new InstanceThread(resource, event);
 }
 
 extern "C"

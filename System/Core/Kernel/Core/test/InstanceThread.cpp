@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Resource.h"
+#include "testResource.h"
 #include "testThread.h"
 #include "TestHelpers.h"
 
@@ -34,8 +34,10 @@ BOOST_AUTO_TEST_CASE(testDeliveryWanted)
 	struct inlineThread : public testThread, private visit_mock {
 		virtual void Activate() { visit(); }
 	} thread;
-	thread.Wait(&thread, 666);	// Инстанция создается здесь
-	thread.setEvent(666);		// Здесь она должна дернуть метод Activate
+	testResource resource;
+	
+	thread.Wait(&resource, 666);	// Инстанция создается здесь
+	resource.setEvent(666);		// Здесь она должна дернуть метод thread->Activate
 }
 
 BOOST_AUTO_TEST_SUITE_END()

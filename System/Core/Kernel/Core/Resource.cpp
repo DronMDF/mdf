@@ -147,6 +147,10 @@ void Resource::addInstance(Instance *instance)
 void Resource::removeInstance(Instance *instance)
 {
 	m_instances.Remove(instance);
+	// DESTORY здесь как-то не катит, но нам надо занулить адрес ресурса в инстанции
+	// Или может быть в инстанции стоит смотреть на факт завязанности линка?
+	instance->event(RESOURCE_EVENT_DESTROY);
+	
 	if (m_instances.isEmpty()) {
 		delete this;
 	}

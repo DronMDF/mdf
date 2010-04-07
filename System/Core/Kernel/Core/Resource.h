@@ -72,7 +72,7 @@ public:
 	virtual void addObserver(ResourceThread *thread, uint32_t event);
 	void setEvent(uint32_t event);
 
-	void addInstance(Instance *instance);
+	virtual void addInstance(Instance *instance);
 	void removeInstance(Instance *instance);
 };
 

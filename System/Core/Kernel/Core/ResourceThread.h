@@ -10,6 +10,7 @@
 
 namespace Core {
 
+class InstanceThread;
 class ResourceProcess;
 
 class ResourceThread : public Resource
@@ -51,6 +52,7 @@ private:
 	laddr_t m_entry;
 
 	uint32_t m_event;
+	Instance *m_event_instance;
 
 private:
 	ResourceThread (const ResourceThread &);
@@ -58,6 +60,8 @@ private:
 
 	void setStack(offset_t request, size_t request_size, uint32_t access);
 
+	InstanceThread *createInstance(Resource *resource, uint32_t event) const;
+	
 protected:
 	explicit ResourceThread (ResourceProcess *process = 0);
 
