@@ -25,13 +25,13 @@ protected:
 
 	uint32_t mixBits (const uint32_t u, const uint32_t v) const
 	{
-		return (u & 0x80000000UL) | (v & 0x7fffffffUL);
+		return uint32_t((u & 0x80000000UL) | (v & 0x7fffffffUL));
 	}
 
 	uint32_t twist (const uint32_t m, const uint32_t s0, const uint32_t s1) const
 	{
 		const uint32_t y = mixBits (s0, s1);
-		return m ^ (y >> 1) ^ ((y & 1) ? 0x9908b0dfUL : 0UL);
+		return uint32_t(m ^ (y >> 1) ^ ((y & 1) ? 0x9908b0dfUL : 0UL));
 	}
 
 	uint32_t xorBits (const int i) const
@@ -55,9 +55,9 @@ public:
 
 void RandomGenerator::entropy ()
 {
-	state[0] = (uint32_t)StubGetTimestampCounter();
+	state[0] = uint32_t(StubGetTimestampCounter());
 	for (int i = 1; i < N; i++)
-		state[i] = 1812433253UL * xorBits(i - 1) + i;
+		state[i] = 1812433253UL * xorBits(i - 1) + uint32_t(i);
 	reload ();
 }
 
@@ -141,7 +141,7 @@ void __init__ InitUtils(void)
 // Правда рандомизации от нее будет не много ну и чтож с того?
 
 extern "C"
-unsigned long CoreRandom (void)
+uint32_t CoreRandom (void)
 {
 	if (Core::rnd != 0)
 		return Core::rnd->get ();

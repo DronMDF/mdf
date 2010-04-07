@@ -35,7 +35,7 @@ private:
 	// Массив страничных инстанций (ссылки)
 	const PageInstance **m_page_instances;
 
-	size_t m_size;		// Размер в байтах от смещения.
+	size_t m_size;		// Размер в байтах.
 	uint32_t m_mode;	// Режим
 
 private:

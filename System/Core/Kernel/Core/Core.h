@@ -16,7 +16,7 @@ const char *CoreVersion(void);
 
 void CoreInit(void);
 
-unsigned long CoreRandom (void);
+uint32_t CoreRandom(void);
 void CorePrint (const char *format, ...);
 
 // Внутреннее отражение API

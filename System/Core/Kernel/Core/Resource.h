@@ -64,7 +64,7 @@ public:
 	// Call сильно атрофированный метод, можно ли его приравнять к методам
 	// API, уж не знаю. Да всеравно..
 	virtual ResourceThread *Call ();
-	virtual int Attach(Resource *resource, uint32_t access, uint32_t spec);
+	virtual int Attach(Resource *resource, uint32_t access, laddr_t base);
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info(int info_id, void *info, size_t *info_size) const;
 

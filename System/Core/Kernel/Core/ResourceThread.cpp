@@ -76,51 +76,51 @@ ResourceThread *ResourceThread::asThread ()
 	return this;
 }
 
-void ResourceThread::setStack (offset_t request, size_t request_size, int flags)
+void ResourceThread::setStack(offset_t request, size_t request_size, uint32_t access)
 {
 	struct StubStackFrame stack_frame;
 
 	// TODO: Установить идентификатор вызывающей нити.
-	StubSetStackFrame (&stack_frame, 0, request, request_size, flags);
+	StubSetStackFrame(&stack_frame, 0, request, request_size, access);
 
-	m_stack.copyIn(USER_STACK_SIZE - sizeof (struct StubStackFrame),
-		       &stack_frame, sizeof (struct StubStackFrame));
+	m_stack.copyIn(USER_STACK_SIZE - sizeof(struct StubStackFrame),
+		       &stack_frame, sizeof(struct StubStackFrame));
 }
 
-void ResourceThread::setRequest (const void *request, size_t request_size, int flags)
+void ResourceThread::setRequest(const void *request, size_t size, uint32_t access)
 {
 	// Запрос всегда находится в текущем линейном пространстве.
 	STUB_ASSERT (m_txa != 0, "Request already exist");
 
 	m_txa_offset = 0;
 
-	const bool map_request = !isSet(flags, RESOURCE_CALL_COPY);
+	const bool map_request = !isSet(access, RESOURCE_CALL_COPY);
 	
 	if (map_request) {
 		// При маппинге параметров учитывается смещение.
 		m_txa_offset = reinterpret_cast<laddr_t>(request) % PAGE_SIZE;
 	}
 
-	STUB_ASSERT (m_txa_offset + request_size > USER_TXA_SIZE, "Big request");
+	STUB_ASSERT (m_txa_offset + size > USER_TXA_SIZE, "Big request");
 
 	// TODO: В связи с новой логикой Memory txa лучше будет
 	// представить в виде региона. Причем здесь хранить инстанцию.
-	m_txa = new Memory (request_size, Memory::ALLOC);
-	m_txa_access = RESOURCE_ACCESS_READ |
-		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
+	m_txa = new Memory(size, Memory::ALLOC);
+	m_txa_access = uint32_t(RESOURCE_ACCESS_READ |
+		(isSet(access, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE));
 
 	if (map_request) {
-		m_txa->Map(request, request_size);
+		m_txa->Map(request, size);
 	} else {
-		m_txa->copyIn(0, request, request_size);
+		m_txa->copyIn(0, request, size);
 	}
 
 	// TODO: В стек наверное надо устанавливать смещение в пространстве
 	//	пользователя.
-	setStack (m_txa_offset, request_size, flags);
+	setStack(m_txa_offset, size, access);
 
 	// TODO: Выбросить эту ерунду нафиг
-	if (!isSet(flags, RESOURCE_CALL_READONLY) && !map_request) {
+	if (!isSet(access, RESOURCE_CALL_READONLY) && !map_request) {
 		// Зафиксировать место откуда блок поступил, чтобы потом скопировать его обратно.
 	}
 }

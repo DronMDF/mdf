@@ -26,7 +26,7 @@ BOOST_FIXTURE_TEST_CASE(testCopyIn, MemFixture1)
 	Memory mem(mem_size, Memory::ALLOC);
 	BOOST_REQUIRE(mem.copyIn(0, data, mem_size));
 
-	for (int i = 0; i < 3; i++) {
+	for (uint i = 0; i < 3; i++) {
 		const PageInstance *pinst = mem.getPage(i * PAGE_SIZE);
 		PageInfo *page = StubGetPageByInstance(pinst);
 		BOOST_REQUIRE(page != 0);

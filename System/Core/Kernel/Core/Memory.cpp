@@ -22,8 +22,8 @@ Memory::~Memory ()
 {
 	if (m_page_instances == 0) return;
 
-	const uint page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
-	for (uint pidx = 0; pidx < page_count; pidx++) {
+	const size_t page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
+	for (size_t pidx = 0; pidx < page_count; pidx++) {
 		if (m_page_instances[pidx] == 0) continue;
 		StubPageInstanceDelete(m_page_instances[pidx]);
 	}
@@ -37,12 +37,12 @@ const PageInstance *Memory::setPage (PageInfo *page, const offset_t page_offset)
 	STUB_ASSERT (page_offset >= m_size, "Overload region");
 
 	if (m_page_instances == 0) {
-		const uint page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
+		const size_t page_count = (m_size + PAGE_SIZE - 1) / PAGE_SIZE;
 		m_page_instances = new const PageInstance *[page_count];
 		StubMemoryClear (m_page_instances, page_count * sizeof (PageInstance *));
 	}
 
-	const uint pidx = page_offset / PAGE_SIZE;
+	const size_t pidx = page_offset / PAGE_SIZE;
 	STUB_ASSERT(m_page_instances[pidx] != 0, "Page already exist");
 
 	m_page_instances[pidx] = StubGetPageInstance (page, 0, 0);

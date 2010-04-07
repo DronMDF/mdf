@@ -61,7 +61,7 @@ void *StubTaskGetThread (const Task *task);
 #define RETMAGIC	666
 
 void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
-	offset_t txa_offset, size_t txa_size, int flags);
+	offset_t txa_offset, size_t txa_size, uint32_t access);
 
 // -----------------------------------------------------------------------------
 // Вводо-вывод

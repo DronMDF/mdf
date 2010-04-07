@@ -39,13 +39,13 @@ uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
 
 	// В качестве приоритета необходимо учитывать только приоритет
 	// а не его класс который, возможно, будет закодирован в этом же значении.
-	const uint64_t index = StubGetCurrentClock() -
+	const clock_t index = StubGetCurrentClock() -
 		thread->getTimestamp() + thread->getPriority();
 
 	if (index >= 0x100000000LL)
 		return 0xffffffff;
 
-	return index;
+	return uint32_t(index);
 }
 
 bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,

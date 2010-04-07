@@ -106,7 +106,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 }
 
 // ubase - хранит базу в пространстве пользователя
-laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_t ubase) const
+laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, laddr_t ubase) const
 {
 	STUB_ASSERT (region == 0, "setBase for non region");
 
@@ -132,7 +132,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, uint32_
 }
 
 // TODO: Эта база - юзерлевела... надо бы переделать в кернеллевел..
-int ResourceProcess::Attach (Resource *resource, uint32_t access, uint32_t ubase)
+int ResourceProcess::Attach (Resource *resource, uint32_t access, laddr_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
 	for (InstanceProcess *instance = m_instance_list.getFirst();
@@ -264,7 +264,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 }
 
 InstanceProcess *ResourceProcess::createInstance(Resource *resource,
-		uint32_t access, uint32_t base) const
+		uint32_t access, laddr_t base) const
 {
 	return new InstanceProcess(resource, access, base);
 }

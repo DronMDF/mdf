@@ -47,7 +47,7 @@ typedef volatile int lock_t;
 typedef uint32_t timeout_t;
 
 struct StubStackFrame {
-	int32_t		flags;
+	uint32_t	flags;
 	size_t		txa_size;
 	laddr_t		txa_ptr;
 	id_t		caller;

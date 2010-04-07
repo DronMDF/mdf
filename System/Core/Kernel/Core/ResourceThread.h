@@ -56,7 +56,7 @@ private:
 	ResourceThread (const ResourceThread &);
 	ResourceThread & operator = (const ResourceThread &);
 
-	void setStack (offset_t request, size_t request_size, int flag);
+	void setStack(offset_t request, size_t request_size, uint32_t access);
 
 protected:
 	explicit ResourceThread (ResourceProcess *process = 0);
@@ -72,7 +72,7 @@ public:
 
 	virtual ResourceThread *asThread ();
 
-	void setRequest (const void *request, size_t request_size, int flags);
+	void setRequest(const void *request, size_t size, uint32_t access);
 
 	uint32_t getPriority () const;
 	void setPriority (uint32_t priority);

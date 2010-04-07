@@ -97,7 +97,7 @@ ResourceThread *Resource::Call ()
 	return 0;
 }
 
-int Resource::Attach (Resource *, uint32_t, uint32_t)
+int Resource::Attach (Resource *, uint32_t, laddr_t)
 {
 	return ERROR_INVALIDID;
 }

@@ -102,5 +102,5 @@ struct StubStackFrame {
 	id_t		caller;
 	laddr_t		txa_ptr;
 	size_t		txa_size;
-	int32_t		flags;
+	uint32_t	flags;
 };

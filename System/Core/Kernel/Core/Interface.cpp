@@ -163,8 +163,8 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 	if (!helper.checkCalledAccess(id)) return ERROR_ACCESS;
 	if (!helper.createCalled(id)) return ERROR_INVALIDID;
 
-	const uint32_t access = RESOURCE_ACCESS_READ |
-		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE);
+	const uint32_t access = uint32_t(RESOURCE_ACCESS_READ |
+		(isSet(flags, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE));
 	if (!helper.copyOutRequest(buffer, buffer_size, access)) {
 		return ERROR_INVALIDPARAM;
 	}
