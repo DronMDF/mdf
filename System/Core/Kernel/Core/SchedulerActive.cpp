@@ -37,15 +37,12 @@ uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
 	STUB_ASSERT(StubGetCurrentClock() < thread->getTimestamp(),
 		"Thread timestamp in the future");
 
-	// В качестве приоритета необходимо учитывать только приоритет
+	// TODO: В качестве приоритета необходимо учитывать только приоритет
 	// а не его класс который, возможно, будет закодирован в этом же значении.
-	const clock_t index = StubGetCurrentClock() -
+	const uint64_t index = StubGetCurrentClock() -
 		thread->getTimestamp() + thread->getPriority();
 
-	if (index >= 0x100000000LL)
-		return 0xffffffff;
-
-	return uint32_t(index);
+	return min(index, 0xffffffffULL);
 }
 
 bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,

@@ -106,8 +106,10 @@ void ResourceThread::setRequest(const void *request, size_t size, uint32_t acces
 	// TODO: В связи с новой логикой Memory txa лучше будет
 	// представить в виде региона. Причем здесь хранить инстанцию.
 	m_txa = new Memory(size, Memory::ALLOC);
-	m_txa_access = uint32_t(RESOURCE_ACCESS_READ |
-		(isSet(access, RESOURCE_CALL_READONLY) ? 0 : RESOURCE_ACCESS_WRITE));
+	m_txa_access = RESOURCE_ACCESS_READ;
+	if (!isSet(access, RESOURCE_CALL_READONLY)) {
+		m_txa_access |= RESOURCE_ACCESS_WRITE;
+	}
 
 	if (map_request) {
 		m_txa->Map(request, size);

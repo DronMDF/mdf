@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(inactive_scheduler)
 
 class testThread : public ResourceThread {
 public:
-	testThread(clock_t ts) : ResourceThread() {
+	testThread(timeout_t ts) : ResourceThread() {
 		setTimestamp(StubGetCurrentClock() - ts);
 		Sleep(ts);
 	}
