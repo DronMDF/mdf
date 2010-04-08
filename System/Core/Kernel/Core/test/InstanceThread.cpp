@@ -20,7 +20,9 @@ BOOST_AUTO_TEST_SUITE(suiteInstance)
 
 BOOST_AUTO_TEST_CASE(testCreateInstance)
 {
-	testThread thread;
+	struct inThread : public testThread {
+		virtual void Activate() { }
+	} thread;
 	struct inResource : public Resource, private visit_mock {
 		virtual void addInstance(Instance *instance) {
 			visit(); Resource::addInstance(instance);

@@ -17,7 +17,7 @@ InstanceThread::InstanceThread(Resource *resource, uint32_t event, ResourceThrea
 void InstanceThread::event(uint32_t event)
 {
 	// Если нить и без нас активна - прост сохраняем события.
-	if (event == m_event) {
+	if (event == m_event || event == RESOURCE_EVENT_DESTROY) {
 		m_thread->Activate();
 	}
 
