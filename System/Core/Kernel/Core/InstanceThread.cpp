@@ -4,12 +4,22 @@
 //
 
 #include "Kernel.h"
-#include "Resource.h"
+#include "ResourceThread.h"
 #include "InstanceThread.h"
 
 using namespace Core;
 
-InstanceThread::InstanceThread(Resource *resource, uint32_t event)
-	: Instance(resource)
+InstanceThread::InstanceThread(Resource *resource, uint32_t event, ResourceThread *thread)
+	: Instance(resource), m_event(event), m_thread(thread)
 {
+}
+
+void InstanceThread::event(uint32_t event)
+{
+	// Если нить и без нас активна - прост сохраняем события.
+	if (event == m_event) {
+		m_thread->Activate();
+	}
+
+	Instance::event(event);
 }

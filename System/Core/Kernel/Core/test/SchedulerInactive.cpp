@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(order)
 	BOOST_REQUIRE_EQUAL(scheduler.getThread(), &thread1);
 
 	// Но если время ожидания бесконечно - не возвращается вообще.
-	thread1.Sleep(CLOCK_MAX);
+	thread1.Sleep(TIMEOUT_INFINITY);
 	scheduler.addThread(&thread1);
 	BOOST_REQUIRE(scheduler.getThread() == 0);
 

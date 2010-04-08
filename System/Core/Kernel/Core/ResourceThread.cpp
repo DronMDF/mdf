@@ -172,10 +172,10 @@ laddr_t ResourceThread::getEntry() const
 	return m_entry;
 }
 
-void ResourceThread::Sleep (timeout_t timeout)
+void ResourceThread::Sleep(timeout_t timeout)
 {
-	if (timeout == CLOCK_MAX) {
-		m_wakeupstamp = CLOCK_MAX;
+	if (timeout == TIMEOUT_INFINITY) {
+		m_wakeupstamp = TIMESTAMP_FUTURE;
 	} else {
 		m_wakeupstamp = StubGetCurrentClock() + timeout;
 	}
@@ -183,6 +183,7 @@ void ResourceThread::Sleep (timeout_t timeout)
 
 void ResourceThread::Wait(Resource *resource, uint32_t event)
 {
+	STUB_ASSERT(resource == this, "Wait youself?");
 	m_event_instance = createInstance(resource, event);
 }
 
@@ -245,7 +246,7 @@ void ResourceThread::Kill()
 	}
 }
 
-const PageInstance *ResourceThread::PageFault (laddr_t addr, uint32_t *access)
+const PageInstance *ResourceThread::PageFault(laddr_t addr, uint32_t *access)
 {
 	if (addr == USER_MEMORY_BASE + RETMAGIC) {
 		Kill();
@@ -254,7 +255,7 @@ const PageInstance *ResourceThread::PageFault (laddr_t addr, uint32_t *access)
 
 	if (m_stack.inBounds(USER_STACK_BASE, addr)) {
 		*access &= RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE;
-		return m_stack.PageFault (addr - USER_STACK_BASE);
+		return m_stack.PageFault(addr - USER_STACK_BASE);
 	}
 
 	if (m_txa && m_txa->inBounds(USER_TXA_BASE, addr, m_txa_offset)) {
@@ -345,9 +346,9 @@ void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 	m_copyback_addr = buffer;
 }
 
-InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t event) const
+InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t event)
 {
-	return new InstanceThread(resource, event);
+	return new InstanceThread(resource, event, this);
 }
 
 extern "C"

@@ -60,7 +60,7 @@ private:
 
 	void setStack(offset_t request, size_t request_size, uint32_t access);
 
-	InstanceThread *createInstance(Resource *resource, uint32_t event) const;
+	InstanceThread *createInstance(Resource *resource, uint32_t event);
 	
 protected:
 	explicit ResourceThread (ResourceProcess *process = 0);

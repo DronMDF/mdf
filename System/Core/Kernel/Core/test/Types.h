@@ -46,6 +46,10 @@ typedef volatile int lock_t;
 
 typedef uint32_t timeout_t;
 
+static const clock_t TIMESTAMP_FUTURE = 0x7fffffffffffffffULL;
+static const clock_t __attribute__((deprecated)) CLOCK_MAX = TIMESTAMP_FUTURE;
+static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
+
 struct StubStackFrame {
 	uint32_t	flags;
 	size_t		txa_size;
@@ -53,8 +57,6 @@ struct StubStackFrame {
 	id_t		caller;
 	laddr_t		retmagic;
 };
-
-#define CLOCK_MAX INT_MAX
 
 // Специальные функции для тестовых целей.
 void TestIncrementCurrentClock(clock_t increment);

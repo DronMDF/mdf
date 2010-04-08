@@ -132,11 +132,19 @@ void Resource::addObserver(ResourceThread *thread, uint32_t event)
 
 void Resource::setEvent(uint32_t event)
 {
+	// Устаревшее
 	if (m_event == 0) {
 		m_event = new Event;
 	}
 
 	m_event->Action(event);
+
+	// новое
+	for (Instance *instance = m_instances.getFirst(); instance != 0;
+		instance = m_instances.getNext(instance))
+	{
+		instance->event(event);
+	}
 }
 
 void Resource::addInstance(Instance *instance)

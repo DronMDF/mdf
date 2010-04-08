@@ -73,8 +73,8 @@ ResourceThread *ResourceProcess::Call ()
 bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t base) const
 {
 	// Границы подгоняем до границ страниц
-	const laddr_t lowbound = base & PADDR_MASK;
-	const laddr_t hibound = (base + region->size() + PAGE_SIZE - 1) & PADDR_MASK;
+	const laddr_t lowbound = base & LADDR_MASK;
+	const laddr_t hibound = (base + region->size() + PAGE_SIZE - 1) & LADDR_MASK;
 
 	// Нижняя граница пользовательской памяти
 	if (lowbound < USER_MEMORY_BASE + PAGE_SIZE)
@@ -96,8 +96,8 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		if (exregion == 0) continue;
 
 		laddr_t raddr = instance->addr();
-		if (hibound <= (raddr & PADDR_MASK)) continue;
-		if (raddr + exregion->size() <= (base & PADDR_MASK)) continue;
+		if (hibound <= (raddr & LADDR_MASK)) continue;
+		if (raddr + exregion->size() <= (base & LADDR_MASK)) continue;
 
 		return false;
 	}
@@ -113,7 +113,7 @@ laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, laddr_t
 	if (ubase == 0) {
 		// Адрес не определен - определяем
 		for (laddr_t base = 0; ; base = 0) {
-			base = (CoreRandom() & PADDR_MASK) + region->offset();
+			base = (CoreRandom() & LADDR_MASK) + region->offset();
 
 			if (CheckRegionPlace (region, base))
 				return base;

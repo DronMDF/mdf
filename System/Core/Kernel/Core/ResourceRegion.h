@@ -45,7 +45,7 @@ protected:
 	
 	int bindRegion(ResourceRegion *parent, offset_t poffset, 
 		       size_t psize, offset_t skip);
-	int bindPhysical(offset_t poffset, size_t psize, offset_t skip);
+	int bindPhysical(paddr_t poffset, size_t psize, offset_t skip);
 	
 public:
 	ResourceRegion(size_t size, uint32_t access);

@@ -93,10 +93,10 @@ BOOST_AUTO_TEST_CASE(timestamp)
 	// Таймстамп не должен меняться - таймстамп показывает время последнего вызова.
 	BOOST_REQUIRE_EQUAL(thread.getTimestamp(), 10);
 	BOOST_REQUIRE_GT(thread.getWakeupstamp(), StubGetCurrentClock());
-	BOOST_REQUIRE_NE(thread.getWakeupstamp(), CLOCK_MAX);
+	BOOST_REQUIRE_NE(thread.getWakeupstamp(), TIMESTAMP_FUTURE);
 
-	thread.Sleep(CLOCK_MAX);
-	BOOST_REQUIRE_EQUAL(thread.getWakeupstamp(), CLOCK_MAX);
+	thread.Sleep(TIMEOUT_INFINITY);
+	BOOST_REQUIRE_EQUAL(thread.getWakeupstamp(), TIMESTAMP_FUTURE);
 }
 
 BOOST_AUTO_TEST_CASE(info_current)
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(activate)
 	BOOST_REQUIRE(scheduler.m_inactives == 0);
 	BOOST_REQUIRE(scheduler.m_killed == 0);
 	
-	thread.Sleep(CLOCK_MAX);
+	thread.Sleep(TIMEOUT_INFINITY);
 	scheduler.addInactiveThread(&thread);
 
 	thread.Activate();

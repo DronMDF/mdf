@@ -69,7 +69,7 @@ size_t Memory::getSize() const
 // psize			   +------+	<- область будет импортирована в memory
 // m_size		-----------+------+---	<- область memory
 // skip			-----------|	  |	<- смещение
-int Memory::bindPhysical(offset_t poffset, size_t size, offset_t skip)
+int Memory::bindPhysical(paddr_t poffset, size_t size, offset_t skip)
 {
 	if (poffset % PAGE_SIZE != skip % PAGE_SIZE) return ERROR_UNALIGN;
 	if (skip + size > m_size) return ERROR_OVERSIZE;

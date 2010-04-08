@@ -54,7 +54,7 @@ public:
 
 	size_t getSize() const;
 
-	virtual int bindPhysical(offset_t poffset, size_t size, offset_t skip);
+	virtual int bindPhysical(paddr_t poffset, size_t size, offset_t skip);
 
 	void Map(const void *src, size_t size, offset_t offset = 0);
 

@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(testRunSinchronized)
 	helper.m_called = &called;
 
 	helper.runSinchronized();
-	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), CLOCK_MAX);
+	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), TIMESTAMP_FUTURE);
 	BOOST_REQUIRE_EQUAL(subsched->thread, &caller);
 }
 

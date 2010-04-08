@@ -48,7 +48,7 @@ Memory *ResourceRegion::getMemory()
 // m_size		     ------+------+---	<- область региона
 // skip			     ------|	  |	<- смещение в регионе
 
-int ResourceRegion::bindPhysical(offset_t poffset, size_t psize, offset_t skip)
+int ResourceRegion::bindPhysical(paddr_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
 	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
@@ -109,9 +109,9 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 	
 		ResourceRegion *parent = resource->asRegion();
 		if (parent == 0) return ERROR_INVALIDID;
-			
-		return bindRegion(parent, bindparam->offset, bindparam->size, 
-				  bindparam->shift);
+
+		return bindRegion(parent, min(bindparam->offset, parent->size()),
+				  bindparam->size, bindparam->shift);
 	}
 
 	return Resource::Modify(param_id, param, param_size);

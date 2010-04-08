@@ -108,7 +108,7 @@ void CallHelper::runSinchronized() const
 	STUB_ASSERT(m_caller == 0, "Fatal in kernel mode");
 
 	// Текущая нить ждет вечно
-	m_caller->Sleep(CLOCK_MAX);
+	m_caller->Sleep(TIMEOUT_INFINITY);
 	Scheduler().addInactiveThread(m_caller);
 
 	// Новая нить уведомит когда завершится

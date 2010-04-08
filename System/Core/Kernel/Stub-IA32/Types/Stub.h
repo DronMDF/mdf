@@ -43,60 +43,62 @@ typedef uint32_t offset_t;
 typedef uint64_t paddr_t;
 typedef uint64_t clock_t;
 
-#define CLOCK_MAX 0xffffffffffffffffULL
+static const clock_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
+static const clock_t __attribute__((deprecated)) CLOCK_MAX = TIMESTAMP_FUTURE;
+static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
 typedef volatile uint32_t lock_t;
 
-#define PAGE_SIZE 0x00001000UL
-#define LADDR_MASK 0xfffff000UL
-#define PADDR_MASK 0xfffffffffffff000ULL
+static const size_t PAGE_SIZE  = 4096;
+static const size_t PDIR_SIZE = PAGE_SIZE * 1024;
+static const sizex_t LINEAR_MEMORY_SIZE = 0x100000000ULL;
 
-#define LINEAR_MEMORY_SIZE	0x100000000ULL
-#define PDIR_SIZE		(PAGE_SIZE * 1024)
+static const uint32_t LADDR_MASK = 0xfffff000U;
+static const uint64_t PADDR_MASK = 0xfffffffffffff000ULL;
+
+static const size_t MEBIBYTE = 1024 * 1024;
 
 // -----------------------------------------------------------------------------
 // Распределение памяти ядра
-#define KERNEL_MEMORY_SIZE	(256 * 1024 * 1024)	// 256MiB
+static const size_t KERNEL_MEMORY_SIZE = 256 * MEBIBYTE;	// 256MiB
 
-#define KERNEL_TEMP_SIZE	(4 * 1024 * 1024)
-#define KERNEL_PAGETABLE_SIZE	(8 * 1024 * 1024)	// С рассчетом на PAE
+static const size_t KERNEL_TEMP_SIZE = 4 * MEBIBYTE;
+static const size_t KERNEL_PAGETABLE_SIZE = 8 * MEBIBYTE;	// С рассчетом на PAE
 
-#define KERNEL_TEMP_BASE	(KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE - KERNEL_TEMP_SIZE)
-STATIC_ASSERT (KERNEL_TEMP_BASE % PDIR_SIZE == 0);
+static const laddr_t KERNEL_TEMP_BASE =  KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE - KERNEL_TEMP_SIZE;
 
-#define KERNEL_PAGETABLE_BASE	(KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE)
-STATIC_ASSERT (KERNEL_PAGETABLE_BASE % PDIR_SIZE == 0);
+static const laddr_t KERNEL_PAGETABLE_BASE = KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE;
 
-#define KERNEL_STACK_HOLE	(LINEAR_MEMORY_SIZE - PAGE_SIZE * 2)
-#define KERNEL_STACK_BASE	(KERNEL_STACK_HOLE + PAGE_SIZE)
-#define KERNEL_STACK_SIZE	(LINEAR_MEMORY_SIZE - KERNEL_STACK_HOLE)
+static const laddr_t KERNEL_STACK_HOLE = LINEAR_MEMORY_SIZE - PAGE_SIZE * 2;
+static const laddr_t KERNEL_STACK_BASE = KERNEL_STACK_HOLE + PAGE_SIZE;
+static const size_t KERNEL_STACK_SIZE = LINEAR_MEMORY_SIZE - KERNEL_STACK_HOLE;
 
-// На этом адресе заканчивается память приложения.
+STATIC_ASSERT(KERNEL_TEMP_BASE % PDIR_SIZE == 0);
+STATIC_ASSERT(KERNEL_PAGETABLE_BASE % PDIR_SIZE == 0);
 
 // -----------------------------------------------------------------------------
 // Распределение памяти приложения.
-#define USER_MEMORY_BASE	KERNEL_MEMORY_SIZE
-STATIC_ASSERT (USER_MEMORY_BASE % PDIR_SIZE == 0);
-
-#define USER_MEMORY_SIZE 	(KERNEL_STACK_HOLE - USER_MEMORY_BASE)
-STATIC_ASSERT (USER_MEMORY_BASE + USER_MEMORY_SIZE <= LINEAR_MEMORY_SIZE);
-
+static const laddr_t USER_MEMORY_BASE = KERNEL_MEMORY_SIZE;
+static const size_t USER_MEMORY_SIZE = KERNEL_STACK_HOLE - USER_MEMORY_BASE;
 // TXA - порядка 4МиБ без небольшого...
-#define USER_TXA_HOLE		(LINEAR_MEMORY_SIZE - PDIR_SIZE + PAGE_SIZE * 16)
-#define USER_TXA_BASE		(USER_TXA_HOLE + PAGE_SIZE)
-#define USER_TXA_SIZE		(KERNEL_STACK_HOLE - USER_TXA_BASE)
-
+static const laddr_t USER_TXA_HOLE = LINEAR_MEMORY_SIZE - PDIR_SIZE + PAGE_SIZE * 16;
+static const laddr_t USER_TXA_BASE = USER_TXA_HOLE + PAGE_SIZE;
+static const size_t USER_TXA_SIZE = KERNEL_STACK_HOLE - USER_TXA_BASE;
 // Стек порядка 12МиБ с небольшим
-#define USER_STACK_HOLE		(LINEAR_MEMORY_SIZE - PDIR_SIZE * 4)
-#define USER_STACK_BASE		(USER_STACK_HOLE + PAGE_SIZE)
-#define USER_STACK_SIZE		(USER_TXA_HOLE - USER_STACK_BASE)
+static const laddr_t USER_STACK_HOLE = LINEAR_MEMORY_SIZE - PDIR_SIZE * 4;
+static const laddr_t USER_STACK_BASE = USER_STACK_HOLE + PAGE_SIZE;
+static const size_t USER_STACK_SIZE = USER_TXA_HOLE - USER_STACK_BASE;
 
-#define USER_CODE_SIZE		(USER_STACK_BASE - USER_MEMORY_BASE)
+static const size_t USER_CODE_SIZE = USER_STACK_BASE - USER_MEMORY_BASE;
 
-#define USER_PAGETABLE_BASE	(KERNEL_PAGETABLE_BASE + USER_MEMORY_BASE / PAGE_SIZE * 4)
-#define USER_PAGETABLE_SIZE	(USER_MEMORY_SIZE / PAGE_SIZE * 4)
+static const laddr_t USER_PAGETABLE_BASE = KERNEL_PAGETABLE_BASE + USER_MEMORY_BASE / PAGE_SIZE * 4;
+static const size_t USER_PAGETABLE_SIZE = USER_MEMORY_SIZE / PAGE_SIZE * 4;
+
+STATIC_ASSERT (USER_MEMORY_BASE % PDIR_SIZE == 0);
+STATIC_ASSERT (USER_MEMORY_BASE + USER_MEMORY_SIZE <= LINEAR_MEMORY_SIZE);
 STATIC_ASSERT(USER_PAGETABLE_BASE % PAGE_SIZE == 0);
 
+// -----------------------------------------------------------------------------
 struct StubStackFrame {
 	laddr_t		retmagic;
 	id_t		caller;

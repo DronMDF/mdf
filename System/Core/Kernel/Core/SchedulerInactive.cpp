@@ -38,7 +38,7 @@ void SchedulerInactive::addThread(ResourceThread *thread)
 {
 	STUB_ASSERT(thread == 0, "thread invalid");
 
-	if (thread->getWakeupstamp() == CLOCK_MAX) {
+	if (thread->getWakeupstamp() == TIMESTAMP_FUTURE) {
 		m_infinity.Insert(thread);
 		return;
 	}
