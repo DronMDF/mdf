@@ -91,7 +91,7 @@ public:
 	ResourceProcess *getProcess() const;
 
 	void Sleep(timeout_t timeout);
-	void Wait (Resource *resource, int event);
+	void Wait(Resource *resource, uint32_t event);
 
 	bool isActive () const;
 

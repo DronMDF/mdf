@@ -181,7 +181,7 @@ void ResourceThread::Sleep (timeout_t timeout)
 	}
 }
 
-void ResourceThread::Wait(Resource *resource, int event)
+void ResourceThread::Wait(Resource *resource, uint32_t event)
 {
 	m_event_instance = createInstance(resource, event);
 }

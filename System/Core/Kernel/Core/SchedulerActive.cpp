@@ -42,7 +42,7 @@ uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
 	const uint64_t index = StubGetCurrentClock() -
 		thread->getTimestamp() + thread->getPriority();
 
-	return min(index, 0xffffffffULL);
+	return min(index, 0xffffffffU);
 }
 
 bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,

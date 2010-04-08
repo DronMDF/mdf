@@ -10,29 +10,31 @@
 
 namespace Core {
 
-template<typename T>
-T max(const T &a, const T &b)
-{
+template<typename T> T max(const T &a, const T &b) {
 	return (a > b) ? a : b;
 }
 
-template<typename T>
-T min(const T &a, const T &b)
-{
+template<typename T> T min(const T &a, const T &b) {
 	return (a < b) ? a : b;
 }
 
-template<typename T>
-T min(const T &a, const T &b, const T &c)
-{
+template<typename T> T min(const T &a, const T &b, const T &c) {
 	return min(min(a, b), c);
 }
 
-template<typename T, typename E>
-bool isSet(const T &value, const E &bits)
-{
-	T b = bits;
-	return (value & b) == b;
+template<typename T> bool isSet(const T &value, const T &bits) {
+	return (value & bits) == bits;
+}
+
+// Разрешение неоднозначностей
+inline uint32_t min(uint64_t a, uint32_t b) {
+	if (a > 0xffffffffU) return b;
+	return (uint32_t(a) < b) ? uint32_t(a) : b;
+}
+
+inline bool isSet(uint32_t value, int bits) {
+	STUB_ASSERT(bits < 0, "Bit operation with negative");
+	return (value & uint32_t(bits)) == uint32_t(bits);
 }
 
 void InitUtils (void);

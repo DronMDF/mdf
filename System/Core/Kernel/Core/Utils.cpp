@@ -23,18 +23,18 @@ protected:
 
 	void reload (void);
 
-	uint32_t mixBits (const uint32_t u, const uint32_t v) const
+	uint32_t mixBits(uint32_t u, uint32_t v) const
 	{
-		return uint32_t((u & 0x80000000UL) | (v & 0x7fffffffUL));
+		return (u & 0x80000000U) | (v & 0x7fffffffU);
 	}
 
-	uint32_t twist (const uint32_t m, const uint32_t s0, const uint32_t s1) const
+	uint32_t twist(uint32_t m, uint32_t s0, uint32_t s1) const
 	{
 		const uint32_t y = mixBits (s0, s1);
-		return uint32_t(m ^ (y >> 1) ^ ((y & 1) ? 0x9908b0dfUL : 0UL));
+		return m ^ (y >> 1) ^ ((y & 1) ? 0x9908b0dfU : 0U);
 	}
 
-	uint32_t xorBits (const int i) const
+	uint32_t xorBits(unsigned int i) const
 	{
 		return state[i] ^ (state[i] >> 30);
 	}
@@ -56,8 +56,8 @@ public:
 void RandomGenerator::entropy ()
 {
 	state[0] = uint32_t(StubGetTimestampCounter());
-	for (int i = 1; i < N; i++)
-		state[i] = 1812433253UL * xorBits(i - 1) + uint32_t(i);
+	for (unsigned int i = 1; i < N; i++)
+		state[i] = 1812433253U * xorBits(i - 1) + i;
 	reload ();
 }
 
@@ -115,8 +115,8 @@ uint32_t RandomGenerator::get()
 
 	// Tempering
 	y ^= (y >> 11);
-	y ^= (y << 7) & 0x9d2c5680UL;
-	y ^= (y << 15) & 0xefc60000UL;
+	y ^= (y << 7) & 0x9d2c5680U;
+	y ^= (y << 15) & 0xefc60000U;
 	y ^= (y >> 18);
 
 	return y;

@@ -21,7 +21,7 @@ using namespace Core;
 // Корочное апи...
 
 extern "C"
-int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
+int CoreWait (const Task *outask, id_t id, uint32_t event, timeout_t timeout)
 {
 	Core::ResourceThread *outhread =
 		reinterpret_cast<Core::ResourceThread *>(StubTaskGetThread(outask));
@@ -45,7 +45,7 @@ int CoreWait (const Task *outask, id_t id, int event, timeout_t timeout)
 
 				// Нить собирается кого-то ждать...
 				// Поставим ее в очередь на ожидание к кому-то.
-				outhread->Wait (resource, event);
+				outhread->Wait(resource, event);
 			}
 
 			outhread->Sleep(timeout);
@@ -156,7 +156,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 }
 
 extern "C"
-int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, int flags)
+int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, uint32_t flags)
 {
 	CallHelper helper(task);
 
