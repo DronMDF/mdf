@@ -29,15 +29,26 @@ BOOST_AUTO_TEST_CASE(testCreateInstance)
 	thread.Wait(&resource, 666);	// Инстанция создается здесь
 }
 
+struct inThread : public testThread, private visit_mock {
+	virtual void Activate() { visit(); }
+};
+
 BOOST_AUTO_TEST_CASE(testDeliveryWanted)
 {
-	struct inlineThread : public testThread, private visit_mock {
-		virtual void Activate() { visit(); }
-	} thread;
+	inThread thread;
 	testResource resource;
 	
 	thread.Wait(&resource, 666);	// Инстанция создается здесь
 	resource.setEvent(666);		// Здесь она должна дернуть метод thread->Activate
+}
+
+BOOST_AUTO_TEST_CASE(testDeliveryDie)
+{
+	inThread thread;
+	testResource resource;
+
+	thread.Wait(&resource, 666);	// Инстанция создается здесь
+	// При смерти ресурс должен уведомить нить.
 }
 
 BOOST_AUTO_TEST_SUITE_END()
