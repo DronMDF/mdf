@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(suiteSchedulerActive)
 
 class testThread : public ResourceThread {
 public:
-	testThread(clock_t timestamp, uint32_t priority = 128)
+	testThread(tick_t timestamp, uint32_t priority = 128)
 		: ResourceThread()
 	{
 		setTimestamp(timestamp);

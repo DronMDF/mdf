@@ -113,7 +113,7 @@ enum SELECTOR_PL {
 #define STUB_MAX_CPU_COUNT	2048
 
 static volatile descriptor_t *GDT = nullptr;
-static volatile clock_t *task_time = nullptr;
+static volatile tick_t *task_time = nullptr;
 
 enum GDT_IDX {
 	GDT_CPU_BASE	= 2048,
@@ -239,12 +239,12 @@ void __init__ StubInitGDT ()
 	StubSetGDT (GDT, gdt_size);
 
 	// Выделить память для таймеров слотов задач
-	const int task_time_size = sizeof (clock_t) * STUB_MAX_TASK_COUNT;
-	task_time = StubMemoryAllocAligned (task_time_size, sizeof (clock_t));
+	const int task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
+	task_time = StubMemoryAllocAligned(task_time_size, sizeof(tick_t));
 	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
 
 	// Чистить эту память в принципе не обязательно, но для порядку почистим.
-	StubMemoryClear ((clock_t *)task_time, task_time_size);
+	StubMemoryClear(task_time, task_time_size);
 
 	CorePrint ("GDT initialized.\n");
 }
@@ -393,7 +393,7 @@ void StubTaskSlotUse(tss_t *tss)
 {
 	if (tss->slot == SLOT_INVALID) {
 		unsigned int slot = SLOT_INVALID;
-		clock_t oldest = 0xFFFFFFFFFFFFFFFFLLU;
+		tick_t oldest = TIMESTAMP_FUTURE;
 		bool slot_used = false;
 
 		for (int i = 0; i < STUB_MAX_TASK_COUNT; i++) {
@@ -514,9 +514,9 @@ void StubTaskExecute (const Task *task)
 // {
 // 	const uint32_t us = 10000;
 //
-// 	const clock_t start_tsc = StubGetTimestampCounter();
+// 	const tick_t start_tsc = StubGetTimestampCounter();
 // 	StubMicroSleep (us);
-// 	const clock_t end_tsc = StubGetTimestampCounter();
+// 	const tick_t end_tsc = StubGetTimestampCounter();
 //
 // 	return (end_tsc - start_tsc) * 1000000 / us;
 // }

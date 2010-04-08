@@ -55,7 +55,8 @@ public:
 
 void RandomGenerator::entropy ()
 {
-	state[0] = uint32_t(StubGetTimestampCounter());
+	// TODO: Проинициализировать каким нибудь значением.
+	state[0] = 0xDEADBEAF;
 	for (unsigned int i = 1; i < N; i++)
 		state[i] = 1812433253U * xorBits(i - 1) + i;
 	reload ();

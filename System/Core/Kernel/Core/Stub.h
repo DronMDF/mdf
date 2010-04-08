@@ -68,13 +68,10 @@ void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
 void StubPrintChar (const int c);
 int StubGetChar (void);
 
-// TODO: Таймстамп каунтер процессора - исключить надо.
-clock_t StubGetTimestampCounter ();
-
 void StubLock (lock_t * const lock);
 void StubUnlock (lock_t * const lock);
 
-clock_t StubGetCurrentClock ();
+tick_t StubGetCurrentClock();
 
 // TODO: необходимо заменить на CoreInfoValue
 int StubInfoValue(void *info, size_t *info_size, const void *data, size_t data_size);

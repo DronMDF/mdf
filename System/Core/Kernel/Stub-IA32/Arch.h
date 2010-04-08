@@ -25,4 +25,4 @@ void StubTaskBootstrapCreate();
 void StubInitGDT ();
 void StubInitIDT ();
 
-clock_t StubGetTSC (void);
+tick_t StubGetTSC (void);

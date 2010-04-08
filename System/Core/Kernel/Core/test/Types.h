@@ -45,9 +45,9 @@ typedef unsigned long offset_t;
 typedef volatile int lock_t;
 
 typedef uint32_t timeout_t;
+typedef uint64_t tick_t;
 
-static const clock_t TIMESTAMP_FUTURE = 0x7fffffffffffffffULL;
-static const clock_t __attribute__((deprecated)) CLOCK_MAX = TIMESTAMP_FUTURE;
+static const tick_t TIMESTAMP_FUTURE = 0x7fffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
 struct StubStackFrame {
@@ -59,6 +59,6 @@ struct StubStackFrame {
 };
 
 // Специальные функции для тестовых целей.
-void TestIncrementCurrentClock(clock_t increment);
+void TestIncrementCurrentClock(tick_t increment);
 void TestSetStubTaskDestroyReaction(int react);
 

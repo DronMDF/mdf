@@ -44,8 +44,8 @@ protected:
 	uint32_t m_txa_access;
 
 private:
-	clock_t m_timestamp;
-	clock_t m_wakeupstamp;
+	tick_t m_timestamp;
+	tick_t m_wakeupstamp;
 
 	uint32_t m_priority;
 
@@ -81,9 +81,9 @@ public:
 	uint32_t getPriority () const;
 	void setPriority (uint32_t priority);
 
-	clock_t getTimestamp() const;
-	void setTimestamp(clock_t timestamp);
-	clock_t getWakeupstamp() const;
+	tick_t getTimestamp() const;
+	void setTimestamp(tick_t timestamp);
+	tick_t getWakeupstamp() const;
 
 	laddr_t getEntry() const;
 

@@ -200,12 +200,6 @@ int StubGetChar ()
 	return ch;
 }
 
-// Таймер
-clock_t StubGetTimestampCounter ()
-{
-	return 0;
-}
-
 void StubLock (lock_t * const)
 {
 }
@@ -214,9 +208,9 @@ void StubUnlock (lock_t * const)
 {
 }
 
-static clock_t counter = 100;
+static tick_t counter = 100;
 
-clock_t StubGetCurrentClock ()
+tick_t StubGetCurrentClock ()
 {
 	return counter;
 }
@@ -241,7 +235,7 @@ void StubCPUIdle()
 } // extern "C"
 
 // Вспомогательно-тестовые методы
-void TestIncrementCurrentClock(clock_t increment)
+void TestIncrementCurrentClock(tick_t increment)
 {
 	counter += increment;
 }

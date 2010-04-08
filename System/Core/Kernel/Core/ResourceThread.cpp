@@ -141,17 +141,17 @@ void ResourceThread::setPriority(uint32_t priority)
 	m_priority = priority;
 }
 
-clock_t ResourceThread::getTimestamp() const
+tick_t ResourceThread::getTimestamp() const
 {
 	return m_timestamp;
 }
 
-clock_t ResourceThread::getWakeupstamp() const
+tick_t ResourceThread::getWakeupstamp() const
 {
 	return m_wakeupstamp;
 }
 
-void ResourceThread::setTimestamp(clock_t timestamp)
+void ResourceThread::setTimestamp(tick_t timestamp)
 {
 	m_timestamp = timestamp;
 }

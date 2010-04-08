@@ -93,18 +93,18 @@ uint32_t StubI8254ReadCounter2 ()
 	return (hi << 8) | low;
 }
 
-clock_t StubGetTimestampCounter ()
+tick_t StubGetTimestampCounter ()
 {
 	if (StubCPUHasTSC()) {
 		return StubGetTSC();
 	}
 
 	// Если rdtsc не поддерживается - будем симулировать...
-	static clock_t tsc = 0;
+	static tick_t tsc = 0;
 	return tsc++;
 }
 
-static clock_t stubClock = 0;
+static tick_t stubClock = 0;
 
 void StubClockHandler()
 {
@@ -115,7 +115,7 @@ void StubClockHandler()
 	CoreWait(task, 0, 0, 0);
 }
 
-clock_t StubGetCurrentClock()
+tick_t StubGetCurrentClock()
 {
 	return stubClock;
 }

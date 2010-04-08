@@ -41,10 +41,9 @@ typedef uint32_t id_t;
 typedef uint32_t laddr_t;
 typedef uint32_t offset_t;
 typedef uint64_t paddr_t;
-typedef uint64_t clock_t;
+typedef uint64_t tick_t;
 
-static const clock_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
-static const clock_t __attribute__((deprecated)) CLOCK_MAX = TIMESTAMP_FUTURE;
+static const tick_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
 typedef volatile uint32_t lock_t;
