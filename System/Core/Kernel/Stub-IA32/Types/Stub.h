@@ -19,7 +19,6 @@
 #define __noreturn__		__attribute__((noreturn))
 
 // Стандартные типы си
-
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
 typedef signed short int16_t;
@@ -43,12 +42,13 @@ typedef uint32_t offset_t;
 typedef uint64_t paddr_t;
 typedef uint64_t tick_t;
 
+typedef volatile uint32_t lock_t;
+
+// -----------------------------------------------------------------------------
 static const tick_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
-typedef volatile uint32_t lock_t;
-
-static const size_t PAGE_SIZE  = 4096;
+static const size_t PAGE_SIZE = 4096;
 static const size_t PDIR_SIZE = PAGE_SIZE * 1024;
 static const sizex_t LINEAR_MEMORY_SIZE = 0x100000000ULL;
 

@@ -1,7 +1,7 @@
 
 Description "Типы для архитектуры IA32";
 
-Release 0.0.54.18
+Release 0.0.54.22
 {
 	Depend System-Core/MDF-Env-0.0.13;
 

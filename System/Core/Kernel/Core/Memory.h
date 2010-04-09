@@ -28,7 +28,7 @@ public:
 	enum MODE {
 		NONE = 0,
 		ALLOC = 1,
-		ZEROING = 2,
+		ZEROING = 2
 	};
 
 private:

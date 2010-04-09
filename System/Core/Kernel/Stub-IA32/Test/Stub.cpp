@@ -5,8 +5,8 @@
 
 extern "C" {
 
-void __init_begin() {};
-void __bss_end() {};
+void __init_begin() {}
+void __bss_end() {}
 
 void StubCreatePageRegion(paddr_t, sizex_t, int)
 {

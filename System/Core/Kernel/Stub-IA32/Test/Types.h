@@ -31,6 +31,7 @@ typedef unsigned long offset_t;
 typedef uint64_t sizex_t;
 typedef uint32_t timeout_t;
 typedef volatile uint32_t lock_t;
+typedef uint64_t tick_t;
 
 #define PAGE_SIZE 4096
 #define PADDR_MASK (~(PAGE_SIZE - 1))

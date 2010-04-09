@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(memory_place)
 	info.mmap_addr = 0;
 	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, 0) == 0);
 
-	const MultibootMemory mmap1[] = {};
+	const MultibootMemory mmap1[1] = {};
 	info.mmap_length = 0;
 	info.mmap_addr = &(mmap1[0]);
 	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, 0) == 0);
