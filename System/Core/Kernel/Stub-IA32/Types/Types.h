@@ -48,54 +48,48 @@ typedef volatile uint32_t lock_t;
 static const tick_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
-static const size_t PAGE_SIZE = 4096;
-static const size_t PDIR_SIZE = PAGE_SIZE * 1024;
-static const sizex_t LINEAR_MEMORY_SIZE = 0x100000000ULL;
+// Эту штуку вообще надо выкинуть нафиг
+static const size_t PDIR_SIZE = 0x400000; //PAGE_SIZE * 1024;
 
 static const uint32_t LADDR_MASK = 0xfffff000U;
 static const uint64_t PADDR_MASK = 0xfffffffffffff000ULL;
 
-static const size_t MEBIBYTE = 1024 * 1024;
+#define PAGE_SIZE	4096U
+
+#define MEBIBYTE (1024U * 1024U)
 
 // -----------------------------------------------------------------------------
-// Распределение памяти ядра
-static const size_t KERNEL_MEMORY_SIZE = 256 * MEBIBYTE;	// 256MiB
+// Распределение памяти
 
-static const size_t KERNEL_TEMP_SIZE = 4 * MEBIBYTE;
-static const size_t KERNEL_PAGETABLE_SIZE = 8 * MEBIBYTE;	// С рассчетом на PAE
+#define KERNEL_MEMORY_SIZE	(256U * MEBIBYTE)
 
-static const laddr_t KERNEL_TEMP_BASE =  KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE - KERNEL_TEMP_SIZE;
+// Неперекрывающиеся области памяти в порядке следования
+#define KERNEL_TEMP_SIZE	(4U * MEBIBYTE)
+#define KERNEL_PAGETABLE_SIZE	(1048576U * 8U) // 1048576 страниц по 8 байт на дескриптор (PAE)
+#define USER_CODE_SIZE		((4096U - 256U - 16U) * MEBIBYTE - PAGE_SIZE)
+//	дырка			PAGE_SIZE
+#define USER_STACK_SIZE		(12U * MEBIBYTE + 16U * PAGE_SIZE)
+//	дырка			PAGE_SIZE
+#define USER_TXA_SIZE		(4U * MEBIBYTE - 19U * PAGE_SIZE)
+//	дырка			PAGE_SIZE
+#define KERNEL_STACK_SIZE 	PAGE_SIZE
 
-static const laddr_t KERNEL_PAGETABLE_BASE = KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE;
+// Базовые адреса неперекрывающихся областей
+#define KERNEL_TEMP_BASE	(KERNEL_PAGETABLE_BASE - KERNEL_TEMP_SIZE)
+#define KERNEL_PAGETABLE_BASE	(KERNEL_MEMORY_SIZE - KERNEL_PAGETABLE_SIZE)
+#define USER_MEMORY_BASE	KERNEL_MEMORY_SIZE
+#define USER_STACK_BASE		(USER_MEMORY_BASE + USER_CODE_SIZE + PAGE_SIZE)
+#define USER_TXA_BASE		(USER_STACK_BASE + USER_STACK_SIZE + PAGE_SIZE)
+#define KERNEL_STACK_BASE	(USER_TXA_BASE + USER_TXA_SIZE + PAGE_SIZE)
 
-static const laddr_t KERNEL_STACK_HOLE = LINEAR_MEMORY_SIZE - PAGE_SIZE * 2;
-static const laddr_t KERNEL_STACK_BASE = KERNEL_STACK_HOLE + PAGE_SIZE;
-static const size_t KERNEL_STACK_SIZE = LINEAR_MEMORY_SIZE - KERNEL_STACK_HOLE;
+#define USER_MEMORY_SIZE	(KERNEL_STACK_BASE - USER_MEMORY_BASE - PAGE_SIZE)
 
-STATIC_ASSERT(KERNEL_TEMP_BASE % PDIR_SIZE == 0);
-STATIC_ASSERT(KERNEL_PAGETABLE_BASE % PDIR_SIZE == 0);
+// USER_PAGETABLE_* зависит от использования PAE
+#define USER_PAGETABLE_BASE	(KERNEL_PAGETABLE_BASE + USER_MEMORY_BASE / PAGE_SIZE * 4U)
+#define USER_PAGETABLE_SIZE	(USER_MEMORY_SIZE / PAGE_SIZE * 4U)
 
 // -----------------------------------------------------------------------------
 // Распределение памяти приложения.
-static const laddr_t USER_MEMORY_BASE = KERNEL_MEMORY_SIZE;
-static const size_t USER_MEMORY_SIZE = KERNEL_STACK_HOLE - USER_MEMORY_BASE;
-// TXA - порядка 4МиБ без небольшого...
-static const laddr_t USER_TXA_HOLE = LINEAR_MEMORY_SIZE - PDIR_SIZE + PAGE_SIZE * 16;
-static const laddr_t USER_TXA_BASE = USER_TXA_HOLE + PAGE_SIZE;
-static const size_t USER_TXA_SIZE = KERNEL_STACK_HOLE - USER_TXA_BASE;
-// Стек порядка 12МиБ с небольшим
-static const laddr_t USER_STACK_HOLE = LINEAR_MEMORY_SIZE - PDIR_SIZE * 4;
-static const laddr_t USER_STACK_BASE = USER_STACK_HOLE + PAGE_SIZE;
-static const size_t USER_STACK_SIZE = USER_TXA_HOLE - USER_STACK_BASE;
-
-static const size_t USER_CODE_SIZE = USER_STACK_BASE - USER_MEMORY_BASE;
-
-static const laddr_t USER_PAGETABLE_BASE = KERNEL_PAGETABLE_BASE + USER_MEMORY_BASE / PAGE_SIZE * 4;
-static const size_t USER_PAGETABLE_SIZE = USER_MEMORY_SIZE / PAGE_SIZE * 4;
-
-STATIC_ASSERT (USER_MEMORY_BASE % PDIR_SIZE == 0);
-STATIC_ASSERT (USER_MEMORY_BASE + USER_MEMORY_SIZE <= LINEAR_MEMORY_SIZE);
-STATIC_ASSERT(USER_PAGETABLE_BASE % PAGE_SIZE == 0);
 
 // -----------------------------------------------------------------------------
 struct StubStackFrame {

@@ -47,7 +47,7 @@ typedef volatile int lock_t;
 typedef uint32_t timeout_t;
 typedef uint64_t tick_t;
 
-static const tick_t TIMESTAMP_FUTURE = 0x7fffffffffffffffU;
+static const tick_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
 struct StubStackFrame {

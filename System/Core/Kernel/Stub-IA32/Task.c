@@ -71,7 +71,7 @@ void *StubTaskGetThread (const Task *task)
 }
 
 void StubSetStackFrame (struct StubStackFrame *frame, id_t caller,
-	offset_t txa_offset, size_t txa_size, int flags)
+	offset_t txa_offset, size_t txa_size, uint32_t flags)
 {
 	frame->flags = flags;
 	frame->txa_size = txa_size;
