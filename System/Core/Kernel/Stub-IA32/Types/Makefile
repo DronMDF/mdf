@@ -7,7 +7,7 @@ PREFIX = $(MDF_IMAGE)/Develop/Include/$(ARCH)/MDF
 
 all: $(PREFIX)/Types.h $(PREFIX)/KernelImp.h
 
-$(PREFIX)/Types.h : Stub.h
+$(PREFIX)/Types.h : Types.h
 	$(ECHO) Copy $<...
 	$(MKDIR) -p $(dir $@)
 	$(CP) $< $@
