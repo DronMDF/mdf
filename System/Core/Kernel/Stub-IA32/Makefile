@@ -22,6 +22,9 @@ FLAGS+= --include "$(MDF_DEV)/Include/IA32/MDF/Types.h"
 # Стандартные инклюды нафиг не нужны, мои нужны.
 FLAGS+= -I $(MDF_DEV)/Include/MDF
 
+# Очень много ругани - пока поосторожничаем.
+FLAGS += -Wno-conversion -Wno-sign-conversion
+
 CFLAGS += ${FLAGS}
 CXXFLAGS += ${FLAGS}
 

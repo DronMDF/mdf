@@ -127,6 +127,7 @@ struct KernelCreateCallParam {
 };
 
 struct KernelCreateCustomParam {
+	uint32_t reserved;
 };
 
 

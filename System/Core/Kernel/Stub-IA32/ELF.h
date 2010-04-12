@@ -138,9 +138,10 @@ enum {
 	SHT_SHLIB	= 10,
 	SHT_DYNSYM	= 11,
 	SHT_LOPROC	= 0x70000000,
-	SHT_HIPROC	= 0x7fffffff,
-	SHT_LOUSER	= 0x80000000,
-	SHT_HIUSER	= 0xffffffff,
+	SHT_HIPROC	= 0x7fffffff
+	// Значения не соответствуют стандарту на enum
+	//SHT_LOUSER	= 0x80000000,
+	//SHT_HIUSER	= 0xffffffff,
 };
 
 // Symbol Table
@@ -188,7 +189,8 @@ enum {
 	PF_X		= 0x1,
 	PF_W		= 0x2,
 	PF_R		= 0x4,
-	PF_MASKPROC	= 0xf0000000,
+	// Значение не соответствует стандартту на enum
+	//PF_MASKPROC	= 0xf0000000,
 };
 
 // -----------------------------------------------------------------------------

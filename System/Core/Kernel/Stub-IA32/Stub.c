@@ -143,7 +143,7 @@ static
 void __init__ StubInit (const MultibootInfo * const info)
 {
 	// Инициализируем bss.
-	StubMemoryClear (&__bss_begin, &__bss_end - &__bss_begin);
+	StubMemoryClear (&__bss_begin, (uint32_t)&__bss_end - (uint32_t)&__bss_begin);
 
 	// Инитим подсистемы
 	StubInitPage();
@@ -223,6 +223,8 @@ void __init__ StubInit (const MultibootInfo * const info)
 	StubMultibootModulesLoad ();
 }
 
+//extern void StubBootstrapEntry;
+
 void StubEntry (const MultibootInfo * const info, const unsigned long magic)
 {
 	CorePrint ("Kernel (IA32) Stub-" VERSION " and %s\n\n", CoreVersion());
@@ -234,7 +236,7 @@ void StubEntry (const MultibootInfo * const info, const unsigned long magic)
 	// TODO: всетаки CPU нужно сделать отдельной от тасков сущностью.
 	StubTaskBootstrapCreate();
 
-	StubBootstrapCaller (v2laddr(StubBootstrapEntry), StubGetSelectorCPU(0));
+	StubBootstrapCaller(v2laddr(&StubBootstrapEntry), StubGetSelectorCPU(0));
 
 	STUB_FATAL ("Stub has leave...");
 }

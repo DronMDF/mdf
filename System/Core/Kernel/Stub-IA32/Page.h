@@ -54,8 +54,8 @@ struct _PageInfo {
 
 // Через размер void это надо выразить ради тестирования на EM64T
 // Хотя жэто можно просто перенести в юниттесты и в зависимости от разрядности проверять.
-STATIC_ASSERT (sizeof(struct _PageInfo) == 32);
-STATIC_ASSERT (sizeof(PageInfo) == 32);
+STATIC_ASSERT(sizeof(struct _PageInfo) == 32);
+STATIC_ASSERT(sizeof(PageInfo) == 32);
 
 struct _PageInstance {
 	uint32_t flags;

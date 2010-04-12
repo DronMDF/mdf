@@ -78,7 +78,7 @@ struct _MCB {
 	unsigned long prot2;
 #endif
 
-	MCBLink link[0];
+	MCBLink link[];
 };
 
 #ifdef MEMORY_PROTECTOR

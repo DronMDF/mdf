@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(memory_size)
 		{ { sizeof(MultibootMemory) - sizeof(u32), 1, 0x1ffe, 1 } };
 
 	info.mmap_length = 0;
-	info.mmap_addr = (const MultibootMemory *)&mmap1;
+	info.mmap_addr = &mmap1[0];
 	BOOST_CHECK(StubMultibootMemorySize(&info) == 0);
 
 	// Блоки округляются до страниц...
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(memory_size)
 		  { sizeof(MultibootMemory) - sizeof(u32), 0xFFFC0000, 0x40000, 2 } };
 
 	info.mmap_length = sizeof(mmap2);
-	info.mmap_addr = (const MultibootMemory *)&mmap2;
+	info.mmap_addr = &mmap2[0];
 	BOOST_CHECK(StubMultibootMemorySize(&info) == 0x3EF0000 + 0x9F000);
 }
 
@@ -67,42 +67,41 @@ BOOST_AUTO_TEST_CASE(memory_place)
 
 	const MultibootMemory mmap1[1] = {};
 	info.mmap_length = 0;
-	info.mmap_addr = &(mmap1[0]);
+	info.mmap_addr = &mmap1[0];
 	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, 0) == 0);
 
 	const MultibootMemory mmap2[] =
 		{{ sizeof(MultibootMemory) - sizeof(u32), 0x100000, 0x3F00000, 1 }};
 	info.mmap_length = sizeof(mmap2);
-	info.mmap_addr = &(mmap2[0]);
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, 0) == (void *)0x100000);
+	info.mmap_addr = &mmap2[0];
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, 0) == reinterpret_cast<void *>(0x100000));
 
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, (void *)0xf0000) == (void *)0x100000);
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, (void *)0x3ff0000) == 0);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, reinterpret_cast<void *>(0xf0000)) == reinterpret_cast<void *>(0x100000));
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, reinterpret_cast<void *>(0x3ff0000)) == 0);
 
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, (void *)0x100345) == (void *)0x101000);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0, reinterpret_cast<void *>(0x100345)) == reinterpret_cast<void *>(0x101000));
 
 	const MultibootMemory mmap3[] =
 		{{ sizeof(MultibootMemory) - sizeof(u32), 0, 0x98000, 1 },
 		 { sizeof(MultibootMemory) - sizeof(u32), 0x100000, KERNEL_TEMP_BASE + 0x100000, 1 }};
 	info.mmap_length = sizeof(mmap3);
-	info.mmap_addr = &(mmap3[0]);
+	info.mmap_addr = &mmap3[0];
 	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0x90000, 0) == 0);
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, 0) == (void *)0x100000);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, 0) == reinterpret_cast<void *>(0x100000));
 
 	const MultibootModule module[] =
 		{{ 0x60000, 0x70000, 0, 0 },
 		 { 0x160000, 0x170000, 0, 0 }};
 	info.flags |= MULTIBOOT_FLAG_MODS;
-	info.mods_addr = &(module[0]);
+	info.mods_addr = &module[0];
 	info.mods_count = 1;
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0x90000, 0) == (void *)0x100000);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0x90000, 0) == reinterpret_cast<void *>(0x100000));
 
 	info.mods_count = 2;
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0x90000, 0) == (void *)0x170000);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0x90000, 0) == reinterpret_cast<void *>(0x170000));
 
 	// Не должен выходить на KERNEL_TEMP_BASE
-	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, (void *)(KERNEL_TEMP_BASE - 0x50000)) == 0);
+	BOOST_CHECK(StubMultibootGetFreeMemory(&info, 0xa0000, reinterpret_cast<void *>(KERNEL_TEMP_BASE - 0x50000)) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

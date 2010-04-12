@@ -8,3 +8,6 @@
 void StubClockHandler();
 void StubMicroSleep(uint32_t us);
 void StubTimeInit();
+
+tick_t StubGetTimestampCounter();
+

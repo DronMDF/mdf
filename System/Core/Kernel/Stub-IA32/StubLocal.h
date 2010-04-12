@@ -26,12 +26,12 @@ void __deprecated__ outbyte (unsigned short port, unsigned char value)
 static inline
 unsigned char __deprecated__ inbyte (unsigned short port)
 {
-        int value;
+        unsigned char value;
         __asm__ __volatile__ (
 		"inb %w1, %b0"
 		: "=a"(value)
 		: "Nd" (port));
-        return value & 0xff;
+        return value;
 }
 
 static inline
@@ -119,7 +119,7 @@ static inline
 size_t x2size (const sizex_t xsize)
 {
 	STUB_ASSERT (xsize >= 0x100000000LL, "Big xsize for size");
-	return xsize;
+	return (size_t)xsize;
 }
 
 // Interrupt

@@ -19,11 +19,11 @@
 #define __initdata__
 
 #define __deprecated__ __attribute__((deprecated))
-#define __noreturn__	__attribute__((noreturn))
+#define __noreturn__ __attribute__((noreturn))
 
 #define STUB_FATAL(msg)		assert(false)
 #define STUB_ASSERT(exp, msg)	assert(!(exp))
-#define STATIC_ASSERT(exp)
+#define STATIC_ASSERT(exp)	extern char __static_assert[]
 
 typedef unsigned long laddr_t;
 typedef uint64_t paddr_t;

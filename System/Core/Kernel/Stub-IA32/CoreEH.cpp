@@ -118,7 +118,7 @@ void ParseCIE(const void *ptr)
 	// .uleb128 0x1
 	// Как его расшифровать - непонятно.
 	
-	STUB_ASSERT(ciep - reinterpret_cast<const uint8_t *>(ptr) > (int)length,
+	STUB_ASSERT(ciep - reinterpret_cast<const uint8_t *>(ptr) > static_cast<int>(length),
 		"Invalid CIE length");
 }
 
@@ -128,7 +128,7 @@ void ParseCIE(const void *ptr)
 namespace __cxxabiv1 {
 
 typedef enum {
-	_URC_NO_REASON = 0,
+	_URC_NO_REASON = 0
 } _Unwind_Reason_Code;
 
 typedef enum {
@@ -208,12 +208,12 @@ void __cxa_end_catch(void)
 {
 }
 
-extern "C" void __eh_frame();
+extern "C" void *__eh_frame;
 
 extern "C"
 void __cxa_throw (void *thrown_exception, std::type_info *, void (*dtor)(void *))
 {
-	ParseCIE(reinterpret_cast<const void *>(__eh_frame));
+	ParseCIE(__eh_frame);
 
 	if (dtor != 0) {
 		(*dtor)(thrown_exception);

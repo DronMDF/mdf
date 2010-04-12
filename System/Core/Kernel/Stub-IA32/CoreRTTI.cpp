@@ -38,8 +38,8 @@ namespace __cxxabiv1 {
 // -----------------------------------------------------------------------------
 // __fundamental_type_info используется в частности для int
 
-class __fundamental_type_info : public std::type_info
-{
+class __fundamental_type_info : public std::type_info {
+public:
 	virtual ~__fundamental_type_info()
 	{
 	}

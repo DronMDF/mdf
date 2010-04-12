@@ -126,14 +126,14 @@ STATIC_ASSERT (GDT_TASK_BASE + STUB_MAX_TASK_COUNT == GDT_SIZE);
 
 // Эта функция работает только с GDT
 static
-void StubSetSegmentDescriptor (unsigned int di, laddr_t base, size_t size, int flags)
+void StubSetSegmentDescriptor (unsigned int di, laddr_t base, size_t size, unsigned int flags)
 {
 	STUB_ASSERT (GDT == nullptr, "nullptr GDT, init first");
 	STUB_ASSERT (isSet(flags, DESCRIPTOR_GRANULARITY), "Manual granularity forbidden");
 
 	GDT[di].raw = 0;
 
-	GDT[di].segment.baselo =  base & 0x00ffffff;
+	GDT[di].segment.baselo = base & 0x00ffffff;
 	GDT[di].segment.basehi = (base & 0xff000000) >> 24;
 
 	if (size == 0) {
@@ -146,7 +146,7 @@ void StubSetSegmentDescriptor (unsigned int di, laddr_t base, size_t size, int f
 		size = (size + PAGE_SIZE - 1) / PAGE_SIZE;
 	}
 
-	const int limit = size - 1;
+	const size_t limit = size - 1;
 	GDT[di].segment.limitlo =  limit & 0x0ffff;
 	GDT[di].segment.limithi = (limit & 0xf0000) >> 16;
 
@@ -166,7 +166,7 @@ void __init__ StubSetSegmentDescriptorBySelector (unsigned int selector,
 static
 laddr_t StubGetSegmentBase (unsigned int di)
 {
-	return GDT[di].segment.baselo | (GDT[di].segment.basehi << 24);
+	return (GDT[di].segment.basehi << 24) | GDT[di].segment.baselo;
 }
 
 static
@@ -244,7 +244,7 @@ void __init__ StubInitGDT ()
 	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
 
 	// Чистить эту память в принципе не обязательно, но для порядку почистим.
-	StubMemoryClear(task_time, task_time_size);
+	StubMemoryClear((tick_t *)task_time, task_time_size);
 
 	CorePrint ("GDT initialized.\n");
 }
@@ -298,7 +298,7 @@ typedef struct {
 	Task *task;
 	unsigned int slot;
 
-	unsigned char iomap[0];
+	unsigned char iomap[];
 } __attribute__ ((packed)) tss_t;
 
 STATIC_ASSERT (offsetof(tss_t, iomap_size) == 104);
@@ -570,42 +570,52 @@ enum IDT_IDX {
 	IDT_SIZE		= 64,
 };
 
-extern void *StubExceptionDE;
-extern void *StubExceptionDB;
-extern void *StubExceptionNMI;
-extern void *StubExceptionBP;
-extern void *StubExceptionOF;
-extern void *StubExceptionBR;
-extern void *StubExceptionUD;
-extern void *StubExceptionNM;
-extern void *StubExceptionDF;
-extern void *StubExceptionCSO;
-extern void *StubExceptionTS;
-extern void *StubExceptionNP;
-extern void *StubExceptionSS;
-extern void *StubExceptionGP;
-extern void *StubExceptionPF;
-extern void *StubExceptionMF;
-extern void *StubExceptionAC;
-extern void *StubExceptionMC;
-extern void *StubExceptionXF;
+extern void StubExceptionDE;
+extern void StubExceptionDB;
+extern void StubExceptionNMI;
+extern void StubExceptionBP;
+extern void StubExceptionOF;
+extern void StubExceptionBR;
+extern void StubExceptionUD;
+extern void StubExceptionNM;
+extern void StubExceptionDF;
+extern void StubExceptionCSO;
+extern void StubExceptionTS;
+extern void StubExceptionNP;
+extern void StubExceptionSS;
+extern void StubExceptionGP;
+extern void StubExceptionPF;
+extern void StubExceptionMF;
+extern void StubExceptionAC;
+extern void StubExceptionMC;
+extern void StubExceptionXF;
 
-extern void *StubInterrupt0;
-extern void *StubInterrupt1;
-extern void *StubInterrupt2;
-extern void *StubInterrupt3;
-extern void *StubInterrupt4;
-extern void *StubInterrupt5;
-extern void *StubInterrupt6;
-extern void *StubInterrupt7;
-extern void *StubInterrupt8;
-extern void *StubInterrupt9;
-extern void *StubInterrupt10;
-extern void *StubInterrupt11;
-extern void *StubInterrupt12;
-extern void *StubInterrupt13;
-extern void *StubInterrupt14;
-extern void *StubInterrupt15;
+extern void StubInterrupt0;
+extern void StubInterrupt1;
+extern void StubInterrupt2;
+extern void StubInterrupt3;
+extern void StubInterrupt4;
+extern void StubInterrupt5;
+extern void StubInterrupt6;
+extern void StubInterrupt7;
+extern void StubInterrupt8;
+extern void StubInterrupt9;
+extern void StubInterrupt10;
+extern void StubInterrupt11;
+extern void StubInterrupt12;
+extern void StubInterrupt13;
+extern void StubInterrupt14;
+extern void StubInterrupt15;
+
+// Так было бы проще
+// extern void KernelWait;
+// extern void KernelFind;
+// extern void KernelCreate;
+// extern void KernelCall;
+// extern void KernelAttach;
+// extern void KernelDetach;
+// extern void KernelModify;
+// extern void KernelInfo;
 
 static
 void __init__ StubSetGateDescriptor (descriptor_t *dt, int vector,

@@ -213,7 +213,7 @@ static
 MultibootModule *modules __initdata__ = nullptr;
 
 static
-int modules_count __initdata__ = 0;
+u32 modules_count __initdata__ = 0;
 
 void __init__ StubMultibootReserveModules (const MultibootInfo * const info)
 {
@@ -223,9 +223,9 @@ void __init__ StubMultibootReserveModules (const MultibootInfo * const info)
 	StubMemoryCopy (modules, info->mods_addr,
 		sizeof(MultibootModule) * modules_count);
 
-	laddr_t modbase = KERNEL_TEMP_BASE;
+	u32 modbase = KERNEL_TEMP_BASE;
 
-	for (int i = 0; i < modules_count; i++) {
+	for (u32 i = 0; i < modules_count; i++) {
 		if (modules[i].string) {
 			const size_t len = StubStringLength (modules[i].string);
 			char *str = (char *)StubMemoryAlloc (len + 1);
@@ -283,7 +283,7 @@ void __init__ StubMultibootModuleLoad (const laddr_t base, const size_t size,
 
 void __init__ StubMultibootModulesLoad (void)
 {
-	for (int i = 0; i < modules_count; i++) {
+	for (u32 i = 0; i < modules_count; i++) {
 		StubMultibootModuleLoad (modules[i].mod_start,
 			modules[i].mod_end - modules[i].mod_start, modules[i].string);
 

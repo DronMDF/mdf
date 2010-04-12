@@ -377,7 +377,7 @@ void __init__ StubPageInitMode ()
 	pdir[stubPdIdx] = StubPageDescriptor(kernelPDir->paddr, kernelPDir->flags);
 
 	// До каталога страниц набиваем таблицы, они статические.
-	for (int a = 0; a < KERNEL_PAGETABLE_BASE; a += PAGE_SIZE * 1024) {
+	for (laddr_t a = 0; a < KERNEL_PAGETABLE_BASE; a += PAGE_SIZE * 1024) {
 		const int ptidx = a / (PAGE_SIZE * 1024);
 		pts[ptidx] = StubPageAlloc();
 		StubMemoryClear (p2vptr(pts[ptidx]->paddr), PAGE_SIZE);
