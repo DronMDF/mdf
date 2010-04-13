@@ -243,16 +243,11 @@ BOOST_AUTO_TEST_CASE(testRunSinchronized)
 
 	testThread caller;
 
-	class inlineThread : public testThread, private order_mock<2> {
+	class inlineThread : public testThread, private order_mock<1> {
 	private:
 		ResourceThread *m_caller;
 	public:
 		inlineThread(ResourceThread *thread) : m_caller(thread) {}
-		void addObserver(ResourceThread *thread, uint32_t event) {
-			order(1);
-			BOOST_REQUIRE_EQUAL(thread, m_caller);
-			BOOST_REQUIRE_EQUAL(event, RESOURCE_EVENT_DESTROY);
-		}
 		void Run() {
 			order(2);
 		}
@@ -263,6 +258,8 @@ BOOST_AUTO_TEST_CASE(testRunSinchronized)
 	helper.m_called = &called;
 
 	helper.runSinchronized();
+	// TODO: caller должен встать на wait
+	
 	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), TIMESTAMP_FUTURE);
 	BOOST_REQUIRE_EQUAL(subsched->thread, &caller);
 }
