@@ -6,7 +6,6 @@
 #include "Kernel.h"
 
 #include "Memory.h"
-#include "Event.h"
 #include "ResourceId.h"
 
 #include "Instance.h"
@@ -21,7 +20,6 @@ Resource::Resource (void)
 	: ResourceId(),
 	  m_name(0),
 	  m_namelen(0),
-	  m_event(0),
 	  m_instances(&Instance::ResourceLink)
 {
 }
@@ -29,7 +27,6 @@ Resource::Resource (void)
 Resource::~Resource (void)
 {
 	delete[] m_name;
-	delete m_event;
 	
 	while (Instance *instance = m_instances.getFirst()) {
 		m_instances.Remove(instance);
@@ -121,25 +118,8 @@ int Resource::Info (int info_id, void *info, size_t *info_size) const
 	return InfoIndependent(info_id, info, info_size);
 }
 
-void Resource::addObserver(ResourceThread *thread, uint32_t event)
-{
-	if (m_event == 0) {
-		m_event = new Event;
-	}
-
-	m_event->addObserver(thread, event);
-}
-
 void Resource::setEvent(uint32_t event)
 {
-	// Устаревшее
-	if (m_event == 0) {
-		m_event = new Event;
-	}
-
-	m_event->Action(event);
-
-	// новое
 	for (Instance *instance = m_instances.getFirst(); instance != 0;
 		instance = m_instances.getNext(instance))
 	{

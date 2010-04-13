@@ -51,7 +51,6 @@ private:
 
 	laddr_t m_entry;
 
-	uint32_t m_event;
 	Instance *m_event_instance;
 
 private:
@@ -69,7 +68,6 @@ protected:
 
 public:
 	Link<ResourceThread> ScheduleLink;
-	Link<ResourceThread> EventLink;
 
 	ResourceThread (ResourceProcess *process, laddr_t entry);
 	virtual ~ResourceThread();
@@ -106,9 +104,6 @@ public:
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info (int info_id, void *info, size_t *info_size) const;
-
-	void setEvent(uint32_t event);
-	uint32_t getEvent() const;
 
 	bool createRequestArea(ResourceThread *caller,
 			       laddr_t offset, laddr_t size, uint32_t access);

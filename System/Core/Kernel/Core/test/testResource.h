@@ -9,6 +9,4 @@
 
 class testResource : public Core::Resource
 {
-public:
-	using Core::Resource::m_event;
 };

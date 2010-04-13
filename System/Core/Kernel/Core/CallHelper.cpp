@@ -107,12 +107,12 @@ void CallHelper::runSinchronized() const
 {
 	STUB_ASSERT(m_caller == 0, "Fatal in kernel mode");
 
+	// Новая нить уведомит когда завершится
+	m_caller->Wait(m_called, RESOURCE_EVENT_DESTROY);
+	
 	// Текущая нить ждет вечно
 	m_caller->Sleep(TIMEOUT_INFINITY);
 	Scheduler().addInactiveThread(m_caller);
-
-	// Новая нить уведомит когда завершится
-	m_called->addObserver(m_caller, RESOURCE_EVENT_DESTROY);
 
 	// Новую нить запускаем.
 	m_called->Run();

@@ -29,9 +29,6 @@ private:
 	unsigned char *m_name;
 	size_t m_namelen;
 
-protected:	// для теста
-	Event *m_event;
-
 private:
 	/// Список инстанций
 	List<Instance> m_instances;
@@ -69,7 +66,6 @@ public:
 	virtual int Info(int info_id, void *info, size_t *info_size) const;
 
 	// Этa функции уйдет в небытие после перевода на событийные инстанции.
-	virtual void addObserver(ResourceThread *thread, uint32_t event);
 	void setEvent(uint32_t event);
 
 	virtual void addInstance(Instance *instance);

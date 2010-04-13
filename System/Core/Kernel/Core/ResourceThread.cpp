@@ -35,10 +35,8 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	  m_wakeupstamp(0),
 	  m_priority(255),
 	  m_entry(0),
-	  m_event(0),
 	  m_event_instance(0),
-	  ScheduleLink(),
-	  EventLink()
+	  ScheduleLink()
 {
 }
 
@@ -58,10 +56,8 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	  m_wakeupstamp(0),
 	  m_priority(255),
 	  m_entry(entry),
-	  m_event(0),
 	  m_event_instance(0),
-	  ScheduleLink(),
-	  EventLink()
+	  ScheduleLink()
 {
 	STUB_ASSERT(m_task == 0, "Unable to create task");
 
@@ -196,8 +192,6 @@ void ResourceThread::Run()
 {
 	// TODO: Снять нить из очереди ожидания, если она там стоит.
 	STUB_ASSERT(ScheduleLink.isLinked(), "Running thread linked by scheduler link");
-	STUB_ASSERT(EventLink.isLinked(), "Running thread linked by event link");
-
 	StubTaskRun (m_task);
 }
 
@@ -296,16 +290,6 @@ ResourceThread *ResourceThread::Call ()
 	// TODO: Указатель должен возвращаться только для неинициализированных нитей.
 	// Запущенная нить возвращает 0.
 	return this;
-}
-
-uint32_t ResourceThread::getEvent() const
-{
-	return m_event;
-}
-
-void ResourceThread::setEvent(uint32_t event)
-{
-	m_event = event;
 }
 
 bool ResourceThread::createRequestArea(ResourceThread *caller,
