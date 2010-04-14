@@ -65,8 +65,7 @@ public:
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info(int info_id, void *info, size_t *info_size) const;
 
-	// Этa функции уйдет в небытие после перевода на событийные инстанции.
-	void setEvent(uint32_t event);
+	void event(uint32_t event);
 
 	virtual void addInstance(Instance *instance);
 	void removeInstance(Instance *instance);

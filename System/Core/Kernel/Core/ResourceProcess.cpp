@@ -24,28 +24,16 @@ ResourceProcess::ResourceProcess (laddr_t entry)
 	  m_instance_list(&InstanceProcess::ProcessLink),
 	  m_pagetable(USER_PAGETABLE_SIZE, Memory::ALLOC | Memory::ZEROING)
 {
-	// TODO: Все способности в инстанции доступны
-	InstanceProcess *self = createInstance(this, RESOURCE_ACCESS_OWNER);
-	m_instance_list.Insert(self);
+	// TODO: Самоинстанцию я убрал - она не вписывается в картину.
+	//	Надо обеспечить альтернативный доступ к процессу
 }
 
 ResourceProcess::~ResourceProcess ()
 {
-	for (InstanceProcess *instance = m_instance_list.getFirst(); instance != 0; )
-	{
-		InstanceProcess *instance_to_delete = instance;
-		instance = m_instance_list.getNext (instance);
-
-		if (instance_to_delete->resource() != this) {
-			// TODO: Вот эта неудобная бяка могла бы исчезнуть с
-			//	применением наблюдающих указателей
-			m_instance_list.Remove(instance_to_delete);
-			delete instance_to_delete;
-		}
+	while (InstanceProcess *instance = m_instance_list.getFirst()) {
+		m_instance_list.Remove(instance);
+		delete instance;
 	}
-
-	STUB_ASSERT(m_instance_list.getSize() != 1, "Missing selfprocess instance");
-	m_instance_list.Remove(m_instance_list.getFirst());
 }
 
 ResourceProcess *ResourceProcess::asProcess ()

@@ -190,22 +190,26 @@ bool ResourceThread::isActive () const
 
 void ResourceThread::Run()
 {
-	// TODO: Снять нить из очереди ожидания, если она там стоит.
-	STUB_ASSERT(ScheduleLink.isLinked(), "Running thread linked by scheduler link");
-	StubTaskRun (m_task);
+	delete m_event_instance;
+	m_event_instance = 0;
+	ScheduleLink.Unlink(this);
+	
+	StubTaskRun(m_task);
 }
 
 void ResourceThread::Activate()
 {
+	// Идею синхронных иннстанций я пока не выносил, поэтому после активации
+	// 	инстанция, слушающая события, удаляется.
+	delete m_event_instance;
+	m_event_instance = 0;
 	ScheduleLink.Unlink(this);
+	
 	Scheduler().addActiveThread(this);
 }
 
 bool ResourceThread::Deactivate()
 {
-	STUB_ASSERT(getInstancesCount() > 1, "Many instances for thread");
-
-	// должен попытаться удалить Task, если получилось - вернет true
 	if (StubTaskDestroy(m_task)) {
 		m_task = 0;
 		return true;
@@ -218,6 +222,8 @@ void ResourceThread::Kill()
 {
 	// TODO: Надо в отдельную функцию.
 	// TODO: А связь с другими нитями ради копибека - это тоже инстанция!
+
+	// На месте ли здесь этот код?
 	if (m_copyback_id != INVALID_ID) {
 		if (Resource *resource = FindResource(m_copyback_id)) {
 			if (ResourceThread *caller = resource->asThread()) {
@@ -227,6 +233,8 @@ void ResourceThread::Kill()
 			}
 		}
 	}
+
+	event(RESOURCE_EVENT_THREAD_EXIT);
 
 	Scheduler().addKillThread(this);
 

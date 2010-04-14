@@ -26,12 +26,8 @@ Resource::Resource (void)
 
 Resource::~Resource (void)
 {
+	event(RESOURCE_EVENT_DESTROY);
 	delete[] m_name;
-	
-	while (Instance *instance = m_instances.getFirst()) {
-		m_instances.Remove(instance);
-		instance->event(RESOURCE_EVENT_DESTROY);
-	}
 }
 
 int Resource::getInstancesCount() const
@@ -118,12 +114,16 @@ int Resource::Info (int info_id, void *info, size_t *info_size) const
 	return InfoIndependent(info_id, info, info_size);
 }
 
-void Resource::setEvent(uint32_t event)
+void Resource::event(uint32_t event)
 {
-	for (Instance *instance = m_instances.getFirst(); instance != 0;
-		instance = m_instances.getNext(instance))
+	for (Instance *instance = m_instances.getFirst(); instance != 0;)
 	{
-		instance->event(event);
+		// Событие может повлечь за собой отвязывание или удаление
+		// инстанции, поэтому следующую инстанцию прикапываем
+		Instance *einst = instance;
+		instance = m_instances.getNext(instance);
+		
+		einst->event(event);
 	}
 }
 
@@ -135,10 +135,9 @@ void Resource::addInstance(Instance *instance)
 void Resource::removeInstance(Instance *instance)
 {
 	m_instances.Remove(instance);
-	// DESTORY здесь как-то не катит, но нам надо занулить адрес ресурса в инстанции
-	// Или может быть в инстанции стоит смотреть на факт завязанности линка?
-	instance->event(RESOURCE_EVENT_DESTROY);
+	// Здесь никакие события уже не нужны, этот метод дергается из инстанций.
 	
+	// TODO: Процессы умирают по другим критериям (как-то не на месте)
 	if (m_instances.isEmpty()) {
 		delete this;
 	}

@@ -24,9 +24,8 @@ Instance::Instance (Resource *resource, uint32_t access)
 Instance::~Instance()
 {
 	if (m_resource != 0) {
-		Resource *resource = m_resource;
+		m_resource->removeInstance(this);
 		m_resource = 0;
-		resource->removeInstance(this);
 	}
 }
 
@@ -40,7 +39,7 @@ laddr_t Instance::addr() const
 void Instance::setAddr(laddr_t addr)
 {
 	STUB_ASSERT(m_addr != 0, "Adress already defined");
-	STUB_ASSERT(m_resource == 0, "No resource");
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
 
 	if (const ResourceRegion *region = m_resource->asRegion()) {
 		m_addr = addr;
@@ -51,7 +50,7 @@ void Instance::setAddr(laddr_t addr)
 
 bool Instance::inBounds(laddr_t addr) const
 {
-	STUB_ASSERT(m_resource == 0, "no resource for instance");
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
 
 	const ResourceRegion *region = m_resource->asRegion();
 	if (region == 0)
@@ -67,6 +66,8 @@ bool Instance::inBounds(laddr_t addr) const
 
 const PageInstance *Instance::PageFault(laddr_t addr, uint32_t *access)
 {
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
+	
 	ResourceRegion *region = m_resource->asRegion();
 	STUB_ASSERT (region == 0, "Instance not for region");
 	STUB_ASSERT (m_addr == 0, "Region not attached");
@@ -81,19 +82,23 @@ const PageInstance *Instance::PageFault(laddr_t addr, uint32_t *access)
 
 id_t Instance::id() const
 {
-	STUB_ASSERT(m_resource == 0, "no resource for instance");
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
 	return m_resource->id();
 }
 
 Resource *Instance::resource() const
 {
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
 	return m_resource;
 }
 
 void Instance::event(uint32_t eid)
 {
+	STUB_ASSERT(m_resource == 0, "No resource for instance");
 	if (eid == RESOURCE_EVENT_DESTROY) {
-		STUB_ASSERT(ResourceLink.isLinked(), "Destroy from linked resource");
+		// События исходят от самого ресурса. нет смысла пытаться отвязаться
+		// Но отлинковаться надо
+		ResourceLink.Unlink(this);
 		m_resource = 0;
 	}
 }

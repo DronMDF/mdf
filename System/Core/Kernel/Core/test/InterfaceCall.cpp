@@ -97,11 +97,6 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), calledprocess);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
-
-	// TODO: Процессы имеют свою инстанцию и поэтому не удаляются при
-	//	удалении внешней инстанции - пока удалим ручками.
-	process.Detach(calledprocess);
-	delete calledprocess;
 }
 
 BOOST_AUTO_TEST_CASE(testCallParametersDeliver)

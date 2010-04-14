@@ -34,13 +34,12 @@ BOOST_AUTO_TEST_CASE(testDropInstances)
 	};
 	
 	Resource *resource = new testResource;
-	
+
 	testInstance instance1(resource);
 	testInstance instance2(resource);
 	testInstance instance3(resource);
 	
 	delete resource;
-
 	// инстанции при удалении проконтролируют - вызывались они или нет.
 }
 

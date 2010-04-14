@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(testDeliveryWanted)
 	testResource resource;
 	
 	thread.Wait(&resource, 666);	// Инстанция создается здесь
-	resource.setEvent(666);		// Здесь она должна дернуть метод thread->Activate
+	resource.event(666);		// Здесь она должна дернуть метод thread->Activate
 }
 
 BOOST_AUTO_TEST_CASE(testDeliveryDie)

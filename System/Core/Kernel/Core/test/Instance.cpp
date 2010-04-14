@@ -17,7 +17,6 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteInstance)
 
-// TODO: перенести в test/Instance.cpp
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
 	Resource *resource = new testResource(); // Ресурс удаляется удалением инстанции
