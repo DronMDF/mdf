@@ -92,13 +92,11 @@ BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
 	ResourceThread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
-	struct testCallHelper : public CallHelper, private visit_mock {
-		testCallHelper() : CallHelper(0) {}
+	struct inCallHelper : public testCallHelper, private visit_mock {
 		InstanceProcess *getCalledInstance(ResourceThread *thread, id_t id) const {
 			visit();
-			return CallHelper::getCalledInstance(thread, id);
+			return testCallHelper::getCalledInstance(thread, id);
 		}
-		using CallHelper::m_caller;
 	} helper;
 	helper.m_caller = thread;
 
@@ -241,27 +239,20 @@ BOOST_AUTO_TEST_CASE(testRunSinchronized)
 	testScheduler scheduler;
 	scheduler.m_inactives = subsched;
 
-	testThread caller;
-
-	class inlineThread : public testThread, private order_mock<1> {
-	private:
-		ResourceThread *m_caller;
-	public:
-		inlineThread(ResourceThread *thread) : m_caller(thread) {}
-		void Run() {
-			order(2);
-		}
-	} called(&caller);
+	// После смерти called'а срабатывает событие и вызывается активация caller'а
+	// которая ставит его в очередь активных. Нам это не за чем.
+	struct inThread : public testThread, private visit_mock {
+		virtual void Activate() { visit(); }
+		virtual void Run() { visit(); }
+	} caller, called;
 
 	testCallHelper helper;
 	helper.m_caller = &caller;
 	helper.m_called = &called;
 
 	helper.runSinchronized();
-	// TODO: caller должен встать на wait
-	
 	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), TIMESTAMP_FUTURE);
-	BOOST_REQUIRE_EQUAL(subsched->thread, &caller);
+	BOOST_REQUIRE_EQUAL(subsched->thread, static_cast<ResourceThread *>(&caller));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
