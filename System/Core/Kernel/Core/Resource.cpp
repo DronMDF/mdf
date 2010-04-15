@@ -135,10 +135,14 @@ void Resource::addInstance(Instance *instance)
 void Resource::removeInstance(Instance *instance)
 {
 	m_instances.Remove(instance);
-	// Здесь никакие события уже не нужны, этот метод дергается из инстанций.
-	
-	// TODO: Процессы умирают по другим критериям (как-то не на месте)
-	if (m_instances.isEmpty()) {
-		delete this;
+
+	for (Instance *instance = m_instances.getFirst(); instance != 0;
+		instance = m_instances.getNext(instance))
+	{
+		if (instance->active()) return;
 	}
+
+	// Активных инстанций не осталось - ресурс умирает.
+	// TODO: А все дочерние процессы без самоинстанций и поумирают нафиг?
+	delete this;
 }
