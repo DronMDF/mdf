@@ -24,4 +24,10 @@ BOOST_AUTO_TEST_CASE(testGetResource)
 	BOOST_REQUIRE_EQUAL(instance.resource(), resource);
 }
 
+BOOST_AUTO_TEST_CASE(testNotActive)
+{
+	Instance instance(0, 0);
+	BOOST_REQUIRE_EQUAL(instance.active(), false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

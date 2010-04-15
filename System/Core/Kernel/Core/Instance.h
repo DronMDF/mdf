@@ -43,6 +43,8 @@ public:
 	bool allow(uint32_t want) const;
 
 	virtual void event(uint32_t eid);
+
+	virtual bool active() const;
 };
 
 } // namespace Core

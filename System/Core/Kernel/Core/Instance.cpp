@@ -18,7 +18,11 @@ Instance::Instance (Resource *resource, uint32_t access)
 	  m_addr(0),
 	  ResourceLink()
 {
-	m_resource->addInstance(this);
+	// Конечно странно, что инстанция конструируется без ресурса. Но в
+	// тестах будет полезно (а может быть мигрирующие инстанции изобретуться)
+	if (m_resource) {
+		m_resource->addInstance(this);
+	}
 }
 
 Instance::~Instance()
@@ -106,4 +110,9 @@ void Instance::event(uint32_t eid)
 bool Instance::allow(uint32_t want) const
 {
 	return isSet(m_access, want);
+}
+
+bool Instance::active() const
+{
+	return false;
 }
