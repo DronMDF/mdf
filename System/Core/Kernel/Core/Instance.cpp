@@ -86,13 +86,11 @@ const PageInstance *Instance::PageFault(laddr_t addr, uint32_t *access)
 
 id_t Instance::id() const
 {
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
-	return m_resource->id();
+	return m_resource != 0 ? m_resource->id() : INVALID_ID;
 }
 
 Resource *Instance::resource() const
 {
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
 	return m_resource;
 }
 
