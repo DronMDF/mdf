@@ -52,4 +52,9 @@ int InstanceProcess::Info(int infoid, void *info, size_t *size) const
 	return resource->Info(infoid, info, size);
 }
 
+bool InstanceProcess::active() const
+{
+	return true;
+}
+
 

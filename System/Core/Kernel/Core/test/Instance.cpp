@@ -4,13 +4,10 @@
 //
 
 #include <boost/test/unit_test.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include "Types.h"
-#include "../Resource.h"
-#include "testResource.h"
-
 #include "../Instance.h"
+#include "testResource.h"
 
 using namespace boost;
 using namespace Core;
@@ -27,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testGetResource)
 BOOST_AUTO_TEST_CASE(testNotActive)
 {
 	Instance instance(0, 0);
-	BOOST_REQUIRE_EQUAL(instance.active(), false);
+	BOOST_REQUIRE(!instance.active());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

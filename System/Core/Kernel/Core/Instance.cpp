@@ -43,8 +43,8 @@ laddr_t Instance::addr() const
 void Instance::setAddr(laddr_t addr)
 {
 	STUB_ASSERT(m_addr != 0, "Adress already defined");
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
-
+	if (m_resource == 0) return;
+	
 	if (const ResourceRegion *region = m_resource->asRegion()) {
 		m_addr = addr;
 		STUB_ASSERT((m_addr - region->offset()) % PAGE_SIZE != 0,

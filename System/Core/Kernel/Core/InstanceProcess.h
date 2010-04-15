@@ -28,6 +28,8 @@ public:
 	ResourceThread *Call();
 	int Modify(int paramid, const void *param, size_t size);
 	int Info(int infoid, void *info, size_t *size) const;
+
+	virtual bool active() const;
 };
 
 } // namespace Core
