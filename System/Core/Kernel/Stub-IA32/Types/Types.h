@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2000-2009 Андрей Валяев <dron@infosec.ru>
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
@@ -49,12 +49,12 @@ static const tick_t TIMESTAMP_FUTURE = 0xffffffffffffffffULL;
 static const timeout_t TIMEOUT_INFINITY = 0xffffffffU;
 
 // Эту штуку вообще надо выкинуть нафиг
-static const size_t PDIR_SIZE = 0x400000; //PAGE_SIZE * 1024;
 
 static const uint32_t LADDR_MASK = 0xfffff000U;
 static const uint64_t PADDR_MASK = 0xfffffffffffff000ULL;
 
-#define PAGE_SIZE	4096U
+#define PAGE_SIZE 4096U
+#define PDIR_SIZE (PAGE_SIZE * 1024U)
 
 #define MEBIBYTE (1024U * 1024U)
 
@@ -82,14 +82,17 @@ static const uint64_t PADDR_MASK = 0xfffffffffffff000ULL;
 #define USER_TXA_BASE		(USER_STACK_BASE + USER_STACK_SIZE + PAGE_SIZE)
 #define KERNEL_STACK_BASE	(USER_TXA_BASE + USER_TXA_SIZE + PAGE_SIZE)
 
+STATIC_ASSERT(KERNEL_TEMP_BASE % PDIR_SIZE == 0);
+STATIC_ASSERT(KERNEL_PAGETABLE_BASE % PDIR_SIZE == 0);
+STATIC_ASSERT (USER_MEMORY_BASE % PDIR_SIZE == 0);
+
 #define USER_MEMORY_SIZE	(KERNEL_STACK_BASE - USER_MEMORY_BASE - PAGE_SIZE)
 
 // USER_PAGETABLE_* зависит от использования PAE
+// TODO: Эти константы лучше выводить в коде.
 #define USER_PAGETABLE_BASE	(KERNEL_PAGETABLE_BASE + USER_MEMORY_BASE / PAGE_SIZE * 4U)
 #define USER_PAGETABLE_SIZE	(USER_MEMORY_SIZE / PAGE_SIZE * 4U)
-
-// -----------------------------------------------------------------------------
-// Распределение памяти приложения.
+STATIC_ASSERT(USER_PAGETABLE_BASE % PAGE_SIZE == 0);
 
 // -----------------------------------------------------------------------------
 struct StubStackFrame {
