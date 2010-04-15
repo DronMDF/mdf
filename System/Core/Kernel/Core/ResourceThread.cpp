@@ -14,6 +14,7 @@
 
 #include "include/Instance.h"
 #include "include/InstanceThread.h"
+#include "include/InstanceCopyBack.h"
 #include "include/Resource.h"
 #include "include/ResourceProcess.h"
 #include "include/ResourceThread.h"
@@ -25,8 +26,6 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	: Resource(),
 	  m_process(process),
 	  m_task(0),
-	  m_copyback_id(INVALID_ID),
-	  m_copyback_addr(0),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -36,6 +35,7 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 	  m_priority(255),
 	  m_entry(0),
 	  m_event_instance(0),
+	  m_copyback_instance(0),
 	  ScheduleLink()
 {
 }
@@ -46,8 +46,6 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	: Resource(),
 	  m_process(process),
 	  m_task(StubTaskCreate (entry, this)),
-	  m_copyback_id(INVALID_ID),
-	  m_copyback_addr(0),
 	  m_stack(USER_STACK_SIZE, Memory::ALLOC),
 	  m_txa(0),
 	  m_txa_offset(0),
@@ -57,6 +55,7 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 	  m_priority(255),
 	  m_entry(entry),
 	  m_event_instance(0),
+	  m_copyback_instance(0),
 	  ScheduleLink()
 {
 	STUB_ASSERT(m_task == 0, "Unable to create task");
@@ -67,6 +66,8 @@ ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
 
 ResourceThread::~ResourceThread()
 {
+	// Если нить не вышла корректно - доставки результата уже не будет.
+	delete m_copyback_instance;
 	delete m_event_instance;
 	delete m_txa;
 }
@@ -181,6 +182,8 @@ void ResourceThread::Wait(Resource *resource, uint32_t event)
 {
 	STUB_ASSERT(resource == this, "Wait youself?");
 	m_event_instance = createInstance(resource, event);
+	
+	// TODO: Здесь же можно поставить на ожидание в планировщике.
 }
 
 bool ResourceThread::isActive () const
@@ -220,20 +223,6 @@ bool ResourceThread::Deactivate()
 
 void ResourceThread::Kill()
 {
-	// TODO: Надо в отдельную функцию.
-	// TODO: А связь с другими нитями ради копибека - это тоже инстанция!
-
-	// На месте ли здесь этот код?
-	if (m_copyback_id != INVALID_ID) {
-		if (Resource *resource = FindResource(m_copyback_id)) {
-			if (ResourceThread *caller = resource->asThread()) {
-				caller->copyIn(m_copyback_addr,
-					reinterpret_cast<void *>(USER_TXA_BASE + m_txa_offset),
-					m_txa->getSize() - m_txa_offset);
-			}
-		}
-	}
-
 	event(RESOURCE_EVENT_THREAD_EXIT);
 
 	Scheduler().addKillThread(this);
@@ -251,6 +240,17 @@ void ResourceThread::Kill()
 const PageInstance *ResourceThread::PageFault(laddr_t addr, uint32_t *access)
 {
 	if (addr == USER_MEMORY_BASE + RETMAGIC) {
+		// Нить вышла корректно
+		// Надо в отдельную функцию
+		if (m_copyback_instance != 0) {
+			// Доставляем результат (находясь в адресном пространстве этой нити!
+			m_copyback_instance->copyIn(
+				reinterpret_cast<void *>(USER_TXA_BASE + m_txa_offset),
+				m_txa->getSize() - m_txa_offset);
+			delete m_copyback_instance;
+			m_copyback_instance = 0;
+		}
+		
 		Kill();
 		STUB_FATAL("Thread is killed.");
 	}
@@ -334,8 +334,7 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 
 void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
 {
-	m_copyback_id = thread->id();
-	m_copyback_addr = buffer;
+	m_copyback_instance = new InstanceCopyBack(thread, buffer);
 }
 
 InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t event)

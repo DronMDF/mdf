@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(testCopyBack)
 {
 	struct inThread : public testThread, private visit_mock {
 		enum { DST = 111, SIZE = 222 };
-		bool copyIn(laddr_t dst, const void *src, size_t size) {
+		bool copyIn(laddr_t dst, const void *, size_t size) {
 			BOOST_REQUIRE_EQUAL(dst, laddr_t(DST));
 			BOOST_REQUIRE_EQUAL(size, size_t(SIZE));
 			visit();

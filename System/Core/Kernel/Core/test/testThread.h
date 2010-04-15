@@ -16,9 +16,6 @@ public:
 		Register();
 	}
 
-	using Core::ResourceThread::m_copyback_id;
-	using Core::ResourceThread::m_copyback_addr;
-
 	using Core::ResourceThread::m_txa;
 	using Core::ResourceThread::m_txa_offset;
 	using Core::ResourceThread::m_txa_access;

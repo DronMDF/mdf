@@ -11,6 +11,7 @@
 namespace Core {
 
 class InstanceThread;
+class InstanceCopyBack;
 class ResourceProcess;
 
 class ResourceThread : public Resource
@@ -21,17 +22,6 @@ private:
 protected:
 	Task *m_task;
 
-	// TODO: Размер обратного копирования необходимо хранить. потому что
-	//	форвард может изменить размер запроса, но копибек останется
-	//	неизменным.
-
-	// TODO: Еще открыт вопрос о том, стоит ли доставлять блок в процесс,
-	//	если вызывающая нить уже умерла? тогда надо хранить и pid.
-
-	// Параметры обратного копирования TXA;
-	id_t m_copyback_id;
-	laddr_t m_copyback_addr;
-	
 private:
 	// TODO: Здесь надо ввести новый тип, основанный на мемори, но иначе
 	//	выделяющий память. сверху вниз, а не всю сразу, как memory.
@@ -52,6 +42,7 @@ private:
 	laddr_t m_entry;
 
 	Instance *m_event_instance;
+	InstanceCopyBack *m_copyback_instance;
 
 private:
 	ResourceThread (const ResourceThread &);

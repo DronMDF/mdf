@@ -207,17 +207,6 @@ BOOST_AUTO_TEST_CASE(testCopyIn)
 		m, m + strlen(request));
 }
 
-BOOST_AUTO_TEST_CASE(testSetCopyBack)
-{
-	testThread thread;
-
-	const laddr_t address = 0xADD0000;
-	thread.setCopyBack(&thread, address);
-
-	BOOST_REQUIRE_EQUAL(thread.m_copyback_id, thread.id());
-	BOOST_REQUIRE_EQUAL(thread.m_copyback_addr, address);
-}
-
 BOOST_AUTO_TEST_CASE(testCreateRequestArea)
 {
 	testThread thread;
