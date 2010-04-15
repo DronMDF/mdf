@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "../Scheduler.h"
-#include "../SubScheduler.h"
+#include "../include/Scheduler.h"
+#include "../include/SubScheduler.h"
 
 class testScheduler : public Core::Scheduler
 {

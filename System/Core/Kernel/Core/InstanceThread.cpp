@@ -3,9 +3,9 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
-#include "ResourceThread.h"
-#include "InstanceThread.h"
+#include "include/Kernel.h"
+#include "include/ResourceThread.h"
+#include "include/InstanceThread.h"
 
 using namespace Core;
 

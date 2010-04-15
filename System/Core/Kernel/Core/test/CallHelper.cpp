@@ -6,9 +6,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Kernel.h"
-#include "../CallHelper.h"
-#include "../InstanceProcess.h"
+#include "../include/Kernel.h"
+#include "../include/CallHelper.h"
+#include "../include/InstanceProcess.h"
 
 #include "testResource.h"
 #include "testThread.h"

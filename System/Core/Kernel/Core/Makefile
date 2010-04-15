@@ -24,7 +24,7 @@ $(OPREFIX)/MDF/Core.o : test $(OBJECTS)
 	$(MKDIR) -p $(dir $@)
 	$(LD) -Ur -o $@ $(OBJECTS)
 
-$(IPREFIX)/MDF/%.h : %.h
+$(IPREFIX)/MDF/%.h : include/%.h
 	$(ECHO) Install $(notdir $@)...
 	$(MKDIR) -p $(dir $@)
 	$(CP) $< $@

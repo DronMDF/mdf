@@ -8,7 +8,7 @@
 #include "TestHelpers.h"
 
 #include "Types.h"
-#include "../Memory.h"
+#include "../include/Memory.h"
 
 using namespace std;
 using namespace Core;

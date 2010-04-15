@@ -7,16 +7,14 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "Types.h"
-#include "../Stub.h"
-#include "../Core.h"
-#include "../Kernel.h"
-#include "../List.h"
-#include "../Resources.h"
+#include "../include/Stub.h"
+#include "../include/Core.h"
+#include "../include/Kernel.h"
+#include "../include/List.h"
+#include "../include/Resources.h"
 
-#include "../Resource.h"
-#include "../ResourceProcess.h"
-#include "../ResourceThread.h"
-#include "../ResourceCall.h"
+#include "../include/Resource.h"
+#include "../include/ResourceCall.h"
 
 #include "testProcess.h"
 #include "testThread.h"

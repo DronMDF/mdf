@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../InstanceProcess.h"
+#include "../include/InstanceProcess.h"
 
 using namespace boost;
 using namespace Core;

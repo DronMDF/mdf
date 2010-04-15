@@ -3,7 +3,7 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "../SubScheduler.h"
+#include "../include/SubScheduler.h"
 
 namespace Core { class ResourceThread; }
 

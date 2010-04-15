@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Instance.h"
+#include "../include/Instance.h"
 #include "testResource.h"
 
 using namespace boost;

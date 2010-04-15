@@ -11,8 +11,8 @@
 
 #include "Types.h"
 
-#include "../CoreLocal.h"
-#include "../Core.h"
+#include "../include/CoreLocal.h"
+#include "../include/Core.h"
 
 class init {
 public:

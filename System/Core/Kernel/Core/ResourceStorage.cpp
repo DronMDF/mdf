@@ -3,10 +3,10 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "List.h"
-#include "ResourceId.h"
-#include "ResourceStorage.h"
-#include "CoreLocal.h"
+#include "include/List.h"
+#include "include/ResourceId.h"
+#include "include/ResourceStorage.h"
+#include "include/CoreLocal.h"
 
 using namespace Core;
 

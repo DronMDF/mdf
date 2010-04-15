@@ -3,7 +3,7 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "CoreLocal.h"
+#include "include/CoreLocal.h"
 
 using namespace Core;
 

@@ -3,16 +3,16 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "CallHelper.h"
+#include "include/CallHelper.h"
 
-#include "Kernel.h"
-#include "Scheduler.h"
-#include "CoreLocal.h"
+#include "include/Kernel.h"
+#include "include/Scheduler.h"
+#include "include/CoreLocal.h"
 
-#include "InstanceProcess.h"
-#include "Resources.h"
-#include "ResourceProcess.h"
-#include "ResourceThread.h"
+#include "include/InstanceProcess.h"
+#include "include/Resources.h"
+#include "include/ResourceProcess.h"
+#include "include/ResourceThread.h"
 
 using namespace Core;
 

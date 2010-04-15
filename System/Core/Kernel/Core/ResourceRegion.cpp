@@ -3,11 +3,11 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
-#include "CoreLocal.h"
-#include "Resources.h"	// только для Core::FindResources
+#include "include/Kernel.h"
+#include "include/CoreLocal.h"
+#include "include/Resources.h"	// только для Core::FindResources
 
-#include "ResourceRegion.h"
+#include "include/ResourceRegion.h"
 
 using namespace Core;
 

@@ -7,13 +7,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../List.h"
-#include "../Link.h"
-#include "../Memory.h"
-#include "../Resource.h"
-#include "../ResourceThread.h"
-#include "../SubScheduler.h"
-#include "../SchedulerInactive.h"
+#include "../include/List.h"
+#include "../include/Link.h"
+#include "../include/Memory.h"
+#include "../include/Resource.h"
+#include "../include/ResourceThread.h"
+#include "../include/SubScheduler.h"
+#include "../include/SchedulerInactive.h"
 
 using namespace Core;
 

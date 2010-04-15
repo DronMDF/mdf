@@ -3,14 +3,14 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
+#include "include/Kernel.h"
 
-#include "List.h"
-#include "Memory.h"
-#include "Resource.h"
-#include "ResourceProcess.h"
-#include "ResourceThread.h"
-#include "ResourceCall.h"
+#include "include/List.h"
+#include "include/Memory.h"
+#include "include/Resource.h"
+#include "include/ResourceProcess.h"
+#include "include/ResourceThread.h"
+#include "include/ResourceCall.h"
 
 using namespace Core;
 

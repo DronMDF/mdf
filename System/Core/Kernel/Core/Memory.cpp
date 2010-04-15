@@ -3,11 +3,11 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
-#include "Memory.h"
-#include "Stub.h"
+#include "include/Kernel.h"
+#include "include/Memory.h"
+#include "include/Stub.h"
 
-#include "CoreLocal.h"
+#include "include/CoreLocal.h"
 
 using namespace Core;
 

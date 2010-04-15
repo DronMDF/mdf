@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../Resource.h"
+#include "../include/Resource.h"
 
 class testResource : public Core::Resource
 {

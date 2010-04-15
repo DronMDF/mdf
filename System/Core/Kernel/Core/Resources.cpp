@@ -3,11 +3,11 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
-#include "CoreLocal.h"
-#include "ResourceStorage.h"
+#include "include/Kernel.h"
+#include "include/CoreLocal.h"
+#include "include/ResourceStorage.h"
 
-#include "Resources.h"
+#include "include/Resources.h"
 
 namespace Core {
 

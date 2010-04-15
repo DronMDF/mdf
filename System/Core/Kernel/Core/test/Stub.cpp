@@ -16,8 +16,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Stub.h"
-#include "../Kernel.h"
+#include "../include/Stub.h"
+#include "../include/Kernel.h"
 
 using namespace std;
 

@@ -9,12 +9,12 @@
 
 #include "Types.h"
 
-#include "../CoreLocal.h"
-#include "../Core.h"
+#include "../include/CoreLocal.h"
+#include "../include/Core.h"
 
-#include "../ResourceId.h"
-#include "../ResourceStorage.h"
-#include "../Resources.h"
+#include "../include/ResourceId.h"
+#include "../include/ResourceStorage.h"
+#include "../include/Resources.h"
 
 using namespace std;
 using namespace Core;

@@ -10,14 +10,14 @@
 
 #include "Types.h"
 
-#include "../Core.h"
-#include "../Kernel.h"
-#include "../List.h"
-#include "../Memory.h"
-#include "../InstanceProcess.h"
-#include "../Resource.h"
-#include "../ResourceProcess.h"
-#include "../ResourceThread.h"
+#include "../include/Core.h"
+#include "../include/Kernel.h"
+#include "../include/List.h"
+#include "../include/Memory.h"
+#include "../include/InstanceProcess.h"
+#include "../include/Resource.h"
+#include "../include/ResourceProcess.h"
+#include "../include/ResourceThread.h"
 
 #include "testThread.h"
 #include "testProcess.h"

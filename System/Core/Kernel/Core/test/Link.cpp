@@ -9,8 +9,8 @@
 
 #include "Types.h"
 
-#include "../Link.h"
-#include "../List.h"
+#include "../include/Link.h"
+#include "../include/List.h"
 
 using namespace Core;
 

@@ -8,9 +8,9 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "Types.h"
-#include "../Kernel.h"
-#include "../Core.h"
-#include "../ResourceCall.h"
+#include "../include/Kernel.h"
+#include "../include/Core.h"
+#include "../include/ResourceCall.h"
 
 #include "testResource.h"
 #include "testProcess.h"

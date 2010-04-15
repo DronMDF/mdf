@@ -8,12 +8,12 @@
 
 #include "Types.h"
 
-#include "../Memory.h"
-#include "../Resource.h"
-#include "../ResourceThread.h"
-#include "../List.h"
-#include "../Scheduler.h"
-#include "../SubScheduler.h"
+#include "../include/Memory.h"
+#include "../include/Resource.h"
+#include "../include/ResourceThread.h"
+#include "../include/List.h"
+#include "../include/Scheduler.h"
+#include "../include/SubScheduler.h"
 
 #include "testThread.h"
 #include "testScheduler.h"

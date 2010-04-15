@@ -3,17 +3,17 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Kernel.h"
-#include "CoreLocal.h"
-#include "Scheduler.h"
-#include "CallHelper.h"
-#include "Resources.h"	// Для Core::FindResource
+#include "include/Kernel.h"
+#include "include/CoreLocal.h"
+#include "include/Scheduler.h"
+#include "include/CallHelper.h"
+#include "include/Resources.h"	// Для Core::FindResource
 
-#include "InstanceProcess.h"
-#include "ResourceRegion.h"
-#include "ResourceProcess.h"
-#include "ResourceThread.h"
-#include "ResourceCall.h"
+#include "include/InstanceProcess.h"
+#include "include/ResourceRegion.h"
+#include "include/ResourceProcess.h"
+#include "include/ResourceThread.h"
+#include "include/ResourceCall.h"
 
 using namespace Core;
 

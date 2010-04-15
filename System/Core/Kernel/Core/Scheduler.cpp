@@ -3,14 +3,14 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "List.h"
-#include "Memory.h"
-#include "Resource.h"
-#include "Scheduler.h"
-#include "SubScheduler.h"
-#include "SchedulerActive.h"
-#include "SchedulerInactive.h"
-#include "SchedulerKill.h"
+#include "include/List.h"
+#include "include/Memory.h"
+#include "include/Resource.h"
+#include "include/Scheduler.h"
+#include "include/SubScheduler.h"
+#include "include/SchedulerActive.h"
+#include "include/SchedulerInactive.h"
+#include "include/SchedulerKill.h"
 
 using namespace Core;
 

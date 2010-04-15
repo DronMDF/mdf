@@ -7,8 +7,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Kernel.h"
-#include "../ResourceRegion.h"
+#include "../include/Kernel.h"
+#include "../include/ResourceRegion.h"
 
 #include "TestHelpers.h"
 

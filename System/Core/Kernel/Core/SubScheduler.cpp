@@ -3,11 +3,11 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "List.h"
-#include "Memory.h"
-#include "Resource.h"
-#include "ResourceThread.h"
-#include "SubScheduler.h"
+#include "include/List.h"
+#include "include/Memory.h"
+#include "include/Resource.h"
+#include "include/ResourceThread.h"
+#include "include/SubScheduler.h"
 
 using namespace Core;
 

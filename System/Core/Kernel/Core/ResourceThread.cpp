@@ -3,20 +3,20 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-#include "Stub.h"
-#include "Kernel.h"
+#include "include/Stub.h"
+#include "include/Kernel.h"
 
-#include "CoreLocal.h"	// TODO: Делить на классы
-#include "List.h"
-#include "Memory.h"
-#include "Scheduler.h"
-#include "Resources.h"	// TODO: Устаревающее
+#include "include/CoreLocal.h"	// TODO: Делить на классы
+#include "include/List.h"
+#include "include/Memory.h"
+#include "include/Scheduler.h"
+#include "include/Resources.h"	// TODO: Устаревающее
 
-#include "Instance.h"
-#include "InstanceThread.h"
-#include "Resource.h"
-#include "ResourceProcess.h"
-#include "ResourceThread.h"
+#include "include/Instance.h"
+#include "include/InstanceThread.h"
+#include "include/Resource.h"
+#include "include/ResourceProcess.h"
+#include "include/ResourceThread.h"
 
 using namespace Core;
 

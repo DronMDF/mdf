@@ -8,15 +8,14 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
-#include "../Core.h"
-#include "../Kernel.h"
-#include "../List.h"
-#include "../Memory.h"
-#include "../Instance.h"
-#include "../Resource.h"
-#include "../ResourceRegion.h"
-#include "../ResourceProcess.h"
-#include "../ResourceThread.h"
+#include "../include/Core.h"
+#include "../include/Kernel.h"
+#include "../include/List.h"
+#include "../include/Memory.h"
+#include "../include/Instance.h"
+#include "../include/Resource.h"
+#include "../include/ResourceRegion.h"
+#include "../include/ResourceThread.h"
 
 #include "testProcess.h"
 #include "TestHelpers.h"
