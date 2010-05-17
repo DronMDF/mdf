@@ -68,22 +68,6 @@ bool Instance::inBounds(laddr_t addr) const
 	return region->inBounds(addr, m_addr);
 }
 
-const PageInstance *Instance::PageFault(laddr_t addr, uint32_t *access)
-{
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
-	
-	ResourceRegion *region = m_resource->asRegion();
-	STUB_ASSERT (region == 0, "Instance not for region");
-	STUB_ASSERT (m_addr == 0, "Region not attached");
-	STUB_ASSERT (addr < m_addr || m_addr + region->size() <= addr,
-		"Addr out of region bounds");
-
-	if ((m_access & *access) != *access)
-		return 0;	// Нет соответствующего доступа
-
-	return region->PageFault (addr - m_addr, access);
-}
-
 id_t Instance::id() const
 {
 	return m_resource != 0 ? m_resource->id() : INVALID_ID;

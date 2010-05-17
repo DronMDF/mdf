@@ -6,6 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
+#include "../include/Kernel.h"
 #include "../include/InstanceProcess.h"
 
 using namespace boost;
@@ -17,6 +18,13 @@ BOOST_AUTO_TEST_CASE(testActive)
 {
 	InstanceProcess instance(0, 0, 0);
 	BOOST_REQUIRE(instance.active());
+}
+
+BOOST_AUTO_TEST_CASE(testPageFaultNoResource)
+{
+	InstanceProcess instance(0, 0, 0);
+	uint32_t access = RESOURCE_ACCESS_READ;
+	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

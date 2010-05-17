@@ -23,7 +23,7 @@ public:
 	using Instance::setAddr;
 	
 	using Instance::inBounds;
-	using Instance::PageFault;
+	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 	
 	ResourceThread *Call();
 	int Modify(int paramid, const void *param, size_t size);

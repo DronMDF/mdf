@@ -5,6 +5,7 @@
 
 #include "include/Kernel.h"
 #include "include/Resource.h"
+#include "include/ResourceRegion.h"
 #include "include/InstanceProcess.h"
 
 using namespace Core;
@@ -56,5 +57,19 @@ bool InstanceProcess::active() const
 {
 	return true;
 }
+
+const PageInstance *InstanceProcess::PageFault(laddr_t addr, uint32_t *access)
+{
+	if (resource() == 0) return 0;
+	
+	ResourceRegion *region = resource()->asRegion();
+	if (region == 0) return 0;
+	if (!allow(*access)) return 0;
+	if (this->addr() == 0) return 0;
+	if (!inBounds(addr)) return 0;
+
+	return region->PageFault(addr - this->addr(), access);
+}
+
 
 

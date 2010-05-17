@@ -12,3 +12,8 @@ InstanceRegion::InstanceRegion(Resource *resource, uint32_t access,
 	: Instance(resource, access)
 {
 }
+
+const PageInstance *InstanceRegion::PageFault(laddr_t addr, uint32_t *access)
+{
+	return 0;
+}

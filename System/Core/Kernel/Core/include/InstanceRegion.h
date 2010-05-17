@@ -16,6 +16,8 @@ class InstanceRegion : public Instance
 public:
 	InstanceRegion(Resource *resource, uint32_t access, 
 		       offset_t poffset, size_t psize, offset_t skip);
+		       
+	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 };
 
 } // namespace Core

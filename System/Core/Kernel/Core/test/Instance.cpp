@@ -14,16 +14,20 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteInstance)
 
+struct testInstance : public Instance {
+	testInstance(Resource *r) : Instance(r, 0) {}
+};
+
 BOOST_AUTO_TEST_CASE(testGetResource)
 {
 	Resource *resource = new testResource(); // Ресурс удаляется удалением инстанции
-	Instance instance(resource, 0);
+	testInstance instance(resource);
 	BOOST_REQUIRE_EQUAL(instance.resource(), resource);
 }
 
 BOOST_AUTO_TEST_CASE(testNotActive)
 {
-	Instance instance(0, 0);
+	testInstance instance(0);
 	BOOST_REQUIRE(!instance.active());
 }
 
