@@ -43,8 +43,9 @@ public:
 	Resource *resource() const;
 	id_t id() const;
 	
-	bool allow(uint32_t want) const;
-
+	bool allow(uint32_t access) const;
+	uint32_t getAccess() const { return m_access; } 
+	
 	virtual void event(uint32_t eid);
 	virtual bool active() const;
 };

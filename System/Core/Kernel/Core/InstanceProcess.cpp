@@ -64,7 +64,10 @@ const PageInstance *InstanceProcess::PageFault(laddr_t addr, uint32_t *access)
 	
 	ResourceRegion *region = resource()->asRegion();
 	if (region == 0) return 0;
-	if (!allow(*access)) return 0;
+	if (!allow(*access)) {
+		*access &= getAccess();
+		return 0;
+	}
 	if (this->addr() == 0) return 0;
 	if (!inBounds(addr)) return 0;
 

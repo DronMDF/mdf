@@ -89,9 +89,9 @@ void Instance::event(uint32_t eid)
 	}
 }
 
-bool Instance::allow(uint32_t want) const
+bool Instance::allow(uint32_t access) const
 {
-	return isSet(m_access, want);
+	return isSet(m_access, access);
 }
 
 bool Instance::active() const
