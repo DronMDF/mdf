@@ -8,6 +8,7 @@
 #include "Types.h"
 #include "../include/Kernel.h"
 #include "../include/InstanceProcess.h"
+#include "../include/ResourceProcess.h"
 
 using namespace boost;
 using namespace Core;
@@ -26,5 +27,14 @@ BOOST_AUTO_TEST_CASE(testPageFaultNoResource)
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
 }
+
+BOOST_AUTO_TEST_CASE(testPageFaultResourceIsNotRegion)
+{
+	Resource *notregion = new ResourceProcess(0);
+	InstanceProcess instance(notregion, 0, 0);
+	uint32_t access = RESOURCE_ACCESS_READ;
+	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
