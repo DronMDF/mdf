@@ -55,7 +55,7 @@ public:
 
 	bool inBounds(laddr_t addr, laddr_t base = 0) const;
 
-	const PageInstance *PageFault(offset_t offset, uint32_t *access);
+	virtual const PageInstance *PageFault(offset_t offset, uint32_t *access);
 
 	size_t size() const;
 	offset_t offset() const;
