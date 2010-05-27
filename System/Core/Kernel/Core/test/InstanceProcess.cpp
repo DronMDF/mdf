@@ -28,6 +28,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultNoResource)
 	InstanceProcess instance(0, 0, 0);
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
+	BOOST_REQUIRE(!instance.inBounds(500));
 }
 
 BOOST_AUTO_TEST_CASE(testPageFaultResourceIsNotRegion)
@@ -36,6 +37,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultResourceIsNotRegion)
 	InstanceProcess instance(notregion, 0, 0);
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
+	BOOST_REQUIRE(!instance.inBounds(1000));
 }
 
 BOOST_AUTO_TEST_CASE(testPageFaultRegionNoAccess)
@@ -67,7 +69,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionSuccess)
 {
 	struct testRegion : public ResourceRegion, visit_mock {
 		testRegion(): ResourceRegion(1000, RESOURCE_ACCESS_READ) {}
-		virtual const PageInstance *PageFault(offset_t offset, uint32_t *access) {
+		virtual const PageInstance *PageFault(offset_t, uint32_t *) {
 			visit(); return reinterpret_cast<PageInstance *>(666);
 		}
 	};
@@ -76,6 +78,15 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionSuccess)
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(PAGE_SIZE + 30, &access) == 
 		reinterpret_cast<const PageInstance *>(666));
+}
+
+BOOST_AUTO_TEST_CASE(testBounds)
+{
+	Resource *region = new ResourceRegion(1000, 0);
+	InstanceProcess instance(region, RESOURCE_ACCESS_READ, PAGE_SIZE);
+	BOOST_REQUIRE(!instance.inBounds(PAGE_SIZE - 500));
+	BOOST_REQUIRE(!instance.inBounds(PAGE_SIZE + 1500));
+	BOOST_REQUIRE(instance.inBounds(PAGE_SIZE + 500));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

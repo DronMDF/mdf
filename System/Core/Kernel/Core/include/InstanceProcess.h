@@ -14,15 +14,18 @@ class Resource;
 class ResourceThread;
 
 class InstanceProcess : public Instance {
+private:
+	uint32_t m_addr;
+	
 public:
 	Link<InstanceProcess> ProcessLink;
 	
 	InstanceProcess(Resource *resource, uint32_t access, laddr_t base);
 
-	using Instance::addr;
-	using Instance::setAddr;
+	laddr_t addr() const;
+	void setAddr(laddr_t addr);
 	
-	using Instance::inBounds;
+	bool inBounds(laddr_t addr) const;
 	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 	
 	ResourceThread *Call();

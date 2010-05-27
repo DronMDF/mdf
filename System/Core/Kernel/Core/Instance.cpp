@@ -33,41 +33,6 @@ Instance::~Instance()
 	}
 }
 
-laddr_t Instance::addr() const
-{
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
-	STUB_ASSERT(m_resource->asRegion() == 0, "getAddr from no region instance");
-	return m_addr;
-}
-
-void Instance::setAddr(laddr_t addr)
-{
-	STUB_ASSERT(m_addr != 0, "Adress already defined");
-	if (m_resource == 0) return;
-	
-	if (const ResourceRegion *region = m_resource->asRegion()) {
-		m_addr = addr;
-		STUB_ASSERT((m_addr - region->offset()) % PAGE_SIZE != 0,
-			    "Unaligned region base");
-	}
-}
-
-bool Instance::inBounds(laddr_t addr) const
-{
-	STUB_ASSERT(m_resource == 0, "No resource for instance");
-
-	const ResourceRegion *region = m_resource->asRegion();
-	if (region == 0)
-		return false;	// Не регион
-
-	if (m_addr == 0) {
-		CorePrint ("Not mapped region\n");
-		return false;	// Не замаплен
-	}
-
-	return region->inBounds(addr, m_addr);
-}
-
 id_t Instance::id() const
 {
 	return m_resource != 0 ? m_resource->id() : INVALID_ID;
