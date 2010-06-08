@@ -16,23 +16,35 @@ using namespace Core;
 BOOST_AUTO_TEST_SUITE(suiteInstanceRegion)
 
 struct fixtureInstanceRegion {
-	enum {	MOTHER_SIZE = 10000,
+	enum {	
+		INSTANCE_OFFSET = 8000,
+		INSTANCE_ACCESS = RESOURCE_ACCESS_READ,
+		
+		MOTHER_SIZE = 10000,
 		MOTHER_OFFSET = 1000,
 		MOTHER_WINDOW = 3000,
-		MOTHER_POSITION = 1000 };
+		MOTHER_ACCESS = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE
+	};
 	InstanceRegion instance;
 	fixtureInstanceRegion()
-		: instance(new ResourceRegion(MOTHER_SIZE, RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE), 
-			   RESOURCE_ACCESS_READ, MOTHER_OFFSET, MOTHER_WINDOW, MOTHER_POSITION)
+		: instance(new ResourceRegion(MOTHER_SIZE, MOTHER_ACCESS), 
+			   INSTANCE_ACCESS, MOTHER_OFFSET, MOTHER_WINDOW, INSTANCE_OFFSET)
 	{ }
 };
 
 BOOST_FIXTURE_TEST_CASE(testInBounds, fixtureInstanceRegion)
 {
-	BOOST_REQUIRE(!instance.inBounds(MOTHER_POSITION - 1));
-	BOOST_REQUIRE(!instance.inBounds(MOTHER_POSITION + MOTHER_WINDOW));
-	BOOST_REQUIRE(instance.inBounds(MOTHER_POSITION));
-	BOOST_REQUIRE(instance.inBounds(MOTHER_POSITION + MOTHER_WINDOW - 1));
+	BOOST_REQUIRE(!instance.inBounds(INSTANCE_OFFSET - 1));
+	BOOST_REQUIRE(!instance.inBounds(INSTANCE_OFFSET + MOTHER_WINDOW));
+	BOOST_REQUIRE(instance.inBounds(INSTANCE_OFFSET));
+	BOOST_REQUIRE(instance.inBounds(INSTANCE_OFFSET + MOTHER_WINDOW - 1));
+}
+
+BOOST_FIXTURE_TEST_CASE(testPageFaultAccessDeny, fixtureInstanceRegion)
+{
+	uint32_t access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE;
+	BOOST_REQUIRE(instance.PageFault(INSTANCE_OFFSET, &access) == 0);
+	BOOST_REQUIRE_EQUAL(access, uint32_t(INSTANCE_ACCESS));
 }
 
 // BOOST_AUTO_TEST_CASE(testPageFault)

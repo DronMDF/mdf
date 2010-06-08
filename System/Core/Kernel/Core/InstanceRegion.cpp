@@ -19,5 +19,10 @@ bool InstanceRegion::inBounds(laddr_t addr) const
 
 const PageInstance *InstanceRegion::PageFault(laddr_t addr, uint32_t *access)
 {
+	if (!allow(*access)) {
+		*access &= getAccess();
+		return 0;
+	}
+	
 	return 0;
 }
