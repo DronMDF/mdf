@@ -15,24 +15,26 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteInstanceRegion)
 
+enum {	
+	INSTANCE_OFFSET = 8000,
+	INSTANCE_ACCESS = RESOURCE_ACCESS_READ,
+	
+	MOTHER_SIZE = 10000,
+	MOTHER_OFFSET = 1000,
+	MOTHER_WINDOW = 3000,
+	MOTHER_ACCESS = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE
+};
+
+template <typename R = ResourceRegion>
 struct fixtureInstanceRegion {
-	enum {	
-		INSTANCE_OFFSET = 8000,
-		INSTANCE_ACCESS = RESOURCE_ACCESS_READ,
-		
-		MOTHER_SIZE = 10000,
-		MOTHER_OFFSET = 1000,
-		MOTHER_WINDOW = 3000,
-		MOTHER_ACCESS = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE
-	};
 	InstanceRegion instance;
 	fixtureInstanceRegion()
-		: instance(new ResourceRegion(MOTHER_SIZE, MOTHER_ACCESS), 
+		: instance(new R(MOTHER_SIZE, MOTHER_ACCESS), 
 			   INSTANCE_ACCESS, MOTHER_OFFSET, MOTHER_WINDOW, INSTANCE_OFFSET)
 	{ }
 };
 
-BOOST_FIXTURE_TEST_CASE(testInBounds, fixtureInstanceRegion)
+BOOST_FIXTURE_TEST_CASE(testInBounds, fixtureInstanceRegion<>)
 {
 	BOOST_REQUIRE(!instance.inBounds(INSTANCE_OFFSET - 1));
 	BOOST_REQUIRE(!instance.inBounds(INSTANCE_OFFSET + MOTHER_WINDOW));
@@ -40,31 +42,28 @@ BOOST_FIXTURE_TEST_CASE(testInBounds, fixtureInstanceRegion)
 	BOOST_REQUIRE(instance.inBounds(INSTANCE_OFFSET + MOTHER_WINDOW - 1));
 }
 
-BOOST_FIXTURE_TEST_CASE(testPageFaultAccessDeny, fixtureInstanceRegion)
+BOOST_FIXTURE_TEST_CASE(testPageFaultAccessDeny, fixtureInstanceRegion<>)
 {
 	uint32_t access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE;
 	BOOST_REQUIRE(instance.PageFault(INSTANCE_OFFSET, &access) == 0);
 	BOOST_REQUIRE_EQUAL(access, uint32_t(INSTANCE_ACCESS));
 }
 
-// BOOST_AUTO_TEST_CASE(testPageFault)
-// {
-// 	const size_t parent_size = 10000;
-// 	const size_t parent_window_offset = 2000;
-// 	const size_t parent_window_size = 5000;
-// 	const size_t child_size = 20000;
-// 	
-// 	Resource *region = new ResourceRegion(parent_size, 
-// 				RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE);
-// 				
-// 	// Необходимость позиционировать регион без биндинга - пока не определилась
-// 	InstanceRegion instance(region, RESOURCE_ACCESS_READ, 
-// 		parent_window_offset, parent_window_size, child_size - parent_size);
-// 	
-// 	// Инстанция должна ограничить права чтением
-// 	uint32_t access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE;
-// 	BOOST_WARN(instance.PageFault(child_size - parent_size + parent_window_offset, &access));
-// 	BOOST_WARN_EQUAL(access, RESOURCE_ACCESS_READ);
-// }
+struct MockRegion : public ResourceRegion {
+	static PageInstance page;
+	MockRegion(size_t size, uint32_t access) : ResourceRegion(size, access) {}
+	virtual const PageInstance *PageFault(offset_t offset, uint32_t *) {
+		BOOST_REQUIRE_EQUAL(offset, offset_t(MOTHER_OFFSET));
+		return &page;
+	}
+};
+
+PageInstance MockRegion::page;
+
+BOOST_FIXTURE_TEST_CASE(testPageFault, fixtureInstanceRegion<MockRegion>)
+{
+	uint32_t access = RESOURCE_ACCESS_READ;
+	BOOST_REQUIRE_EQUAL(instance.PageFault(INSTANCE_OFFSET, &access), &MockRegion::page);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

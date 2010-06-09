@@ -4,6 +4,7 @@
 //
 
 #include "include/InstanceRegion.h"
+#include "include/ResourceRegion.h"
 
 using namespace Core;
 
@@ -22,6 +23,13 @@ const PageInstance *InstanceRegion::PageFault(laddr_t addr, uint32_t *access)
 	if (!allow(*access)) {
 		*access &= getAccess();
 		return 0;
+	}
+	
+	STUB_ASSERT(addr < m_position, "Check bounds first");
+	if (Resource *res = resource()) {
+		if (ResourceRegion *region = res->asRegion()) {
+			return region->PageFault(addr - m_position + m_offset, access);
+		}
 	}
 	
 	return 0;

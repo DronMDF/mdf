@@ -62,3 +62,4 @@ struct StubStackFrame {
 void TestIncrementCurrentClock(tick_t increment);
 void TestSetStubTaskDestroyReaction(int react);
 
+struct _PageInstance {};
