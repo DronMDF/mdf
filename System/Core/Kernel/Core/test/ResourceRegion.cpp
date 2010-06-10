@@ -119,4 +119,12 @@ BOOST_FIXTURE_TEST_CASE(testCopyInOverload, RegionFixture1)
 // 	BOOST_REQUIRE_EQUAL(region.offset(), offset_t(OFFSET));
 // }
 
+BOOST_AUTO_TEST_CASE(testBindRegionPageFault)
+{
+	// TODO:
+	// Создать тестовый регион
+	// Забиндить его к подставному региону с отладкой.
+	// Вызвать пейджфолт и посмотреть как это будет.
+}
+
 BOOST_AUTO_TEST_SUITE_END()
