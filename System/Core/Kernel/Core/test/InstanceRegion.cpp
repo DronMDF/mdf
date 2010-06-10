@@ -9,6 +9,7 @@
 #include "../include/Kernel.h"
 #include "../include/ResourceRegion.h"
 #include "../include/InstanceRegion.h"
+#include "TestHelpers.h"
 
 using namespace boost;
 using namespace Core;
@@ -49,10 +50,11 @@ BOOST_FIXTURE_TEST_CASE(testPageFaultAccessDeny, fixtureInstanceRegion<>)
 	BOOST_REQUIRE_EQUAL(access, uint32_t(INSTANCE_ACCESS));
 }
 
-struct MockRegion : public ResourceRegion {
+struct MockRegion : public ResourceRegion, private visit_mock {
 	static PageInstance page;
 	MockRegion(size_t size, uint32_t access) : ResourceRegion(size, access) {}
 	virtual const PageInstance *PageFault(offset_t offset, uint32_t *) {
+		visit();
 		BOOST_REQUIRE_EQUAL(offset, offset_t(MOTHER_OFFSET));
 		return &page;
 	}

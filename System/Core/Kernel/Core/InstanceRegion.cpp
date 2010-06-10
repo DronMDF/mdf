@@ -25,12 +25,13 @@ const PageInstance *InstanceRegion::PageFault(laddr_t addr, uint32_t *access)
 		return 0;
 	}
 	
-	STUB_ASSERT(addr < m_position, "Check bounds first");
+	STUB_ASSERT(addr < m_position || addr >= m_position + m_size, "Check bounds first");
+	
 	if (Resource *res = resource()) {
 		if (ResourceRegion *region = res->asRegion()) {
 			return region->PageFault(addr - m_position + m_offset, access);
 		}
 	}
 	
-	return 0;
+	STUB_FATAL("Invalid pagefault");
 }
