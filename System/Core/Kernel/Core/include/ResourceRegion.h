@@ -43,8 +43,6 @@ private:
 protected:
 	virtual Memory *getMemory();
 	
-	int bindRegion(ResourceRegion *parent, offset_t poffset, 
-		       size_t psize, offset_t skip);
 	int bindPhysical(paddr_t poffset, size_t psize, offset_t skip);
 	
 public:
@@ -61,6 +59,9 @@ public:
 	offset_t offset() const;
 
 	virtual bool copyIn(offset_t offset, const void *src, size_t size);
+
+	int bindRegion(ResourceRegion *parent, offset_t poffset, 
+		       size_t psize, offset_t skip);
 };
 
 } // namespace Core

@@ -119,12 +119,36 @@ BOOST_FIXTURE_TEST_CASE(testCopyInOverload, RegionFixture1)
 // 	BOOST_REQUIRE_EQUAL(region.offset(), offset_t(OFFSET));
 // }
 
+enum {
+	MOTHER_SIZE = 3000,
+	MOTHER_OFFSET = 1000,
+	WINDOW_SIZE = 2000,
+	REGION_SIZE = 10000,
+	BIND_OFFSET = 5000
+};
+
+struct testFoltedRegion : public ResourceRegion, private visit_mock {
+	static PageInstance page;
+	testFoltedRegion() : ResourceRegion(MOTHER_SIZE, RESOURCE_ACCESS_READ) {}
+	virtual const PageInstance *PageFault(offset_t offset, uint32_t *) {
+		visit(); return (offset == MOTHER_OFFSET) ? &page : 0;
+	}
+};
+
+PageInstance testFoltedRegion::page;
+
 BOOST_AUTO_TEST_CASE(testBindRegionPageFault)
 {
 	// TODO:
 	// Создать тестовый регион
+	ResourceRegion region(REGION_SIZE, RESOURCE_ACCESS_READ);
 	// Забиндить его к подставному региону с отладкой.
+	ResourceRegion *mother = new testFoltedRegion();
+	region.bindRegion(mother, MOTHER_OFFSET, WINDOW_SIZE, BIND_OFFSET);
+	
 	// Вызвать пейджфолт и посмотреть как это будет.
+	uint32_t access = 0;
+	BOOST_REQUIRE_EQUAL(region.PageFault(BIND_OFFSET, &access), &testFoltedRegion::page);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
