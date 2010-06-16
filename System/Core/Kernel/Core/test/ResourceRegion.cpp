@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(testBindRegionPageFault)
 	ResourceRegion region(REGION_SIZE, RESOURCE_ACCESS_READ);
 	// Забиндить его к подставному региону с отладкой.
 	ResourceRegion *mother = new testFoltedRegion();
-	region.bindRegion(mother, MOTHER_OFFSET, WINDOW_SIZE, BIND_OFFSET);
+	BOOST_REQUIRE_EQUAL(region.bindRegion(mother, MOTHER_OFFSET, WINDOW_SIZE, BIND_OFFSET), SUCCESS);
 	
 	// Вызвать пейджфолт и посмотреть как это будет.
 	uint32_t access = 0;

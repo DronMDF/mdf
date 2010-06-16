@@ -70,12 +70,13 @@ int ResourceRegion::bindPhysical(paddr_t poffset, size_t psize, offset_t skip)
 // skip			     ------|	|	<- смещение в регионе.
 
 int ResourceRegion::bindRegion(ResourceRegion *parent, offset_t poffset, 
-			       size_t psize, offset_t skip)
+			       size_t psize, offset_t position)
 {
 	if (m_binded) return ERROR_BUSY;
-	if (skip + psize > m_size) return ERROR_INVALIDPARAM;
+	if (position + psize > m_size) return ERROR_INVALIDPARAM;
 	if (poffset + psize > parent->size()) return ERROR_INVALIDPARAM;
 
+	// TODO: Здесь не учитывается position!
 	m_offset = (parent->offset() + poffset) % PAGE_SIZE;
 	
 	// Лучше прикапывать идентификатор, а то ресурс удалят и все, или вязать 
