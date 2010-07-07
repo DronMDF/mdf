@@ -141,14 +141,14 @@ BOOST_AUTO_TEST_CASE(testBindRegionPageFault)
 {
 	// TODO:
 	// Создать тестовый регион
-	ResourceRegion region(REGION_SIZE, RESOURCE_ACCESS_READ);
-	// Забиндить его к подставному региону с отладкой.
-	ResourceRegion *mother = new testFoltedRegion();
-	BOOST_REQUIRE_EQUAL(region.bindRegion(mother, MOTHER_OFFSET, WINDOW_SIZE, BIND_OFFSET), SUCCESS);
-	
-	// Вызвать пейджфолт и посмотреть как это будет.
-	uint32_t access = 0;
-	BOOST_REQUIRE_EQUAL(region.PageFault(BIND_OFFSET, &access), &testFoltedRegion::page);
+// 	ResourceRegion region(REGION_SIZE, RESOURCE_ACCESS_READ);
+// 	// Забиндить его к подставному региону с отладкой.
+// 	ResourceRegion *mother = new testFoltedRegion();
+// 	BOOST_REQUIRE_EQUAL(region.bindRegion(mother, MOTHER_OFFSET, WINDOW_SIZE, BIND_OFFSET), SUCCESS);
+// 	
+// 	// Вызвать пейджфолт и посмотреть как это будет.
+// 	uint32_t access = 0;
+// 	BOOST_REQUIRE_EQUAL(region.PageFault(BIND_OFFSET, &access), &testFoltedRegion::page);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
