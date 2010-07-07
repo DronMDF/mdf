@@ -140,3 +140,6 @@ void StubInterruptAcknowledge (int irq);
 // Эти функции мне не очень нравятся...
 #define	round(v, d)	((d) > 0 ? ((v) - (v) % (d)) : (v))
 #define	round_up(v, d)	round((v) + (d) - 1, d)
+
+#define min(a, b)      ((a) < (b) ? (a) : (b))
+#define max(a, b)      ((a) > (b) ? (a) : (b))

@@ -3,7 +3,6 @@
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
-// Stub.h, который следует преобразовать в Types.h инклюдится с командной строки.
 #include <Stub.h>
 #include <Core.h>
 #include <Kernel.h>
@@ -28,7 +27,6 @@ extern void __data_end;
 extern void __bss_begin;
 extern void __bss_end;
 
-#define min(a, b)      ((a) < (b) ? (a) : (b))
 #define offsetof(type, field)  ((unsigned long)(&(((type *)0)->field)))
 
 // -----------------------------------------------------------------------------

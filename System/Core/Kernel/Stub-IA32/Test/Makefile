@@ -25,7 +25,7 @@ $(MDF_TEMP)/Runner: $(OBJECTS)
 
 $(MDF_TEMP)/test_%.o : %.cpp $(wildcard *.h ../*.h ../*.c)
 	$(ECHO) Compile for localhost test/$<...
-	$(HOST_CXX) $(HOST_CXXFLAGS) $(IFLAGS) -c -o $@ $<
+	$(HOST_CXX) $(HOST_CXXFLAGS) $(IFLAGS) -Wno-effc++ -c -o $@ $<
 
 $(MDF_TEMP)/stub_%.o : ../%.c $(wildcard ../*.h)
 	$(ECHO) Compile for localhost $(notdir $<)...
