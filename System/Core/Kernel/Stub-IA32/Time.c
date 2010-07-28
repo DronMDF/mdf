@@ -18,7 +18,7 @@
 // http://en.wikipedia.org/wiki/Intel_8253
 
 static
-device_t i825x_device = {
+const device_t i825x_device = {
 	.io_base = 0x40,
 	.io_last = 0x4f,
 };
