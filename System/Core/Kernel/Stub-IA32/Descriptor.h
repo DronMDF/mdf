@@ -56,6 +56,20 @@ enum DESCRIPTOR_TYPE {
 	DESCRIPTOR_TYPE		= 0x01f,	// Маска
 };
 
+
+enum SELECTOR_PL {
+	SELECTOR_RPL0	= 0,
+	SELECTOR_RPL1	= 1,
+	SELECTOR_RPL2	= 2,
+	SELECTOR_RPL3	= 3,
+};
+
+#define KERNEL_CODE_SELECTOR	((1 * sizeof (descriptor_t)) | SELECTOR_RPL0)
+#define KERNEL_DATA_SELECTOR	((2 * sizeof (descriptor_t)) | SELECTOR_RPL0)
+
+#define USER_CODE_SELECTOR	((4 * sizeof (descriptor_t)) | SELECTOR_RPL3)
+#define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
+
 void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags);
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 laddr_t StubGetSegmentBase(int di);

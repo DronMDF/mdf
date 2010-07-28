@@ -207,8 +207,8 @@ void __init__ StubInit (const MultibootInfo * const info)
 	// Страничный режим
 	StubPageInitMode ();
 
-	//CorePrint ("Kernel used %b\n", StubKernelPagesCnt() * PAGE_SIZE);
-	//CorePrint ("Heap reserve %b\n", StubMemoryReserve());
+	CorePrint ("Kernel used %b\n", StubKernelPagesCnt() * PAGE_SIZE);
+	CorePrint ("Heap reserve %b\n", StubMemoryReserve());
 
 	StubMemoryInitWork (&__bss_end, KERNEL_TEMP_BASE - v2laddr(&__bss_end));
 	//CorePrint ("Heap reserve after enlarge %b\n", StubMemoryReserve());
