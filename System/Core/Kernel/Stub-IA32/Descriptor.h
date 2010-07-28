@@ -55,3 +55,9 @@ enum DESCRIPTOR_TYPE {
 
 	DESCRIPTOR_TYPE		= 0x01f,	// Маска
 };
+
+void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags);
+void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
+laddr_t StubGetSegmentBase(int di);
+size_t StubGetSegmentSize(int di);
+int StubGetSegmentFlags(int di);

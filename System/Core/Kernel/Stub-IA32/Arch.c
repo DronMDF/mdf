@@ -58,8 +58,8 @@ enum SELECTOR_PL {
 #define STUB_MAX_TASK_COUNT	4096
 #define STUB_MAX_CPU_COUNT	2048
 
-static volatile descriptor_t *GDT = nullptr;
-static volatile tick_t *task_time = nullptr;
+volatile descriptor_t *GDT = NULL;
+static volatile tick_t *task_time = NULL;
 
 enum GDT_IDX {
 	GDT_CPU_BASE	= 2048,
@@ -70,66 +70,6 @@ enum GDT_IDX {
 STATIC_ASSERT (GDT_CPU_BASE + STUB_MAX_CPU_COUNT == GDT_TASK_BASE);
 STATIC_ASSERT (GDT_TASK_BASE + STUB_MAX_TASK_COUNT == GDT_SIZE);
 
-// Эта функция работает только с GDT
-static
-void StubSetSegmentDescriptor (unsigned int di, laddr_t base, size_t size, unsigned int flags)
-{
-	STUB_ASSERT (GDT == nullptr, "nullptr GDT, init first");
-	STUB_ASSERT (isSet(flags, DESCRIPTOR_GRANULARITY), "Manual granularity forbidden");
-
-	GDT[di].raw = 0;
-
-	GDT[di].segment.baselo = base & 0x00ffffff;
-	GDT[di].segment.basehi = (base & 0xff000000) >> 24;
-
-	if (size == 0) {
-		// TODO: Зачем передавать ноль, если у нас есть тип sizex_t?
-		// полный флат
-		flags |= DESCRIPTOR_GRANULARITY;
-		size = 0x100000000L / PAGE_SIZE;
-	} else if (size >= 0x100000) {
-		flags |= DESCRIPTOR_GRANULARITY;
-		size = (size + PAGE_SIZE - 1) / PAGE_SIZE;
-	}
-
-	const size_t limit = size - 1;
-	GDT[di].segment.limitlo =  limit & 0x0ffff;
-	GDT[di].segment.limithi = (limit & 0xf0000) >> 16;
-
-	flags |= DESCRIPTOR_PRESENT;
-	GDT[di].segment.flagslo =  flags & 0x0ff;
-	GDT[di].segment.flagshi = (flags & 0xf00) >> 8;
-}
-
-static
-void __init__ StubSetSegmentDescriptorBySelector (unsigned int selector,
-	laddr_t base, size_t size, unsigned int flags)
-{
-	const unsigned int di = selector / sizeof (descriptor_t);
-	StubSetSegmentDescriptor (di, base, size, flags);
-}
-
-static
-laddr_t StubGetSegmentBase (unsigned int di)
-{
-	return (GDT[di].segment.basehi << 24) | GDT[di].segment.baselo;
-}
-
-static
-size_t StubGetSegmentSize (unsigned int di)
-{
-	size_t size = (GDT[di].segment.limitlo | (GDT[di].segment.limithi << 16)) + 1;
-	if (isSet(GDT[di].segment.flagshi, DESCRIPTOR_GRANULARITY >> 8))
-		size *= PAGE_SIZE;
-	return size;
-}
-
-static
-unsigned long StubGetSegmentFlags (unsigned int di)
-{
-	return GDT[di].segment.flagslo | (GDT[di].segment.flagshi << 8);
-}
-
 static
 void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
 {
@@ -138,7 +78,7 @@ void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
 	const int di = GDT_CPU_BASE + ci;
 	STUB_ASSERT (GDT[di].raw != 0, "Busy CPU slot");
 
-	StubSetSegmentDescriptor (di, base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+	StubSetSegmentDescriptor(di, base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
 }
 
 uint32_t StubGetSelectorCPU (const unsigned int ci)

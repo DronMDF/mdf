@@ -9,6 +9,10 @@
 
 #define nullptr ((void *)0)
 
+#ifndef NULL
+	#define NULL ((void *)0)
+#endif
+
 #define VIDEO0_PAGE	0xb8000
 
 int StubGetChar (void);
