@@ -5,6 +5,10 @@
 
 extern "C" {
 
+#include "../Descriptor.h"
+	
+volatile descriptor_t *GDT = NULL;
+
 void __init_begin() {}
 void __bss_end() {}
 

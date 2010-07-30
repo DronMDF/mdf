@@ -9,6 +9,32 @@
 
 extern volatile descriptor_t *GDT;
 
+descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
+{
+	descriptor_t descriptor = { .raw = 0 };
+
+	descriptor.segment.baselo = base & 0x00ffffff;
+	descriptor.segment.basehi = (base & 0xff000000) >> 24;
+
+	if (size == 0) {
+		// TODO: Зачем передавать ноль, если у нас есть тип sizex_t?
+		// полный флат
+		flags |= DESCRIPTOR_GRANULARITY;
+		size = 0x100000000L / PAGE_SIZE;
+	} else if (size > 0x100000) {
+		flags |= DESCRIPTOR_GRANULARITY;
+		size = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+	}
+
+	const size_t limit = size - 1;
+	descriptor.segment.limitlo =  limit & 0x0ffff;
+	descriptor.segment.limithi = (limit & 0xf0000) >> 16;
+
+	// TODO: Новая реализация возвращает дескриптор, докопипастить.
+	
+	return descriptor;
+}
+
 void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags)
 {
 	STUB_ASSERT (GDT == NULL, "nullptr GDT, init first");

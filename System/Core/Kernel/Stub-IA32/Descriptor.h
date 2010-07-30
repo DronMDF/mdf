@@ -33,14 +33,14 @@ STATIC_ASSERT (sizeof (descriptor_t) == 8);
 enum DESCRIPTOR_FLAGS {
 	DESCRIPTOR_PRESENT	= 0x080,
 	DESCRIPTOR_USE32 	= 0x400,
-	DESCRIPTOR_GRANULARITY	= 0x800,
+	DESCRIPTOR_GRANULARITY	= 0x800
 };
 
 enum DESCRIPTOR_PL {
 	DESCRIPTOR_PL0		= 0 << 5,
 	DESCRIPTOR_PL1		= 1 << 5,
 	DESCRIPTOR_PL2		= 2 << 5,
-	DESCRIPTOR_PL3		= 3 << 5,
+	DESCRIPTOR_PL3		= 3 << 5
 };
 
 // Чтобы со сдвигами не намудрить :)
@@ -53,7 +53,7 @@ enum DESCRIPTOR_TYPE {
 	DESCRIPTOR_DATA		= 0x012,
 	DESCRIPTOR_CODE		= 0x018,
 
-	DESCRIPTOR_TYPE		= 0x01f,	// Маска
+	DESCRIPTOR_TYPE		= 0x01f	// Маска
 };
 
 
@@ -61,7 +61,7 @@ enum SELECTOR_PL {
 	SELECTOR_RPL0	= 0,
 	SELECTOR_RPL1	= 1,
 	SELECTOR_RPL2	= 2,
-	SELECTOR_RPL3	= 3,
+	SELECTOR_RPL3	= 3
 };
 
 #define KERNEL_CODE_SELECTOR	((1 * sizeof (descriptor_t)) | SELECTOR_RPL0)
@@ -70,7 +70,8 @@ enum SELECTOR_PL {
 #define USER_CODE_SELECTOR	((4 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 #define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 
-void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags);
+descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags);
+void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags) __deprecated__;
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 laddr_t StubGetSegmentBase(int di);
 size_t StubGetSegmentSize(int di);
