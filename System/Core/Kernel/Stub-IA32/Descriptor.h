@@ -72,6 +72,7 @@ enum SELECTOR_PL {
 
 descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags);
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
-laddr_t StubGetSegmentBase(int di);
-size_t StubGetSegmentSize(int di);
-int StubGetSegmentFlags(int di);
+laddr_t StubGetSegmentBase(descriptor_t descriptor);
+size_t StubGetSegmentSize(int di) __deprecated__;
+int StubGetSegmentFlags(int di) __deprecated__;
+

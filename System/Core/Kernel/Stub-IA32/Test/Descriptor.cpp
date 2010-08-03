@@ -42,4 +42,12 @@ BOOST_AUTO_TEST_CASE(testFlags)
 	BOOST_REQUIRE_EQUAL(desc.raw, 0x0070ff0000000000LL);
 }
 
+BOOST_AUTO_TEST_CASE(testGetBase)
+{
+	const laddr_t  base = 0x12345678;;
+	descriptor_t desc = StubGenerateSegmentDescriptor(base, 1, 0);
+	BOOST_REQUIRE_EQUAL(StubGetSegmentBase(desc), base);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -204,7 +204,7 @@ tss_t *StubGetTaskContextBySlot (unsigned int slot)
 
 	const unsigned int di = GDT_TASK_BASE + slot;
 
-	tss_t *tss = l2vptr(StubGetSegmentBase (di));
+	tss_t *tss = l2vptr(StubGetSegmentBase(GDT[di]));
 	STUB_ASSERT (v2laddr(tss) < v2laddr(&__bss_end) || KERNEL_TEMP_BASE <= v2laddr(tss),
 		"Invalid TSS");
 

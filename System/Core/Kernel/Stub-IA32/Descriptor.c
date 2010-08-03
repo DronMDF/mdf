@@ -36,15 +36,16 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 	return descriptor;
 }
 
+// TODO: Эта функция вообще здесь не к месту.
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags)
 {
 	const unsigned int di = selector / sizeof (descriptor_t);
 	GDT[di] = StubGenerateSegmentDescriptor(base, size, flags);
 }
 
-laddr_t StubGetSegmentBase(int di)
+laddr_t StubGetSegmentBase(descriptor_t descriptor)
 {
-	return (GDT[di].segment.basehi << 24) | GDT[di].segment.baselo;
+	return (descriptor.segment.basehi << 24) | descriptor.segment.baselo;
 }
 
 size_t StubGetSegmentSize(int di)
