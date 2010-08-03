@@ -17,8 +17,7 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 	descriptor.segment.basehi = (base & 0xff000000) >> 24;
 
 	if (size == 0) {
-		// TODO: Зачем передавать ноль, если у нас есть тип sizex_t?
-		// полный флат
+		// Полный flat
 		flags |= DESCRIPTOR_GRANULARITY;
 		size = 0x100000000L / PAGE_SIZE;
 	} else if (size > 0x100000) {
@@ -30,7 +29,9 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 	descriptor.segment.limitlo =  limit & 0x0ffff;
 	descriptor.segment.limithi = (limit & 0xf0000) >> 16;
 
-	// TODO: Новая реализация возвращает дескриптор, докопипастить.
+	flags |= DESCRIPTOR_PRESENT;
+	descriptor.segment.flagslo =  flags & 0x0ff;
+	descriptor.segment.flagshi = (flags & 0xf00) >> 8;
 	
 	return descriptor;
 }
