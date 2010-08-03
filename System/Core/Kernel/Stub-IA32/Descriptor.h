@@ -71,7 +71,6 @@ enum SELECTOR_PL {
 #define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 
 descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags);
-void StubSetSegmentDescriptor(int di, laddr_t base, size_t size, int flags) __deprecated__;
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 laddr_t StubGetSegmentBase(int di);
 size_t StubGetSegmentSize(int di);

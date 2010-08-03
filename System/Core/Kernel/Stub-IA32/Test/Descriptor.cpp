@@ -1,3 +1,7 @@
+//
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
+//
 
 extern "C" {
 #include "../Descriptor.h"
@@ -37,8 +41,5 @@ BOOST_AUTO_TEST_CASE(testFlags)
 	descriptor_t desc = StubGenerateSegmentDescriptor(0, 1, 0x77F);
 	BOOST_REQUIRE_EQUAL(desc.raw, 0x0070ff0000000000LL);
 }
-
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

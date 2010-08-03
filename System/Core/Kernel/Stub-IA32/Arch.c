@@ -64,7 +64,7 @@ void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
 	const int di = GDT_CPU_BASE + ci;
 	STUB_ASSERT (GDT[di].raw != 0, "Busy CPU slot");
 
-	StubSetSegmentDescriptor(di, base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+	GDT[di] = StubGenerateSegmentDescriptor(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
 }
 
 uint32_t StubGetSelectorCPU (const unsigned int ci)
@@ -186,7 +186,7 @@ void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
 
 	const int di = GDT_TASK_BASE + ti;
-	StubSetSegmentDescriptor (di, base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+	GDT[di] = StubGenerateSegmentDescriptor(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
 }
 
 uint32_t StubGetSelectorTask (const unsigned int ti)
