@@ -6,6 +6,8 @@
 #pragma once
 
 typedef union {
+	// TODO: стоит отказаться от 4-х битовых полей - варнинги
+
 	struct {
 		unsigned int limitlo:16;
 		unsigned int baselo:24;
@@ -75,5 +77,4 @@ size_t StubDescriptorGetSize(const descriptor_t descriptor);
 
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 laddr_t StubGetSegmentBase(int di);
-size_t StubGetSegmentSize(int di);
 int StubGetSegmentFlags(int di);

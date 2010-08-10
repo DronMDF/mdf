@@ -6,7 +6,9 @@
 #include <Kernel.h>
 
 namespace {
-	#include "../Allocator.c"
+	extern "C" {
+		#include "../Allocator.c"
+	}
 }
 
 BOOST_AUTO_TEST_SUITE(suiteAllocator)
