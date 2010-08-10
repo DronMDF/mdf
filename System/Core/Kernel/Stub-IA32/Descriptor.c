@@ -47,6 +47,15 @@ laddr_t StubGetSegmentBase(int di)
 	return (GDT[di].segment.basehi << 24) | GDT[di].segment.baselo;
 }
 
+size_t StubDescriptorGetSize(const descriptor_t descriptor)
+{
+	size_t size = (descriptor.segment.limitlo | (descriptor.segment.limithi << 16)) + 1;
+	if (isSet(descriptor.segment.flagshi << 8, DESCRIPTOR_GRANULARITY)) {
+		size *= PAGE_SIZE;
+	}
+	return size;
+}
+
 size_t StubGetSegmentSize(int di)
 {
 	size_t size = (GDT[di].segment.limitlo | (GDT[di].segment.limithi << 16)) + 1;

@@ -42,4 +42,18 @@ BOOST_AUTO_TEST_CASE(testFlags)
 	BOOST_REQUIRE_EQUAL(desc.raw, 0x0070ff0000000000LL);
 }
 
+BOOST_AUTO_TEST_CASE(testGetSize)
+{
+	const size_t size = 0xFEDCB;
+	descriptor_t desc = StubGenerateSegmentDescriptor(0, size, 0);
+	BOOST_REQUIRE_EQUAL(StubDescriptorGetSize(desc), size);
+}
+
+BOOST_AUTO_TEST_CASE(testGetSizeGranularity)
+{
+	const size_t size = 0xFEDCB000;
+	descriptor_t desc = StubGenerateSegmentDescriptor(0, size, 0);
+	BOOST_REQUIRE_EQUAL(StubDescriptorGetSize(desc), size);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
