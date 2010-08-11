@@ -72,7 +72,7 @@ enum SELECTOR_PL {
 #define USER_CODE_SELECTOR	((4 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 #define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 
-descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags);
+descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags);
 size_t StubDescriptorGetSize(const descriptor_t descriptor);
 laddr_t StubDescriptorGetBase(descriptor_t descriptor);
 

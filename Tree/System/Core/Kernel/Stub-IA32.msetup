@@ -2,7 +2,7 @@
 Description "Стаб для IA32";
 License "GPL3";
 
-Release 0.0.213.16
+Release 0.0.213.17
 {
 	Depend System-Core/MDF-Env-0.0.7;
 	Depend System-Core-Kernel/Stub-IA32-Types;
