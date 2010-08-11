@@ -14,7 +14,7 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 	descriptor_t descriptor = { .raw = 0 };
 
 	descriptor.segment.baselo = base & 0x00ffffff;
-	descriptor.segment.basehi = (base & 0xff000000) >> 24;
+	descriptor.segment.basehi = (unsigned char)((base & 0xff000000) >> 24);
 
 	if (size == 0) {
 		// Полный flat
@@ -30,7 +30,7 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 	descriptor.segment.limithi = (limit & 0xf0000) >> 16;
 
 	flags |= DESCRIPTOR_PRESENT;
-	descriptor.segment.flagslo =  flags & 0x0ff;
+	descriptor.segment.flagslo = (unsigned char)(flags & 0x0ff);
 	descriptor.segment.flagshi = (flags & 0xf00) >> 8;
 	
 	return descriptor;
@@ -39,20 +39,22 @@ descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags)
 // TODO: Эта функция вообще здесь не к месту.
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags)
 {
-	const unsigned int di = selector / sizeof (descriptor_t);
+	const int di = selector / (int)sizeof(descriptor_t);
 	GDT[di] = StubGenerateSegmentDescriptor(base, size, flags);
 }
 
-laddr_t StubGetSegmentBase(descriptor_t descriptor)
+laddr_t StubDescriptorGetBase(descriptor_t descriptor)
 {
 	return (descriptor.segment.basehi << 24) | descriptor.segment.baselo;
 }
 
-size_t StubGetSegmentSize(int di)
+size_t StubDescriptorGetSize(const descriptor_t descriptor)
 {
-	size_t size = (GDT[di].segment.limitlo | (GDT[di].segment.limithi << 16)) + 1;
-	if (isSet(GDT[di].segment.flagshi, DESCRIPTOR_GRANULARITY >> 8))
+	size_t size = (size_t)((descriptor.segment.limitlo | 
+			(descriptor.segment.limithi << 16)) + 1);
+	if (isSet(descriptor.segment.flagshi << 8, DESCRIPTOR_GRANULARITY)) {
 		size *= PAGE_SIZE;
+	}
 	return size;
 }
 

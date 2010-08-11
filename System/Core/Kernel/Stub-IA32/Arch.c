@@ -204,11 +204,11 @@ tss_t *StubGetTaskContextBySlot (unsigned int slot)
 
 	const unsigned int di = GDT_TASK_BASE + slot;
 
-	tss_t *tss = l2vptr(StubGetSegmentBase(GDT[di]));
+	tss_t *tss = l2vptr(StubDescriptorGetBase(GDT[di]));
 	STUB_ASSERT (v2laddr(tss) < v2laddr(&__bss_end) || KERNEL_TEMP_BASE <= v2laddr(tss),
 		"Invalid TSS");
 
-	STUB_ASSERT (StubGetSegmentSize (di) != offsetof (tss_t, iomap) + tss->iomap_size,
+	STUB_ASSERT (StubDescriptorGetSize(GDT[di]) != offsetof(tss_t, iomap) + tss->iomap_size,
 		"Invalid task selector size");
 
 	unsigned int type = StubGetSegmentFlags(di) & DESCRIPTOR_TYPE;

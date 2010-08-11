@@ -6,6 +6,8 @@
 #pragma once
 
 typedef union {
+	// TODO: стоит отказаться от 4-х битовых полей - варнинги
+
 	struct {
 		unsigned int limitlo:16;
 		unsigned int baselo:24;
@@ -71,8 +73,8 @@ enum SELECTOR_PL {
 #define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 
 descriptor_t StubGenerateSegmentDescriptor(laddr_t base, size_t size, int flags);
-void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
-laddr_t StubGetSegmentBase(descriptor_t descriptor);
-size_t StubGetSegmentSize(int di) __deprecated__;
-int StubGetSegmentFlags(int di) __deprecated__;
+size_t StubDescriptorGetSize(const descriptor_t descriptor);
+laddr_t StubDescriptorGetBase(descriptor_t descriptor);
 
+void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
+int StubGetSegmentFlags(int di) __deprecated__;

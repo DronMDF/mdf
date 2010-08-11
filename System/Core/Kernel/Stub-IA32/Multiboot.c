@@ -84,7 +84,7 @@ void * __init__ StubMultibootGetFreeMemory(const MultibootInfo * const info,
 			}
 
 			if (mb->base_addr > base && mb->base_addr < nearbase) {
-				nearbase = mb->base_addr;
+				nearbase = (laddr_t)(mb->base_addr);
 			}
 		}
 

@@ -45,9 +45,22 @@ BOOST_AUTO_TEST_CASE(testFlags)
 BOOST_AUTO_TEST_CASE(testGetBase)
 {
 	const laddr_t  base = 0x12345678;;
-	descriptor_t desc = StubGenerateSegmentDescriptor(base, 1, 0);
-	BOOST_REQUIRE_EQUAL(StubGetSegmentBase(desc), base);
+	descriptor_t desc = StubGenerateSegmentDescriptor(base, 0, 0);
+	BOOST_REQUIRE_EQUAL(StubDescriptorGetBase(desc), base);
 }
 
+BOOST_AUTO_TEST_CASE(testGetSize)
+{
+	const size_t size = 0xFEDCB;
+	descriptor_t desc = StubGenerateSegmentDescriptor(0, size, 0);
+	BOOST_REQUIRE_EQUAL(StubDescriptorGetSize(desc), size);
+}
+
+BOOST_AUTO_TEST_CASE(testGetSizeGranularity)
+{
+	const size_t size = 0xFEDCB000;
+	descriptor_t desc = StubGenerateSegmentDescriptor(0, size, 0);
+	BOOST_REQUIRE_EQUAL(StubDescriptorGetSize(desc), size);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
