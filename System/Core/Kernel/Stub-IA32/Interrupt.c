@@ -30,29 +30,29 @@ enum I8259_COMMANDS {
 };
 
 static
-void StubI8259WriteCommand (const int base, const unsigned char value)
+void StubI8259WriteCommand (const uint16_t base, const unsigned char value)
 {
 	outbyte (base + I8259_ISR, value);
 	iowait ();
 }
 
 static
-void StubI8259WriteControl (const int base, const unsigned char value)
+void StubI8259WriteControl (const uint16_t base, const unsigned char value)
 {
-	outbyte (base + I8259_IMR, value);
+	outbyte((uint16_t)(base + I8259_IMR), value);
 	iowait();
 }
 
 static
-void StubI8259WriteMask (const int base, const unsigned char value)
+void StubI8259WriteMask (const uint16_t base, const unsigned char value)
 {
-	outbyte (base + I8259_IMR, value);
+	outbyte((uint16_t)(base + I8259_IMR), value);
 }
 
 static
-unsigned char StubI8259ReadMask (const int base)
+unsigned char StubI8259ReadMask (const uint16_t base)
 {
-	return inbyte (base + I8259_IMR);
+	return inbyte((uint16_t)(base + I8259_IMR));
 }
 
 // TODO: Этот код надо разрулить по отдельным контроллерам.
@@ -80,12 +80,12 @@ void StubI8259Mask (int irq)
 {
 	if (irq < 8) {
 		uint8_t mask = StubI8259ReadMask (I8259_MASTER);
-		mask |= 1 << irq;
+		mask |= (uint8_t)(1 << irq);
 		StubI8259WriteMask (I8259_MASTER, mask);
 	} else {
 		STUB_ASSERT (irq > 15, "Very big irq");
 		uint8_t mask = StubI8259ReadMask (I8259_SLAVE);
-		mask |= 1 << (irq - 8);
+		mask |= (uint8_t)(1 << (irq - 8));
 		StubI8259WriteMask (I8259_SLAVE, mask);
 	}
 }
@@ -96,12 +96,12 @@ void StubI8259Unmask (int irq)
 	CorePrint ("Unmask IRQ #%u\n", irq);
 	if (irq < 8) {
 		uint8_t mask = StubI8259ReadMask (I8259_MASTER);
-		mask &= ~(1 << irq);
+		mask &= (uint8_t)~(1 << irq);
 		StubI8259WriteMask (I8259_MASTER, mask);
 	} else {
 		STUB_ASSERT (irq > 15, "Very big irq");
 		uint8_t mask = StubI8259ReadMask (I8259_SLAVE);
-		mask &= ~(1 << (irq - 8));
+		mask &= (uint8_t)~(1 << (irq - 8));
 		StubI8259WriteMask (I8259_SLAVE, mask);
 	}
 }
@@ -135,7 +135,7 @@ bool StubI8259IsServiced (int irq)
 		STUB_ASSERT (irq > 15, "Very big irq");
 
 		StubI8259WriteCommand (I8259_SLAVE, 0x0b);
-		irr = inbyte (I8259_SLAVE + I8259_ISR) << 8;
+		irr = (uint16_t)(inbyte(I8259_SLAVE + I8259_ISR) << 8);
 		StubI8259WriteCommand (I8259_SLAVE, 0x0a);
 	}
 
@@ -149,10 +149,10 @@ void StubI8259Acknowledge (int irq)
 	// У него код 0x60 + младший номер прерывания (0...7)
 
 	if (irq < 8) {
-		StubI8259WriteCommand (I8259_MASTER, I8259_COMMAND_CEOI + irq);
+		StubI8259WriteCommand(I8259_MASTER, (uint8_t)(I8259_COMMAND_CEOI + irq));
 	} else {
 		STUB_ASSERT (irq > 15, "Very big irq");
-		StubI8259WriteCommand (I8259_SLAVE, I8259_COMMAND_CEOI + irq - 8);
+		StubI8259WriteCommand(I8259_SLAVE, (uint8_t)(I8259_COMMAND_CEOI + irq - 8));
 		StubI8259WriteCommand (I8259_MASTER, I8259_COMMAND_CEOI + 2);
 	}
 }

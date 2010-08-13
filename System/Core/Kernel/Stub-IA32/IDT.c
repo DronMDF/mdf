@@ -81,12 +81,12 @@ void __init__ StubSetGateDescriptor(descriptor_t *dt, int vector,
 
 	dt[idx].raw = 0;
 
-	dt[idx].gate.selector	=  eselector;
+	dt[idx].gate.selector	=  (uint16_t)eselector;
 
 	dt[idx].gate.offsetlo	=  eoffset & 0x0000ffff;
-	dt[idx].gate.offsethi	= (eoffset & 0xffff0000) >> 16;
+	dt[idx].gate.offsethi	= (uint16_t)((eoffset & 0xffff0000) >> 16);
 
-	dt[idx].gate.flags	=  flags & 0xff;
+	dt[idx].gate.flags	=  (uint8_t)(flags & 0xff);
 }
 
 // TODO - в Descriptor.c
