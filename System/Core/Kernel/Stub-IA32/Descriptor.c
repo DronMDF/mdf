@@ -45,7 +45,7 @@ void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size,
 
 laddr_t StubDescriptorGetBase(descriptor_t descriptor)
 {
-	return (descriptor.segment.basehi << 24) | descriptor.segment.baselo;
+	return (laddr_t)((descriptor.segment.basehi << 24) | descriptor.segment.baselo);
 }
 
 size_t StubDescriptorGetSize(const descriptor_t descriptor)

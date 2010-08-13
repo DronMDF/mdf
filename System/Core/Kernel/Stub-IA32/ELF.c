@@ -13,7 +13,8 @@
 #include "Utils.h"
 
 static
-void __init__ StubELFScanSymbols (Elf32_Sym *syms, int entryes, char *strs, int strsize)
+void __init__ StubELFScanSymbols (Elf32_Sym *syms, unsigned int entryes,
+				  char *strs, size_t strsize)
 {
 	if (strs == nullptr)
 		return;
@@ -25,7 +26,7 @@ void __init__ StubELFScanSymbols (Elf32_Sym *syms, int entryes, char *strs, int 
 
 	// Подсчитать количество символов...
 	int sc = 0;
-	for (int snx = 0; snx < entryes; snx++) {
+	for (unsigned int snx = 0; snx < entryes; snx++) {
 		const unsigned long addr = syms[snx].st_value;
 		const char *name = strtab + syms[snx].st_name;
 		if (addr != 0 && *name != '\0')	{
@@ -36,7 +37,7 @@ void __init__ StubELFScanSymbols (Elf32_Sym *syms, int entryes, char *strs, int 
 	StubSoD_SymbolCount (sc);
 
 	// Перенести символы в BSoD..
-	for (int snx = 0; snx < entryes; snx++) {
+	for (unsigned int snx = 0; snx < entryes; snx++) {
 		const unsigned long addr = syms[snx].st_value;
 		const char *name = strtab + syms[snx].st_name;
 		if (addr != 0 && *name != '\0')	{
@@ -57,14 +58,14 @@ void __init__ StubELFScanSections (Elf32_Shdr *sh, int num, int entsize)
 			STUB_ASSERT (sh[ndx].sh_entsize != sizeof (Elf32_Sym),
 				"Illegal sym size");
 
-			const int cnt = sh[ndx].sh_size / sh[ndx].sh_entsize;
-			const int strndx = sh[ndx].sh_link;
+			const unsigned int cnt = sh[ndx].sh_size / sh[ndx].sh_entsize;
+			const unsigned int strndx = sh[ndx].sh_link;
 
 			if (strndx == SHN_UNDEF)
 				break;
 
 			StubELFScanSymbols ((Elf32_Sym *)(sh[ndx].sh_addr), cnt,
-				(char *)(sh[strndx].sh_addr), (int)(sh[strndx].sh_size));
+				(char *)(sh[strndx].sh_addr), (size_t)(sh[strndx].sh_size));
 
 			return;
 		}
@@ -102,9 +103,9 @@ void __init__ StubELFLoadSection (const id_t pid, const id_t rid, const Elf32_Ph
 	STUB_ASSERT (phdr->p_offset % PAGE_SIZE != phdr->p_vaddr % PAGE_SIZE,
 		"Unaligned section in ELF");
 
-	unsigned int access =
-		(isSet(phdr->p_flags, PF_R) ? RESOURCE_ACCESS_READ : 0) |
-		(isSet(phdr->p_flags, PF_W) ? RESOURCE_ACCESS_WRITE : 0);
+	uint32_t access = (uint32_t)
+		((isSet(phdr->p_flags, PF_R) ? RESOURCE_ACCESS_READ : 0) |
+		 (isSet(phdr->p_flags, PF_W) ? RESOURCE_ACCESS_WRITE : 0));
 	// Флаг Execute тоже стоит обработать, но пока таких возможностей нету.
 
 	const struct KernelCreateRegionParam createp = {

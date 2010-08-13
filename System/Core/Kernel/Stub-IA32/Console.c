@@ -26,7 +26,7 @@ unsigned char StubKeyboardRead (void)
 }
 
 static
-void StubKeyboardWrite (const int port, const unsigned char val)
+void StubKeyboardWrite (const uint16_t port, const unsigned char val)
 {
 	while (isSet(StubDeviceReadB(&kbd_device, 4), 2));
 	StubDeviceWriteB(&kbd_device, port, val);
@@ -112,7 +112,7 @@ void StubXGAConsoleSetPos(const unsigned long pos)
 static
 void StubXGAConsolePrintChar(const int c)
 {
-	unsigned short *video = (unsigned short *)VIDEO0_PAGE;
+	uint16_t *video = (uint16_t *)VIDEO0_PAGE;
 	unsigned long pos = StubXGAConsoleReadPos();
 
 	switch (c) {
@@ -126,7 +126,7 @@ void StubXGAConsolePrintChar(const int c)
 			pos = round_up (pos + 1, 8);
 			break;
 		default:
-			video[pos++] = c | 0x700;
+			video[pos++] = (uint16_t)(c | 0x700);
 			break;
 	}
 
@@ -207,7 +207,7 @@ static
 void StubSerialConsolePrintChar(const int c)
 {
 	while (!isSet(StubDeviceReadB(&serial_device, COM_REGISTER_LSR), COM_LSR_TXREADY));
-	StubDeviceWriteB(&serial_device, COM_REGISTER_THR, c);
+	StubDeviceWriteB(&serial_device, COM_REGISTER_THR, (uint8_t)c);
 	if (c == '\n') StubSerialConsolePrintChar('\r');
 }
 
@@ -252,15 +252,11 @@ bool StubSetConsole(const char * const type)
 
 void StubPrintChar (const int c)
 {
-	int outs = 0;
-
 	if (isSet(consoles, CONSOLE_SERIAL)) {
 		StubSerialConsolePrintChar(c);
-		outs++;
-	}
-
-	// Вывод по умолчанию.
-	if (isSet(consoles, CONSOLE_XGA) || outs == 0) {
+	} else {
+		// Вывод по умолчанию.
+		// if (isSet(consoles, CONSOLE_XGA)) {
 		StubXGAConsolePrintChar(c);
 	}
 }

@@ -27,7 +27,7 @@ uint8_t StubDeviceReadB (const device_t *dev, uint16_t io)
 	STUB_ASSERT (dev->io_base > dev->io_last, "Invalid device parameters");
 	STUB_ASSERT (io > dev->io_last - dev->io_base, "Invalid device port");
 
-        int value = 0;
+        uint8_t value = 0;
         __asm__ __volatile__ (
 		"inb %w1, %b0"
 		: "=a"(value)
