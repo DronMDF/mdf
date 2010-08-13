@@ -104,8 +104,8 @@ struct _MCBHead {
 #define isFirst(block)		(((block)->size_prev & MCB_LAST) != 0)
 #define isLast(block)		(((block)->size & MCB_LAST) != 0)
 
-#define BlockSize(block)	((block)->size & ~(MCB_USED | MCB_LAST))
-#define BlockPreviousSize(block)	((block)->size_prev & ~(MCB_USED | MCB_LAST))
+#define BlockSize(block)	((block)->size & (size_t)~(MCB_USED | MCB_LAST))
+#define BlockPreviousSize(block)	((block)->size_prev & (size_t)~(MCB_USED | MCB_LAST))
 
 #define BLOCK_MINSIZE		(sizeof (MCB) + sizeof (MCBLink))
 
@@ -145,7 +145,7 @@ void StubMemoryDequeue (MCBHead * const head, MCB * const block)
 
 static
 MCB *StubMemoryDequeueAlign (MCBHead * const head, MCB * const block,
-	const size_t size, const int align)
+	const size_t size, const unsigned int align)
 {
 	STUB_ASSERT (isUsed (block), "Used block");
 	STUB_ASSERT (!isAligned(size, 4), "Unaligned size");
@@ -339,7 +339,7 @@ void __init__ StubMemoryInit (MCBHead * const head,
 }
 
 static
-void *StubMemoryAllocInternal (MCBHead * const head, size_t size, int align)
+void *StubMemoryAllocInternal(MCBHead * const head, size_t size, unsigned int align)
 {
 	if (size < sizeof (MCBLink)) {
 		size = sizeof (MCBLink);
@@ -363,8 +363,8 @@ void *StubMemoryAllocInternal (MCBHead * const head, size_t size, int align)
 
 			block = aligned_block;
 
-			STUB_ASSERT (isUsed(block), "Used block");
-			STUB_ASSERT (size >= (block->size & ~MCB_LAST), "Small block");
+			STUB_ASSERT(isUsed(block), "Used block");
+			STUB_ASSERT(size >= (block->size & (size_t)~MCB_LAST), "Small block");
 		} else {
 			// Блок уже выровнен или не требует выравнивания.
 			StubMemoryDequeue (head, block);
@@ -389,7 +389,7 @@ static
 void StubMemoryFreeInternal (MCBHead * const head, void * const ptr)
 {
 	MCB *block = (MCB *)((char *)ptr - sizeof (MCB));
-	block->size &= ~MCB_USED;
+	block->size &= (size_t)~MCB_USED;
 
 #ifdef MEMORY_PROTECTOR
 	STUB_ASSERT (block->prot1 != block->prot2, "Protection corrupted");
@@ -442,10 +442,10 @@ void *StubMemoryAlloc (const size_t size)
 	return ptr;
 }
 
-void *StubMemoryAllocAligned (const size_t size, const int align)
+void *StubMemoryAllocAligned(const size_t size, const unsigned int align)
 {
 	StubLock (&memory_lock);
-	void *ptr = StubMemoryAllocInternal (current, size, align);
+	void *ptr = StubMemoryAllocInternal(current, size, align);
 	StubUnlock (&memory_lock);
 	return ptr;
 }

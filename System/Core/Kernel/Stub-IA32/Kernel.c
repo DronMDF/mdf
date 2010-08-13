@@ -21,14 +21,14 @@ int StubKernelPagesCnt ()
 	return kernelPageCnt;
 }
 
-void StubKernelUsePage (PageInfo *page, laddr_t laddr, int flags)
+void StubKernelUsePage(PageInfo *page, laddr_t laddr, unsigned int flags)
 {
 	STUB_ASSERT (page == nullptr, "No page");
 	STUB_ASSERT (page->kaddr != 0, "Page already in kernel");
 	STUB_ASSERT (laddr >= USER_MEMORY_BASE, "Invalid laddr");
 	STUB_ASSERT (!isAligned(laddr, PAGE_SIZE), "Unaligned laddr");
 
-	flags &= ~PFLAG_USER;
+	flags &= (uint32_t)~PFLAG_USER;
 
 	// TODO: Флаг GLOBAL будет притыкаться где-то здесь.
 	flags |= PFLAG_KERNEL | PFLAG_SYSTEM;
@@ -50,7 +50,7 @@ void StubKernelUnusePage (PageInfo *page)
 
 	// TODO: Это мы так хитро заюзаем StubPageUntemporary
 	//	Временный воркэраунд.
-	page->flags &= ~PFLAG_KERNEL;
+	page->flags &= (uint32_t)~PFLAG_KERNEL;
 	page->flags |= PFLAG_TEMPORARY;
 	StubPageUntemporary(page);
 
@@ -87,7 +87,7 @@ void StubKernelDropMemory (laddr_t addr, size_t size)
 }
 
 static
-void __init__ StubKernelReservePage (paddr_t paddr, laddr_t laddr, int flags)
+void __init__ StubKernelReservePage(paddr_t paddr, laddr_t laddr, unsigned int flags)
 {
 	PageInfo *page = StubGetPageByPAddr (paddr);
 	StubKernelUsePage(page, laddr, flags);
@@ -95,7 +95,7 @@ void __init__ StubKernelReservePage (paddr_t paddr, laddr_t laddr, int flags)
 }
 
 void __init__ StubKernelReservePages (paddr_t paddr, sizex_t size,
-	laddr_t laddr, int flags)
+	laddr_t laddr, unsigned int flags)
 {
 	CorePrint ("Kernel reserve area 0x%08lx (%lb) at 0x%08x, %s.\n",
 		paddr, size, laddr, flags & PFLAG_WRITABLE ? "Read, Write" : "Read");

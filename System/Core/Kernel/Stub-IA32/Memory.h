@@ -16,7 +16,7 @@ void StubMemoryInitBoot(void *ptr, size_t size);
 void StubMemoryInitWork(void *ptr, size_t size);
 
 void *StubMemoryAlloc(size_t size);
-void *StubMemoryAllocAligned(size_t size, int align);
+void *StubMemoryAllocAligned(size_t size, unsigned int align);
 void StubMemoryFree(void *ptr);
 
 void StubCalcHeapUsage(struct KernelInfoMemory *info);
