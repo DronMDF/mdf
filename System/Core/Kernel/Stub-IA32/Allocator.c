@@ -22,9 +22,9 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
-int GetSizeIndex(size_t size)
+unsigned int GetSizeIndex(size_t size)
 {
-	for (int i = 0; i < 10; i++) {
+	for (unsigned int i = 0; i < 10; i++) {
 		if (size <= 1 << (i + 2)) {
 			return i;
 		}

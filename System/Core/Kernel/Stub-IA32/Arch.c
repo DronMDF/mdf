@@ -61,7 +61,7 @@ void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
 {
 	STUB_ASSERT (ci >= STUB_MAX_CPU_COUNT, "Invalid CPU no");
 
-	const int di = GDT_CPU_BASE + ci;
+	const unsigned int di = GDT_CPU_BASE + ci;
 	STUB_ASSERT (GDT[di].raw != 0, "Busy CPU slot");
 
 	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
@@ -87,7 +87,7 @@ void __init__ StubInitGDT ()
 	// 2048 - 4095 дескрипторы процессоров (тоже нити только системные)
 	// 4096 - 8191 дескрипторы для нитей (слоты)
 
-	const int gdt_size = sizeof (descriptor_t) * GDT_SIZE;
+	const size_t gdt_size = sizeof (descriptor_t) * GDT_SIZE;
 
 	GDT = StubMemoryAllocAligned (gdt_size, sizeof (descriptor_t));
 	// FIXME: RELEASE
@@ -111,7 +111,7 @@ void __init__ StubInitGDT ()
 	StubSetGDT (GDT, gdt_size);
 
 	// Выделить память для таймеров слотов задач
-	const int task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
+	const size_t task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
 	task_time = StubMemoryAllocAligned(task_time_size, sizeof(tick_t));
 	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
 
@@ -185,7 +185,7 @@ void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 {
 	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
 
-	const int di = GDT_TASK_BASE + ti;
+	const unsigned int di = GDT_TASK_BASE + ti;
 	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
 }
 
@@ -211,6 +211,8 @@ tss_t *StubGetTaskContextBySlot (unsigned int slot)
 	STUB_ASSERT (StubDescriptorGetSize(GDT[di]) != offsetof(tss_t, iomap) + tss->iomap_size,
 		"Invalid task selector size");
 
+	// TODO: Можно абстракцию дескриптора наградить методами состояний
+	//	StubDescriptorIsBusyTask() и тд...
 	unsigned int type = StubGetSegmentFlags(di) & DESCRIPTOR_TYPE;
 	STUB_ASSERT (type != DESCRIPTOR_TASK && type != DESCRIPTOR_TASK_BUSY,
 		"Invalid task selector type");
@@ -268,7 +270,7 @@ void StubTaskSlotUse(tss_t *tss)
 		tick_t oldest = TIMESTAMP_FUTURE;
 		bool slot_used = false;
 
-		for (int i = 0; i < STUB_MAX_TASK_COUNT; i++) {
+		for (unsigned int i = 0; i < STUB_MAX_TASK_COUNT; i++) {
 			if (GDT[GDT_TASK_BASE + i].raw == 0) {
 				slot = i;
 				slot_used = false;
@@ -355,7 +357,7 @@ void StubTaskContextSetPDir (const Task *task, const PageInfo *pdir)
 	STUB_ASSERT (context == nullptr, "Missing TSS");
 	STUB_ASSERT (pdir->paddr >= 0x100000000ULL, "Big paddr for IA32 cr3");
 
-	context->cr3 = pdir->paddr;
+	context->cr3 = p2laddr(pdir->paddr);
 }
 
 Task *StubGetCurrentTask ()
@@ -433,7 +435,7 @@ void StubTaskBootstrapCreate ()
 // Интерфейс ядра
 
 // TODO: Этим методам здесь не место, но пока пусть будут тут
-int StubWait (id_t id, int event, timeout_t timeout)
+int StubWait (id_t id, uint32_t event, timeout_t timeout)
 {
 	const Task *task = StubGetCurrentTask();
 	return CoreWait(task, id, event, timeout);
@@ -471,7 +473,7 @@ int StubCreate (const int type, const uaddr_t param_ptr,
 	return rv;
 }
 
-int StubCall (id_t id, uaddr_t param, size_t size, int flags)
+int StubCall (id_t id, uaddr_t param, size_t size, uint32_t flags)
 {
 	if (param + size > USER_MEMORY_SIZE)
 		return ERROR_INVALIDPARAM;
@@ -490,7 +492,7 @@ int StubCall (id_t id, uaddr_t param, size_t size, int flags)
 	return rv;
 }
 
-int StubAttach (const id_t rid, const id_t pid, const int access, const uint32_t specific)
+int StubAttach (const id_t rid, const id_t pid, const uint32_t access, const uint32_t specific)
 {
 	const Task *task = StubGetCurrentTask();
 

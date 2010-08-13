@@ -58,7 +58,7 @@ size_t StubDescriptorGetSize(const descriptor_t descriptor)
 	return size;
 }
 
-int StubGetSegmentFlags(int di)
+int StubGetSegmentFlags(unsigned int di)
 {
 	return GDT[di].segment.flagslo | (GDT[di].segment.flagshi << 8);
 }

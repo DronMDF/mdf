@@ -77,4 +77,4 @@ size_t StubDescriptorGetSize(const descriptor_t descriptor);
 laddr_t StubDescriptorGetBase(descriptor_t descriptor);
 
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
-int StubGetSegmentFlags(int di) __deprecated__;
+int StubGetSegmentFlags(unsigned int di) __deprecated__;
