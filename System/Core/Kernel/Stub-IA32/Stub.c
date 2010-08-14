@@ -34,7 +34,7 @@ extern void __bss_end;
 MultibootHeader mbh __attribute__((section (".init.multiboot"))) = {
 	.magic = MULTIBOOT_HEADER_MAGIC,
 	.flags = MULTIBOOT_HEADER_FLAGS,
-	.checksum = -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS),
+	.checksum = (u32)-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS),
 };
 
 // -----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void __init__ StubMemoryInit1 (const MultibootInfo * const info,
 	
 	*heap_size = tmpsize;
 
-	StubMemoryInitBoot ((void * const)*heap_ptr, *heap_size);
+	StubMemoryInitBoot((void *)*heap_ptr, (size_t)*heap_size);
 	CorePrint ("Temporary heap - %lb, starting from the address 0x%08x.\n",
 		*heap_size, v2laddr(*heap_ptr));
 }
@@ -247,7 +247,7 @@ void StubIdle();
 // как и у всех остальных задач.
 void __noreturn__ StubBootstrapEntry (void)
 {
-	const laddr_t ibase = v2laddr(&__init_begin) & PADDR_MASK;
+	const laddr_t ibase = (laddr_t)(v2laddr(&__init_begin) & PADDR_MASK);
 	const size_t isize = v2laddr(&__text_begin) - ibase;
 
 	StubKernelDropMemory (ibase, isize);

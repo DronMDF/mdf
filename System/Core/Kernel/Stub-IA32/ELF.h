@@ -195,5 +195,5 @@ enum {
 
 // -----------------------------------------------------------------------------
 // Прототипы функций
-void StubELFScanSections (Elf32_Shdr *sh, int num, int entsize);
+void StubELFScanSections (Elf32_Shdr *sh, unsigned int num, unsigned int entsize);
 bool StubELFLoadModule (const id_t id, const char * const name, const laddr_t addr);

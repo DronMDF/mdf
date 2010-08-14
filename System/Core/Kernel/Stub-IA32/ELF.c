@@ -49,12 +49,12 @@ void __init__ StubELFScanSymbols (Elf32_Sym *syms, unsigned int entryes,
 	CorePrint ("%u symbols loaded...\n", sc);
 }
 
-void __init__ StubELFScanSections (Elf32_Shdr *sh, int num, int entsize)
+void __init__ StubELFScanSections(Elf32_Shdr *sh, unsigned int num, unsigned int entsize)
 {
 	STUB_ASSERT (entsize != sizeof (Elf32_Shdr), "Illegal shdr size");
 
 	// Далее сканируем секции на предмет таблицы символов
-	for (int ndx = 0; ndx < num; ++ndx) {
+	for (unsigned int ndx = 0; ndx < num; ++ndx) {
 		if (sh[ndx].sh_type == SHT_SYMTAB) {
 			STUB_ASSERT (sh[ndx].sh_entsize != sizeof (Elf32_Sym),
 				"Illegal sym size");

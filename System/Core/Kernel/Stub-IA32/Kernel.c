@@ -10,13 +10,13 @@
 #include "StubLocal.h"
 #include "Page.h"
 
-static int kernelPageCnt = 0;
+static unsigned int kernelPageCnt = 0;
 
 void __init__ StubInitKernel (void)
 {
 }
 
-int StubKernelPagesCnt ()
+unsigned int StubKernelPagesCnt ()
 {
 	return kernelPageCnt;
 }

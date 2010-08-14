@@ -8,7 +8,7 @@
 void StubInitKernel();
 void StubKernelReservePages(paddr_t paddr, sizex_t size, laddr_t laddr, unsigned int flags);
 
-int StubKernelPagesCnt();
+unsigned int StubKernelPagesCnt();
 
 void StubKernelUsePage(PageInfo *page, laddr_t laddr, unsigned int flags);
 void StubKernelUnusePage(PageInfo *page);
