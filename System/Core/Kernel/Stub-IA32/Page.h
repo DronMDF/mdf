@@ -75,7 +75,7 @@ void StubPageRelease (PageInfo *page);
 
 void StubInitPage (void);
 PageInfo *StubGetPageByPAddr (paddr_t addr);
-void StubCreatePageRegion (paddr_t base, sizex_t size, int flags);
+void StubCreatePageRegion (paddr_t base, sizex_t size, uint32_t flags);
 void StubPageInitMode ();
 bool StubMemoryReadable (laddr_t addr, size_t size);
 paddr_t StubPageGetPAddr (laddr_t laddr);

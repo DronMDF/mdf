@@ -99,7 +99,7 @@ PageInfo *StubPageAlloc()
 
 	StubUnlock (&stubPageFreeList.lock);
 
-	page->flags &= ~PFLAG_FREE;
+	page->flags &= (uint32_t)~PFLAG_FREE;
 
 	stubMemoryUsed += PAGE_SIZE;
 
@@ -128,7 +128,7 @@ void StubPageAllocByInfo(PageInfo *page)
 	stubPageFreeList.count--;
 	StubUnlock (&stubPageFreeList.lock);
 
-	page->flags &= ~PFLAG_FREE;
+	page->flags &= (uint32_t)~PFLAG_FREE;
 	stubMemoryUsed += PAGE_SIZE;
 }
 
@@ -153,7 +153,7 @@ volatile page_descriptor_t * const stubPageDir =
 
 // Индекс PDir в самом себе -
 static
-const int stubPdIdx = KERNEL_PAGETABLE_BASE / (PAGE_SIZE * 1024);
+const unsigned int stubPdIdx = KERNEL_PAGETABLE_BASE / (PAGE_SIZE * 1024);
 
 void __init__ StubInitPage (void)
 {
@@ -188,7 +188,7 @@ PageInfo *StubGetPageByPAddr (paddr_t addr)
 		    pageRegion[i]->base <= addr &&
 		    pageRegion[i]->base + pageRegion[i]->size > addr)
 		{
-			const int idx = (addr - pageRegion[i]->base) / PAGE_SIZE;
+			const int idx = (int)((addr - pageRegion[i]->base) / PAGE_SIZE);
 			return &(pageRegion[i]->pages[idx]);
 		}
 	}
@@ -198,7 +198,7 @@ PageInfo *StubGetPageByPAddr (paddr_t addr)
 
 paddr_t StubGetPAddrByLAddr (laddr_t addr)
 {
-	const int idx = addr / PAGE_SIZE;
+	const unsigned int idx = addr / PAGE_SIZE;
 	STUB_ASSERT (!isSet(stubPageTable[idx], PFLAG_PRESENT), "Missing page");
 
 	return stubPageTable[idx] & PADDR_MASK;
@@ -288,7 +288,7 @@ PageInfo *StubGetPageByInstance (const PageInstance *instance)
 	return instance->page;
 }
 
-void __init__ StubCreatePageRegion (paddr_t base, sizex_t size, int flags)
+void __init__ StubCreatePageRegion (paddr_t base, sizex_t size, uint32_t flags)
 {
 	STUB_ASSERT (!isAligned(base, PAGE_SIZE), "Unaligned base");
 	STUB_ASSERT (!isAligned(size, PAGE_SIZE), "Unaligned size");
@@ -316,7 +316,7 @@ void __init__ StubCreatePageRegion (paddr_t base, sizex_t size, int flags)
 	pregion->size = size;
 	pregion->flags = flags;
 
-	const size_t pcount = size / PAGE_SIZE;
+	const size_t pcount = (size_t)(size / PAGE_SIZE);
 
 	// Создаем таблицу страничных инф региона
 	pregion->pages = (PageInfo *)StubMemoryAllocAligned (
@@ -348,7 +348,7 @@ void StubCalcMemoryUsage(struct KernelInfoMemory *info)
 	for (int i = 0; i < MAX_PAGE_REGION; i++) {
 		if (pageRegion[i] == nullptr) continue;
 
-		info->MemoryTotal += pageRegion[i]->size;
+		info->MemoryTotal += (size_t)(pageRegion[i]->size);
 		for (unsigned int p = 0; p < pageRegion[i]->size / PAGE_SIZE; p++) {
 			const PageInfo *page = &(pageRegion[i]->pages[p]);
 			if (page->instances != nullptr || page->kaddr != 0) {
@@ -378,7 +378,7 @@ void __init__ StubPageInitMode ()
 
 	// До каталога страниц набиваем таблицы, они статические.
 	for (laddr_t a = 0; a < KERNEL_PAGETABLE_BASE; a += PAGE_SIZE * 1024) {
-		const int ptidx = a / (PAGE_SIZE * 1024);
+		const unsigned int ptidx = a / (PAGE_SIZE * 1024);
 		pts[ptidx] = StubPageAlloc();
 		StubMemoryClear (p2vptr(pts[ptidx]->paddr), PAGE_SIZE);
 		StubKernelUsePage (pts[ptidx],
@@ -453,7 +453,7 @@ void StubPageTaskInit (Task *task)
 		// Debug stuff - проверяем соответствие дескриптора страницы.
 		const laddr_t ltable = StubPageTemporary (task->ptable1023);
 		page_descriptor_t * const dtable = l2vptr(ltable);
-		const paddr_t p = dtable[ptidx(KERNEL_STACK_BASE) % 1024] & ~PFLAG_MASK;
+		const paddr_t p = dtable[ptidx(KERNEL_STACK_BASE) % 1024] & (uint32_t)~PFLAG_MASK;
 		STUB_ASSERT (p != task->stack0->paddr, "Invalid Stack0 descriptor");
 		StubPageUntemporaryByLAddr (ltable);
 	}
@@ -498,10 +498,10 @@ void StubPageTaskInit (Task *task)
 		// Debug stuff - проверяем соответствие дескриптора страницы.
 		page_descriptor_t * const ddir = l2vptr(ldir);
 
-		const paddr_t pd = ddir[pdidx(KERNEL_PAGETABLE_BASE)] & ~PFLAG_MASK;
+		const paddr_t pd = ddir[pdidx(KERNEL_PAGETABLE_BASE)] & (uint32_t)~PFLAG_MASK;
 		STUB_ASSERT (pd != task->pdir->paddr, "Invalid pagedir pagetable (dronlink) descriptor");
 
-		const paddr_t ps = ddir[pdidx(KERNEL_STACK_BASE)] & ~PFLAG_MASK;
+		const paddr_t ps = ddir[pdidx(KERNEL_STACK_BASE)] & (uint32_t)~PFLAG_MASK;
 		STUB_ASSERT (ps != task->ptable1023->paddr, "Invalid Stack0 pagetable descriptor");
 
 		StubPageUntemporaryByLAddr(ldir);
@@ -567,8 +567,8 @@ void StubPageFault (laddr_t laddr, uint32_t error)
 	STUB_ASSERT (laddr < USER_MEMORY_BASE && !isSet(access, RESOURCE_ACCESS_WRITE),
 		"pagetable page without write access");
 
-	const uint32_t pflags = PFLAG_USER |
-		(isSet(access, RESOURCE_ACCESS_WRITE) ? PFLAG_WRITABLE : PFLAG_READABLE);
+	const uint32_t pflags = (uint32_t)(PFLAG_USER |
+		(isSet(access, RESOURCE_ACCESS_WRITE) ? PFLAG_WRITABLE : PFLAG_READABLE));
 
 	//CorePrint ("User Pagefault at 0x%8x, grant 0x%03x(0x%03x)\n", laddr, access, pflags);
 	STUB_ASSERT (access == 0, "No access for page");
@@ -646,7 +646,7 @@ void StubPageUntemporary (PageInfo *page)
 	const laddr_t addr = page->kaddr;
 
 	page->kaddr = 0;
-	page->flags &= ~PFLAG_TEMPORARY;
+	page->flags &= (uint32_t)~PFLAG_TEMPORARY;
 	stubPageTable[ptidx(addr)] = 0;
 	StubPageFlush();
 }
