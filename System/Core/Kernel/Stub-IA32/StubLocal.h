@@ -45,14 +45,6 @@ void __deprecated__ iowait (void)
 		"outb %al, $0x80");
 }
 
-// BSoD
-
-// Поддержка символов..
-void StubSoD_SymbolCount (int symcount);
-void StubSoD_AddSymbol (unsigned long addr, const char *name);
-
-// Сам BSoD описан в начале...
-
 // Разные утилитки
 void StubBootstrapCaller(laddr_t entry, uint32_t tss_sel);
 

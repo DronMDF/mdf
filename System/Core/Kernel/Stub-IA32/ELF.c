@@ -11,6 +11,7 @@
 #include "ELF.h"
 #include "Memory.h"
 #include "Utils.h"
+#include "SoD.h"
 
 static
 void __init__ StubELFScanSymbols (Elf32_Sym *syms, unsigned int entryes,
@@ -25,7 +26,7 @@ void __init__ StubELFScanSymbols (Elf32_Sym *syms, unsigned int entryes,
 	StubMemoryCopy (strtab, strs, strsize);
 
 	// Подсчитать количество символов...
-	int sc = 0;
+	unsigned int sc = 0;
 	for (unsigned int snx = 0; snx < entryes; snx++) {
 		const unsigned long addr = syms[snx].st_value;
 		const char *name = strtab + syms[snx].st_name;

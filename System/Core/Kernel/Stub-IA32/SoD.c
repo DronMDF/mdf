@@ -34,15 +34,15 @@ struct _SymbolInfo {
 } __attribute__((packed));
 
 static
-int SymCount = 0;
+unsigned int SymCount = 0;
 
 static
-int SymCountMax __initdata__;
+unsigned int SymCountMax __initdata__;
 
 static
 SymbolInfo *SymTab = nullptr;
 
-void __init__ StubSoD_SymbolCount (int symcount)
+void __init__ StubSoD_SymbolCount(unsigned int symcount)
 {
 	SymTab = (SymbolInfo *)StubMemoryAlloc (sizeof (SymbolInfo) * symcount);
 	SymCountMax = symcount;
@@ -63,7 +63,7 @@ static
 const char *StubSoD_Symbol (const laddr_t addr)
 {
 	if (SymTab != nullptr) {
-		for (int i = 0; i < SymCount; i++) {
+		for (unsigned int i = 0; i < SymCount; i++) {
 			if (SymTab[i].addr == addr) {
 				return SymTab[i].name;
 			}
@@ -77,7 +77,7 @@ static
 laddr_t StubSoD_NearSymbolAddr (const laddr_t addr)
 {
 	laddr_t m = 0;
-	for (int i = 0; i < SymCount; i++) {
+	for (unsigned int i = 0; i < SymCount; i++) {
 		if (m < SymTab[i].addr && SymTab[i].addr <= addr)
 			m = SymTab[i].addr;
 	}
@@ -186,14 +186,14 @@ static const unsigned char iLength[512] = {
 
 // определение длинны инструкции IA32 (только 32-х битный режим)
 static
-int StubSoDInstructionLength (const laddr_t caddr)
+unsigned int StubSoDInstructionLength(const laddr_t caddr)
 {
 	if (!StubMemoryReadable (caddr, 3))
 		return 0;
 
 	const unsigned char *cptr = l2vptr(caddr);
 	int code = (cptr[0] != 0x0f) ? cptr[0] : (cptr[1] + 256);
-	char cl = iLength[code];
+	uint8_t cl = iLength[code];
 
 	if (cl == 0) {
 		CorePrint ("Unknown %s-byte instruction code 0x%02x at 0x%08x\n",
@@ -206,10 +206,10 @@ int StubSoDInstructionLength (const laddr_t caddr)
 	if ((cl & 0xf0) == 0)
 		return cl;
 
-	int modrm = cl & 0x0f;
+	unsigned int modrm = cl & 0x0f;
 	STUB_ASSERT (modrm == 0, "Illegal mod r/m");
 
-	int imm = 0;
+	unsigned int imm = 0;
 	if ((cl & 0x20) != 0) {
 		imm = 1;
 	}
@@ -299,7 +299,7 @@ bool StubSoDReturnIns (const laddr_t ip)
 }
 
 static
-laddr_t StubSoDCallIns (const laddr_t ip, const int il)
+laddr_t StubSoDCallIns (const laddr_t ip, const unsigned int il)
 {
 	const unsigned char iCall[]	= { 1, 0xff, 0xe8 };
 	const unsigned char iCallInd[]	= { 2, 0xff, 0xff, 0x38, 0x10 };
@@ -316,7 +316,7 @@ laddr_t StubSoDCallIns (const laddr_t ip, const int il)
 }
 
 static
-laddr_t StubSoDBranchIns(const laddr_t ip, const int il)
+laddr_t StubSoDBranchIns(const laddr_t ip, const unsigned int il)
 {
 	const unsigned char iJccShort[]		= { 1, 0xf0, 0x70};
 	const unsigned char iJcxzShort[]	= { 1, 0xff, 0xe3};
@@ -334,7 +334,7 @@ laddr_t StubSoDBranchIns(const laddr_t ip, const int il)
 }
 
 static
-laddr_t StubSoDOtherIns (const laddr_t * * const sptr, const laddr_t ip, const int il)
+laddr_t StubSoDOtherIns (const laddr_t * * const sptr, const laddr_t ip, const unsigned int il)
 {
 	// Есть предположение что эта функция сожрет много стека. поглядим.
 
@@ -416,7 +416,7 @@ laddr_t StubSoDOtherIns (const laddr_t * * const sptr, const laddr_t ip, const i
 }
 
 static
-laddr_t StubSoDJumpIns (const laddr_t ip, int il)
+laddr_t StubSoDJumpIns (const laddr_t ip, unsigned int il)
 {
 	const unsigned char iJmpShort[]	= { 1, 0xff, 0xeb };
 	if (isIns(iJmpShort, ip)) {
@@ -443,8 +443,8 @@ laddr_t StubSoDRetPoint (const laddr_t addr)
 	if (addr < v2laddr(&__init_ro) || v2laddr(&__text_end) < addr)
 		return 0;
 
-	for (int l = 6; l >= 2; l--) {
-		int il = StubSoDInstructionLength (addr - l);
+	for (unsigned int l = 6; l >= 2; l--) {
+		unsigned int il = StubSoDInstructionLength(addr - l);
 		if (il != 0) {
 			if (StubSoDCallIns (addr - l, il) && il == l) {
 				return addr - l;
@@ -517,7 +517,7 @@ bool StubSoDCallStackTrace (state_t *state, const laddr_t *sptr,
 	while (cip != state->eip) {
 		if (StubSoDReturnIns(cip)) return false;
 
-		const int il = StubSoDInstructionLength(cip);
+		const unsigned int il = StubSoDInstructionLength(cip);
 		if (il == 0) return false;
 
 		if (sptr - state->esp >= 3 && (sptr[-1] & 0xffff) == state->cs && sptr[-2] == cip)
@@ -637,7 +637,7 @@ void StubSoDCallStack (laddr_t *stack, laddr_t eip, laddr_t cs)
 		.bac = 0,
 	};
 
-	const laddr_t *sptr = l2vptr((v2laddr (stack) & ~0xfff) | 0xffc);
+	const laddr_t *sptr = l2vptr((v2laddr(stack) & (uint32_t)~0xfff) | 0xffc);
 	StubSoDCallStackRecur (&state, sptr);
 }
 
