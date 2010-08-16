@@ -31,7 +31,7 @@ uint32_t ULEB128(const uint8_t **ptr)
 
 int32_t SLEB128(const uint8_t **ptr)
 {
-	int32_t rv = 0;
+	uint32_t rv = 0;
 
 	for (int shift = 0; ; shift += 7) {
 		uint32_t bval = **ptr;
@@ -41,7 +41,7 @@ int32_t SLEB128(const uint8_t **ptr)
 			rv |= (bval & 0x3f) << shift;
 
 			if ((bval & 0x40) != 0) {
-				rv = (0x40LL << shift) - rv;
+				rv = static_cast<uint32_t>((0x40LL << shift) - rv);
 			}
 
 			break;
@@ -50,7 +50,7 @@ int32_t SLEB128(const uint8_t **ptr)
 		rv |= (bval & 0x7f) << shift;
 	}
 
-	return rv;
+	return static_cast<int32_t>(rv);
 }
 
 void ParseCIE(const void *ptr)
@@ -65,7 +65,7 @@ void ParseCIE(const void *ptr)
 		ciep += sizeof(uint64_t);
 
 		STUB_ASSERT(extended_length > 0xffffffff, "Big CIE length");
-		length = extended_length;
+		length = static_cast<uint32_t>(extended_length);
 	}
 
 	STUB_ASSERT(*reinterpret_cast<const uint32_t *>(ciep) != 0, "Bad CIE ID");

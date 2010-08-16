@@ -132,7 +132,7 @@ void StubMicroSleep (uint32_t us)
 	// Используем для этого второй канал таймера.
 	StubI8254InitCounter2 (65535);
 
-	const uint32_t lowcount = 65535 - ((uint64_t)i8254_frequency * us) / 1000000;
+	const uint32_t lowcount = (uint32_t)(65535 - ((uint64_t)i8254_frequency * us) / 1000000);
 
 	while (StubI8254ReadCounter2() > lowcount);
 }
