@@ -213,7 +213,7 @@ tss_t *StubGetTaskContextBySlot (unsigned int slot)
 
 	// TODO: Можно абстракцию дескриптора наградить методами состояний
 	//	StubDescriptorIsBusyTask() и тд...
-	unsigned int type = StubGetSegmentFlags(di) & DESCRIPTOR_TYPE;
+	unsigned int type = StubDescriptorGetFlags(GDT[di]) & DESCRIPTOR_TYPE;
 	STUB_ASSERT (type != DESCRIPTOR_TASK && type != DESCRIPTOR_TASK_BUSY,
 		"Invalid task selector type");
 

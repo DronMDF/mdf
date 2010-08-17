@@ -73,8 +73,8 @@ enum SELECTOR_PL {
 #define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
 
 descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags);
+laddr_t StubDescriptorGetBase(const descriptor_t descriptor);
 size_t StubDescriptorGetSize(const descriptor_t descriptor);
-laddr_t StubDescriptorGetBase(descriptor_t descriptor);
+int StubDescriptorGetFlags(const descriptor_t descriptor);
 
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
-int StubGetSegmentFlags(unsigned int di) __deprecated__;

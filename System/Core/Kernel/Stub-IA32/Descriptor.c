@@ -43,7 +43,7 @@ void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size,
 	GDT[di] = StubDescriptorGenerate(base, size, flags);
 }
 
-laddr_t StubDescriptorGetBase(descriptor_t descriptor)
+laddr_t StubDescriptorGetBase(const descriptor_t descriptor)
 {
 	return (laddr_t)((descriptor.segment.basehi << 24) | descriptor.segment.baselo);
 }
@@ -58,7 +58,8 @@ size_t StubDescriptorGetSize(const descriptor_t descriptor)
 	return size;
 }
 
-int StubGetSegmentFlags(unsigned int di)
+int StubDescriptorGetFlags(const descriptor_t descriptor)
 {
-	return GDT[di].segment.flagslo | (GDT[di].segment.flagshi << 8);
+	int flags = descriptor.segment.flagslo | (descriptor.segment.flagshi << 8);
+	return flags & ~(DESCRIPTOR_PRESENT | DESCRIPTOR_GRANULARITY);
 }
