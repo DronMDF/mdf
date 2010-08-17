@@ -123,14 +123,6 @@ void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 	StubTssSetDescriptor(ti, tssd);
 }
 
-uint32_t StubGetSelectorTask (const unsigned int ti)
-{
-	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
-
-	const unsigned int selector = (GDT_TASK_BASE + ti) * sizeof(descriptor_t);
-	return selector;
-}
-
 static
 tss_t *StubGetTaskContextBySlot (unsigned int slot)
 {
@@ -309,7 +301,7 @@ void StubTaskExecute (const Task *task)
 {
 	tss_t *context = task->context;
 	StubTaskSlotUse (context);
-	StubTaskSwitch (StubGetSelectorTask(context->slot));
+	StubTaskSwitch (StubTssGetSelector(context->slot));
 }
 
 // -----------------------------------------------------------------------------

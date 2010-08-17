@@ -30,3 +30,4 @@ extern volatile descriptor_t *GDT __deprecated__;
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 
 void StubTssSetDescriptor(unsigned int ti, const descriptor_t tssd);
+unsigned int StubTssGetSelector(unsigned int ti);
