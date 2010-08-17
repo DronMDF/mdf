@@ -16,6 +16,7 @@
 #include "Page.h"
 #include "Descriptor.h"
 #include "GDT.h"
+#include "TSS.h"
 
 extern void __init_begin;
 extern void __init_ro;
@@ -28,8 +29,6 @@ extern void __data_begin;
 extern void __data_end;
 extern void __bss_begin;
 extern void __bss_end;
-
-#define offsetof(type, field)  ((unsigned long)(&(((type *)0)->field)))
 
 // -----------------------------------------------------------------------------
 // Низкоуровневые функции из Stublo.S
@@ -127,59 +126,6 @@ void __init__ StubInitGDT ()
 
 // -----------------------------------------------------------------------------
 // Здесь платформенный контекст задачи.
-
-// Здесь теперь открываются широкие возможности по оптимизации.
-// Кому, как не Arch.c лучше всего понятен смысл слова slot.
-// Даже более того, нету необходимости держать список задач по слотам.
-// Эту информацию легко можно достать из дескриптора.
-
-// Единственное, что не очень то получится выкинуть - это время использования
-// слота. Его можно было бы хранить в контекстах задач, но доставатьвсе задачи
-// из дескриптора для того чтобы определить какая из них дольше не
-// использовалась - будет накладно.
-
-// Вообще в задачах такой счетсик даже есть. :) но доставать его долго.
-// Значит таблица с временем использования слотов - нужна.
-
-typedef struct {
-	unsigned long link;
-	unsigned long esp0, ss0;
-	unsigned long esp1, ss1;
-	unsigned long esp2, ss2;
-	unsigned long cr3;
-	unsigned long eip;
-	unsigned long eflags;
-	unsigned long eax;
-	unsigned long ecx;
-	unsigned long edx;
-	unsigned long ebx;
-	unsigned long esp;
-	unsigned long ebp;
-	unsigned long esi;
-	unsigned long edi;
-	unsigned long es;
-	unsigned long cs;
-	unsigned long ss;
-	unsigned long ds;
-	unsigned long fs;
-	unsigned long gs;
-	unsigned long ldt;
-	unsigned short trace;
-	unsigned short iomap_offset;
-
-	size_t iomap_size;
-	Task *task;
-	unsigned int slot;
-
-	unsigned char iomap[];
-} __attribute__ ((packed)) tss_t;
-
-STATIC_ASSERT (offsetof(tss_t, iomap_size) == 104);
-
-// Биты eflags
-enum {
-	EFLAGS_INTERRUPT_ENABLE = (1 << 9),
-};
 
 static
 void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
