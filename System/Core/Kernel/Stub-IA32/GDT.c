@@ -16,17 +16,40 @@ void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size,
 
 // TSS utility
 
-void StubTssSetDescriptor(unsigned int ti, const descriptor_t tssd)
+void StubTssSetDescriptor(unsigned int slot, const descriptor_t td)
 {
-	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task slot");
-	const unsigned int di = GDT_TASK_BASE + ti;
-	GDT[di] = tssd;
+	STUB_ASSERT(slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
+	GDT[GDT_TASK_BASE + slot] = td;
 }
 
-unsigned int StubTssGetSelector(unsigned int ti)
+descriptor_t StubTssGetDescriptor(unsigned int slot)
 {
-	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task slot");
-	const unsigned int selector = (GDT_TASK_BASE + ti) * sizeof(descriptor_t);
-	return selector;
+	STUB_ASSERT(slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
+	return GDT[GDT_TASK_BASE + slot];
 }
 
+void StubTssClearDescriptor(unsigned int slot)
+{
+	STUB_ASSERT(slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
+	GDT[GDT_TASK_BASE + slot].raw = 0;
+}
+
+bool StubTssIsAvail(unsigned int slot)
+{
+	STUB_ASSERT(slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
+	return GDT[GDT_TASK_BASE + slot].raw == 0;
+}
+
+unsigned int StubTssGetSelector(unsigned int slot)
+{
+	STUB_ASSERT (slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
+	return (GDT_TASK_BASE + slot) * sizeof(descriptor_t);
+}
+
+unsigned int StubTssGetSlot(unsigned int selector)
+{
+	unsigned int slot = selector / sizeof (descriptor_t);
+	STUB_ASSERT(slot < GDT_TASK_BASE || slot >= GDT_TASK_BASE + STUB_MAX_TASK_COUNT,
+		    "Invalid TSS selector");
+	return slot - GDT_TASK_BASE;
+}

@@ -29,5 +29,11 @@ extern volatile descriptor_t *GDT __deprecated__;
 
 void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
 
-void StubTssSetDescriptor(unsigned int ti, const descriptor_t tssd);
-unsigned int StubTssGetSelector(unsigned int ti);
+// TSS utility
+void StubTssSetDescriptor(unsigned int slot, const descriptor_t tssd);
+descriptor_t StubTssGetDescriptor(unsigned int slot);
+void StubTssClearDescriptor(unsigned int slot);
+bool StubTssIsAvail(unsigned int slot);
+
+unsigned int StubTssGetSelector(unsigned int slot);
+unsigned int StubTssGetSlot(unsigned int selector);

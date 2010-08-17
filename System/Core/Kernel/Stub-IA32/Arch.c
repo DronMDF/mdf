@@ -118,7 +118,7 @@ void __init__ StubInitGDT ()
 static
 void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 {
-	const unsigned int flags = DESCRIPTOR_TASK | DESCRIPTOR_PL0;
+	const int flags = DESCRIPTOR_TASK | DESCRIPTOR_PL0;
 	const descriptor_t tssd = StubDescriptorGenerate(base, size, flags);
 	StubTssSetDescriptor(ti, tssd);
 }
@@ -126,20 +126,18 @@ void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 static
 tss_t *StubGetTaskContextBySlot (unsigned int slot)
 {
-	STUB_ASSERT (slot >= STUB_MAX_TASK_COUNT, "Invalid slot");
+	const descriptor_t td = StubTssGetDescriptor(slot);
 
-	const unsigned int di = GDT_TASK_BASE + slot;
-
-	tss_t *tss = l2vptr(StubDescriptorGetBase(GDT[di]));
+	tss_t *tss = l2vptr(StubDescriptorGetBase(td));
 	STUB_ASSERT (v2laddr(tss) < v2laddr(&__bss_end) || KERNEL_TEMP_BASE <= v2laddr(tss),
 		"Invalid TSS");
 
-	STUB_ASSERT (StubDescriptorGetSize(GDT[di]) != offsetof(tss_t, iomap) + tss->iomap_size,
+	STUB_ASSERT (StubDescriptorGetSize(td) != offsetof(tss_t, iomap) + tss->iomap_size,
 		"Invalid task selector size");
 
 	// TODO: Можно абстракцию дескриптора наградить методами состояний
 	//	StubDescriptorIsBusyTask() и тд...
-	unsigned int type = StubDescriptorGetFlags(GDT[di]) & DESCRIPTOR_TYPE;
+	unsigned int type = StubDescriptorGetFlags(td) & DESCRIPTOR_TYPE;
 	STUB_ASSERT (type != DESCRIPTOR_TASK && type != DESCRIPTOR_TASK_BUSY,
 		"Invalid task selector type");
 
@@ -166,23 +164,22 @@ Task *StubGetTaskBySlot (unsigned int slot)
 static
 bool StubTaskSlotRelease(unsigned int slot)
 {
-	STUB_ASSERT (slot >= STUB_MAX_TASK_COUNT, "Invalid slot");
-	STUB_ASSERT (GDT[GDT_TASK_BASE + slot].raw == 0, "Empty slot release");
+	const descriptor_t td = StubTssGetDescriptor(slot);
+	
+	STUB_ASSERT (td.raw == 0, "Empty slot release");
 
-	if ((GDT[GDT_TASK_BASE + slot].segment.flagslo & DESCRIPTOR_TYPE) ==
-			DESCRIPTOR_TASK_BUSY)
-	{
+	if ((td.segment.flagslo & DESCRIPTOR_TYPE) == DESCRIPTOR_TASK_BUSY) {
 		return false;	// Задача занята
 	}
 
-	STUB_ASSERT((GDT[GDT_TASK_BASE + slot].segment.flagslo & DESCRIPTOR_TYPE) !=
-			DESCRIPTOR_TASK, "Invalid slot type");
+	STUB_ASSERT((td.segment.flagslo & DESCRIPTOR_TYPE) != DESCRIPTOR_TASK, 
+		    "Invalid slot type");
 
 	tss_t *tss = StubGetTaskContextBySlot(slot);
 	STUB_ASSERT(tss->slot != slot, "Invalid slot");
 	tss->slot = SLOT_INVALID;
 
-	GDT[GDT_TASK_BASE + slot].raw = 0;
+	StubTssClearDescriptor(slot);
 	task_time[slot] = 0;
 
 	return true;
@@ -197,7 +194,7 @@ void StubTaskSlotUse(tss_t *tss)
 		bool slot_used = false;
 
 		for (unsigned int i = 0; i < STUB_MAX_TASK_COUNT; i++) {
-			if (GDT[GDT_TASK_BASE + i].raw == 0) {
+			if (StubTssIsAvail(i)) {
 				slot = i;
 				slot_used = false;
 				break;
@@ -288,13 +285,9 @@ void StubTaskContextSetPDir (const Task *task, const PageInfo *pdir)
 
 Task *StubGetCurrentTask ()
 {
-	unsigned int selector = StubGetCurrentTaskSelector();
-
-	unsigned int di = selector / sizeof (descriptor_t);
-	if (di < GDT_TASK_BASE || GDT_TASK_BASE + STUB_MAX_TASK_COUNT <= di)
-		return nullptr;	// Возможно CPU... но не Task.
-
-	return StubGetTaskBySlot(di - GDT_TASK_BASE);
+	const unsigned int selector = StubGetCurrentTaskSelector();
+	const unsigned int slot = StubTssGetSlot(selector);
+	return StubGetTaskBySlot(slot);
 }
 
 void StubTaskExecute (const Task *task)
