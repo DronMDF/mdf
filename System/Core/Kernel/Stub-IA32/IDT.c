@@ -7,7 +7,7 @@
 #include <Core.h>
 #include "StubLocal.h"
 #include "Time.h"
-
+#include "GDT.h"
 #include "Descriptor.h"
 
 void StubSetIDT (volatile void *idt, size_t idt_size);
@@ -20,7 +20,7 @@ enum IDT_IDX {
 	IDT_SIZE		= 64,
 };
 
-static descriptor_t IDT[IDT_SIZE] __attribute__((aligned (16)));
+static descriptor_t IDT[IDT_SIZE] __attribute__((aligned(16)));
 
 // Включаемые функции экстерним здесь - так проще.
 extern void StubExceptionDE;

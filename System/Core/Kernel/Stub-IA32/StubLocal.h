@@ -139,3 +139,7 @@ void StubInterruptAcknowledge (int irq);
 
 #define min(a, b)      ((a) < (b) ? (a) : (b))
 #define max(a, b)      ((a) > (b) ? (a) : (b))
+
+#ifndef offsetof
+#define offsetof(type, field)  ((unsigned long)(&(((type *)0)->field)))
+#endif
