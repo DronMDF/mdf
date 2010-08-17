@@ -7,8 +7,6 @@
 #include "StubLocal.h"
 #include "Descriptor.h"
 
-extern volatile descriptor_t *GDT;
-
 descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags)
 {
 	descriptor_t descriptor = { .raw = 0 };
@@ -34,13 +32,6 @@ descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags)
 	descriptor.segment.flagshi = (flags & 0xf00) >> 8;
 	
 	return descriptor;
-}
-
-// TODO: Эта функция вообще здесь не к месту.
-void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags)
-{
-	const int di = selector / (int)sizeof(descriptor_t);
-	GDT[di] = StubDescriptorGenerate(base, size, flags);
 }
 
 laddr_t StubDescriptorGetBase(const descriptor_t descriptor)

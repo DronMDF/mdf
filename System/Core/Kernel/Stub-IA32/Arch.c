@@ -41,20 +41,8 @@ void StubSetGDT (volatile void *gdt, size_t gdt_size);
 // -----------------------------------------------------------------------------
 // Сегментинг (Сегменты, GDT и слоттинг задач, и контексты задач тоже)
 
-#define STUB_MAX_TASK_COUNT	4096
-#define STUB_MAX_CPU_COUNT	2048
-
 volatile descriptor_t *GDT __deprecated__ = NULL;
 static volatile tick_t *task_time = NULL;
-
-enum GDT_IDX {
-	GDT_CPU_BASE	= 2048,
-	GDT_TASK_BASE	= 4096,
-	GDT_SIZE	= 8192,
-};
-
-STATIC_ASSERT (GDT_CPU_BASE + STUB_MAX_CPU_COUNT == GDT_TASK_BASE);
-STATIC_ASSERT (GDT_TASK_BASE + STUB_MAX_TASK_COUNT == GDT_SIZE);
 
 static
 void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
@@ -130,10 +118,9 @@ void __init__ StubInitGDT ()
 static
 void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
 {
-	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
-
-	const unsigned int di = GDT_TASK_BASE + ti;
-	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+	const unsigned int flags = DESCRIPTOR_TASK | DESCRIPTOR_PL0;
+	const descriptor_t tssd = StubDescriptorGenerate(base, size, flags);
+	StubTssSetDescriptor(ti, tssd);
 }
 
 uint32_t StubGetSelectorTask (const unsigned int ti)

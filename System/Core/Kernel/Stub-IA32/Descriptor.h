@@ -70,5 +70,3 @@ descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags);
 laddr_t StubDescriptorGetBase(const descriptor_t descriptor);
 size_t StubDescriptorGetSize(const descriptor_t descriptor);
 int StubDescriptorGetFlags(const descriptor_t descriptor);
-
-void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
