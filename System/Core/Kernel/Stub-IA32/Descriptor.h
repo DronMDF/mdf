@@ -66,12 +66,6 @@ enum SELECTOR_PL {
 	SELECTOR_RPL3	= 3
 };
 
-#define KERNEL_CODE_SELECTOR	((1 * sizeof (descriptor_t)) | SELECTOR_RPL0)
-#define KERNEL_DATA_SELECTOR	((2 * sizeof (descriptor_t)) | SELECTOR_RPL0)
-
-#define USER_CODE_SELECTOR	((4 * sizeof (descriptor_t)) | SELECTOR_RPL3)
-#define USER_DATA_SELECTOR	((5 * sizeof (descriptor_t)) | SELECTOR_RPL3)
-
 descriptor_t StubDescriptorGenerate(laddr_t base, size_t size, int flags);
 laddr_t StubDescriptorGetBase(const descriptor_t descriptor);
 size_t StubDescriptorGetSize(const descriptor_t descriptor);

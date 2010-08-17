@@ -15,6 +15,7 @@
 #include "Task.h"
 #include "Page.h"
 #include "Descriptor.h"
+#include "GDT.h"
 
 extern void __init_begin;
 extern void __init_ro;

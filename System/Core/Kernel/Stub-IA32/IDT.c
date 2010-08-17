@@ -9,6 +9,7 @@
 #include "Time.h"
 
 #include "Descriptor.h"
+#include "GDT.h"
 
 void StubSetIDT (volatile void *idt, size_t idt_size);
 
