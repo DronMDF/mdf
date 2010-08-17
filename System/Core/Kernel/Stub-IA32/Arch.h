@@ -5,6 +5,7 @@
 
 #pragma once
 
+uint32_t StubGetSelectorCPU (const unsigned int ci);
 uint32_t StubGetSelectorTask (const unsigned int ti);
 
 // Возможности CPU

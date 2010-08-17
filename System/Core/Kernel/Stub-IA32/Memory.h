@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <Kernel.h>
+struct KernelInfoMemoryStat;
 
 void StubMemoryCopy(void *dst, const void *src, size_t count);
 bool StubMemoryEqual(const void *dst, const void *src, size_t count);

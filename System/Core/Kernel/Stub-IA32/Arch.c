@@ -15,8 +15,6 @@
 #include "Task.h"
 #include "Page.h"
 #include "Descriptor.h"
-#include "GDT.h"
-#include "TSS.h"
 
 extern void __init_begin;
 extern void __init_ro;
@@ -30,11 +28,98 @@ extern void __data_end;
 extern void __bss_begin;
 extern void __bss_end;
 
+#define offsetof(type, field)  ((unsigned long)(&(((type *)0)->field)))
+
 // -----------------------------------------------------------------------------
 // Низкоуровневые функции из Stublo.S
 
 uint32_t StubGetCurrentTaskSelector();
 void StubTaskSwitch (uint32_t selector);
+
+void StubSetGDT (volatile void *gdt, size_t gdt_size);
+
+// -----------------------------------------------------------------------------
+// Сегментинг (Сегменты, GDT и слоттинг задач, и контексты задач тоже)
+
+#define STUB_MAX_TASK_COUNT	4096
+#define STUB_MAX_CPU_COUNT	2048
+
+volatile descriptor_t *GDT = NULL;
+static volatile tick_t *task_time = NULL;
+
+enum GDT_IDX {
+	GDT_CPU_BASE	= 2048,
+	GDT_TASK_BASE	= 4096,
+	GDT_SIZE	= 8192,
+};
+
+STATIC_ASSERT (GDT_CPU_BASE + STUB_MAX_CPU_COUNT == GDT_TASK_BASE);
+STATIC_ASSERT (GDT_TASK_BASE + STUB_MAX_TASK_COUNT == GDT_SIZE);
+
+static
+void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
+{
+	STUB_ASSERT (ci >= STUB_MAX_CPU_COUNT, "Invalid CPU no");
+
+	const unsigned int di = GDT_CPU_BASE + ci;
+	STUB_ASSERT (GDT[di].raw != 0, "Busy CPU slot");
+
+	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+}
+
+uint32_t StubGetSelectorCPU (const unsigned int ci)
+{
+	STUB_ASSERT (ci >= STUB_MAX_CPU_COUNT, "Invalid CPU no");
+
+	const unsigned int selector = (GDT_CPU_BASE + ci) * sizeof(descriptor_t);
+	return selector;
+}
+
+void __init__ StubInitGDT ()
+{
+	// Нулевой дескриптор - все понятно...
+	// Далее два ядерных дескриптора (код и данные)
+	// 4 дескриптора отведем для приложений. (помимо кода и данных там может
+	// появиться стек, и еще что нибудь..
+
+	// Итого:
+	//  0 - 2047 системные дескрипторы...
+	// 2048 - 4095 дескрипторы процессоров (тоже нити только системные)
+	// 4096 - 8191 дескрипторы для нитей (слоты)
+
+	const size_t gdt_size = sizeof (descriptor_t) * GDT_SIZE;
+
+	GDT = StubMemoryAllocAligned (gdt_size, sizeof (descriptor_t));
+	// FIXME: RELEASE
+	STUB_ASSERT (GDT == nullptr, "Cannot alloc GDT");
+
+	StubMemoryClear ((descriptor_t *)GDT, gdt_size);
+
+	StubSetSegmentDescriptorBySelector (KERNEL_CODE_SELECTOR,
+		0, (size_t)&__text_end,
+		DESCRIPTOR_CODE | DESCRIPTOR_USE32 | DESCRIPTOR_PL0);
+	StubSetSegmentDescriptorBySelector (KERNEL_DATA_SELECTOR, 0, 0,
+		DESCRIPTOR_DATA | DESCRIPTOR_USE32 | DESCRIPTOR_PL0);
+
+	StubSetSegmentDescriptorBySelector (USER_CODE_SELECTOR,
+		USER_MEMORY_BASE, USER_CODE_SIZE,
+		DESCRIPTOR_CODE | DESCRIPTOR_USE32 | DESCRIPTOR_PL3);
+	StubSetSegmentDescriptorBySelector (USER_DATA_SELECTOR,
+		USER_MEMORY_BASE, USER_MEMORY_SIZE,
+		DESCRIPTOR_DATA | DESCRIPTOR_USE32 | DESCRIPTOR_PL3);
+
+	StubSetGDT (GDT, gdt_size);
+
+	// Выделить память для таймеров слотов задач
+	const size_t task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
+	task_time = StubMemoryAllocAligned(task_time_size, sizeof(tick_t));
+	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
+
+	// Чистить эту память в принципе не обязательно, но для порядку почистим.
+	StubMemoryClear((tick_t *)task_time, task_time_size);
+
+	CorePrint ("GDT initialized.\n");
+}
 
 // -----------------------------------------------------------------------------
 // Таск контекстинг и слоттинг
@@ -55,6 +140,87 @@ void StubTaskSwitch (uint32_t selector);
 // Вообще в задачах такой счетсик даже есть. :) но доставать его долго.
 // Значит таблица с временем использования слотов - нужна.
 
+typedef struct {
+	unsigned long link;
+	unsigned long esp0, ss0;
+	unsigned long esp1, ss1;
+	unsigned long esp2, ss2;
+	unsigned long cr3;
+	unsigned long eip;
+	unsigned long eflags;
+	unsigned long eax;
+	unsigned long ecx;
+	unsigned long edx;
+	unsigned long ebx;
+	unsigned long esp;
+	unsigned long ebp;
+	unsigned long esi;
+	unsigned long edi;
+	unsigned long es;
+	unsigned long cs;
+	unsigned long ss;
+	unsigned long ds;
+	unsigned long fs;
+	unsigned long gs;
+	unsigned long ldt;
+	unsigned short trace;
+	unsigned short iomap_offset;
+
+	size_t iomap_size;
+	Task *task;
+	unsigned int slot;
+
+	unsigned char iomap[];
+} __attribute__ ((packed)) tss_t;
+
+STATIC_ASSERT (offsetof(tss_t, iomap_size) == 104);
+
+// Биты eflags
+enum {
+	EFLAGS_INTERRUPT_ENABLE = (1 << 9),
+};
+
+static
+void StubSetSegmentTask (unsigned int ti, laddr_t base, size_t size)
+{
+	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
+
+	const unsigned int di = GDT_TASK_BASE + ti;
+	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+}
+
+uint32_t StubGetSelectorTask (const unsigned int ti)
+{
+	STUB_ASSERT (ti >= STUB_MAX_TASK_COUNT, "Invalid task no");
+
+	const unsigned int selector = (GDT_TASK_BASE + ti) * sizeof(descriptor_t);
+	return selector;
+}
+
+static
+tss_t *StubGetTaskContextBySlot (unsigned int slot)
+{
+	STUB_ASSERT (slot >= STUB_MAX_TASK_COUNT, "Invalid slot");
+
+	const unsigned int di = GDT_TASK_BASE + slot;
+
+	tss_t *tss = l2vptr(StubDescriptorGetBase(GDT[di]));
+	STUB_ASSERT (v2laddr(tss) < v2laddr(&__bss_end) || KERNEL_TEMP_BASE <= v2laddr(tss),
+		"Invalid TSS");
+
+	STUB_ASSERT (StubDescriptorGetSize(GDT[di]) != offsetof(tss_t, iomap) + tss->iomap_size,
+		"Invalid task selector size");
+
+	// TODO: Можно абстракцию дескриптора наградить методами состояний
+	//	StubDescriptorIsBusyTask() и тд...
+	unsigned int type = StubGetSegmentFlags(di) & DESCRIPTOR_TYPE;
+	STUB_ASSERT (type != DESCRIPTOR_TASK && type != DESCRIPTOR_TASK_BUSY,
+		"Invalid task selector type");
+
+	STUB_ASSERT (tss->slot != slot, "Invalid slot in tss");
+	return tss;
+}
+
 static
 Task *StubGetTaskBySlot (unsigned int slot)
 {
@@ -71,18 +237,64 @@ Task *StubGetTaskBySlot (unsigned int slot)
 
 #define SLOT_INVALID	0xffffffff
 
+static
 bool StubTaskSlotRelease(unsigned int slot)
 {
-	if (!StubTaskSlotCanRelease(slot)) {
-		return false;
+	STUB_ASSERT (slot >= STUB_MAX_TASK_COUNT, "Invalid slot");
+	STUB_ASSERT (GDT[GDT_TASK_BASE + slot].raw == 0, "Empty slot release");
+
+	if ((GDT[GDT_TASK_BASE + slot].segment.flagslo & DESCRIPTOR_TYPE) ==
+			DESCRIPTOR_TASK_BUSY)
+	{
+		return false;	// Задача занята
 	}
+
+	STUB_ASSERT((GDT[GDT_TASK_BASE + slot].segment.flagslo & DESCRIPTOR_TYPE) !=
+			DESCRIPTOR_TASK, "Invalid slot type");
 
 	tss_t *tss = StubGetTaskContextBySlot(slot);
 	STUB_ASSERT(tss->slot != slot, "Invalid slot");
 	tss->slot = SLOT_INVALID;
 
-	StubTaskSlotUnuse(slot);
+	GDT[GDT_TASK_BASE + slot].raw = 0;
+	task_time[slot] = 0;
+
 	return true;
+}
+
+static
+void StubTaskSlotUse(tss_t *tss)
+{
+	if (tss->slot == SLOT_INVALID) {
+		unsigned int slot = SLOT_INVALID;
+		tick_t oldest = TIMESTAMP_FUTURE;
+		bool slot_used = false;
+
+		for (unsigned int i = 0; i < STUB_MAX_TASK_COUNT; i++) {
+			if (GDT[GDT_TASK_BASE + i].raw == 0) {
+				slot = i;
+				slot_used = false;
+				break;
+			}
+
+			if (task_time[i] < oldest) {
+				slot = i;
+				oldest = task_time[i];
+				slot_used = true;
+			}
+		}
+
+		STUB_ASSERT (slot == SLOT_INVALID, "Impossible, no slot!");
+		if (slot_used) {
+			StubTaskSlotRelease(slot);
+		}
+
+		tss->slot = slot;
+		StubSetSegmentTask (slot, v2laddr(tss),
+			offsetof (tss_t, iomap) + tss->iomap_size);
+	}
+
+	task_time[tss->slot] = StubGetTimestampCounter();
 }
 
 // -----------------------------------------------------------------------------
@@ -150,9 +362,13 @@ void StubTaskContextSetPDir (const Task *task, const PageInfo *pdir)
 
 Task *StubGetCurrentTask ()
 {
-	const unsigned int selector = StubGetCurrentTaskSelector();
-	const unsigned int slot = StubTaskSlotBySelector(selector);
-	return StubGetTaskBySlot(slot);
+	unsigned int selector = StubGetCurrentTaskSelector();
+
+	unsigned int di = selector / sizeof (descriptor_t);
+	if (di < GDT_TASK_BASE || GDT_TASK_BASE + STUB_MAX_TASK_COUNT <= di)
+		return nullptr;	// Возможно CPU... но не Task.
+
+	return StubGetTaskBySlot(di - GDT_TASK_BASE);
 }
 
 void StubTaskExecute (const Task *task)
