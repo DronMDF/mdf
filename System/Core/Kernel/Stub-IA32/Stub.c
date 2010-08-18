@@ -17,6 +17,7 @@
 #include "Memory.h"
 #include "Kernel.h"
 #include "CoreABI.h"
+#include "GDT.h"
 
 extern void __init_begin;
 extern void __init_ro;

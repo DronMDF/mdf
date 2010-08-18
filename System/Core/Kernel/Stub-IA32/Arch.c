@@ -36,8 +36,6 @@ extern void __bss_end;
 uint32_t StubGetCurrentTaskSelector();
 void StubTaskSwitch (uint32_t selector);
 
-void StubSetGDT (volatile void *gdt, size_t gdt_size);
-
 // -----------------------------------------------------------------------------
 // Сегментинг (Сегменты, GDT и слоттинг задач, и контексты задач тоже)
 
@@ -55,35 +53,6 @@ uint32_t StubGetSelectorCPU (const unsigned int ci)
 
 	const unsigned int selector = (GDT_CPU_BASE + ci) * sizeof(descriptor_t);
 	return selector;
-}
-
-volatile descriptor_t *GDT __deprecated__ = NULL;
-
-void __init__ StubInitGDT ()
-{
-	const size_t gdt_size = sizeof (descriptor_t) * GDT_SIZE;
-
-	GDT = StubMemoryAllocAligned (gdt_size, sizeof (descriptor_t));
-	STUB_ASSERT (GDT == nullptr, "Cannot alloc GDT");
-
-	StubMemoryClear ((descriptor_t *)GDT, gdt_size);
-
-	StubSetSegmentDescriptorBySelector (KERNEL_CODE_SELECTOR,
-		0, (size_t)&__text_end,
-		DESCRIPTOR_CODE | DESCRIPTOR_USE32 | DESCRIPTOR_PL0);
-	StubSetSegmentDescriptorBySelector (KERNEL_DATA_SELECTOR, 0, 0,
-		DESCRIPTOR_DATA | DESCRIPTOR_USE32 | DESCRIPTOR_PL0);
-
-	StubSetSegmentDescriptorBySelector (USER_CODE_SELECTOR,
-		USER_MEMORY_BASE, USER_CODE_SIZE,
-		DESCRIPTOR_CODE | DESCRIPTOR_USE32 | DESCRIPTOR_PL3);
-	StubSetSegmentDescriptorBySelector (USER_DATA_SELECTOR,
-		USER_MEMORY_BASE, USER_MEMORY_SIZE,
-		DESCRIPTOR_DATA | DESCRIPTOR_USE32 | DESCRIPTOR_PL3);
-
-	StubSetGDT (GDT, gdt_size);
-
-	CorePrint ("GDT initialized.\n");
 }
 
 // -----------------------------------------------------------------------------

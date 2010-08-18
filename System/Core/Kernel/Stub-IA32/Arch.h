@@ -22,7 +22,6 @@ void StubTaskExecute (const Task *task);
 
 void StubTaskBootstrapCreate();
 
-void StubInitGDT ();
 void StubInitIDT ();
 
 void StubInitTaskSlots();

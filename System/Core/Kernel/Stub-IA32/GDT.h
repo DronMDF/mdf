@@ -25,9 +25,8 @@ enum GDT_IDX {
 STATIC_ASSERT (GDT_CPU_BASE + STUB_MAX_CPU_COUNT == GDT_TASK_BASE);
 STATIC_ASSERT (GDT_TASK_BASE + STUB_MAX_TASK_COUNT == GDT_SIZE);
 
-extern volatile descriptor_t *GDT __deprecated__;
-
-void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size, int flags) __init__;
+// GDT utility
+void StubInitGDT ();
 
 // CPU utility
 void StubCpuSetDescriptor(unsigned int slot, const descriptor_t desc);
