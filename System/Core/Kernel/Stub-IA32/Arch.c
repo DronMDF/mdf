@@ -45,14 +45,11 @@ volatile descriptor_t *GDT __deprecated__ = NULL;
 static volatile tick_t *task_time = NULL;
 
 static
-void StubSetSegmentCPU (unsigned int ci, laddr_t base, size_t size)
+void StubSetSegmentCPU(unsigned int slot, laddr_t base, size_t size)
 {
-	STUB_ASSERT (ci >= STUB_MAX_CPU_COUNT, "Invalid CPU no");
-
-	const unsigned int di = GDT_CPU_BASE + ci;
-	STUB_ASSERT (GDT[di].raw != 0, "Busy CPU slot");
-
-	GDT[di] = StubDescriptorGenerate(base, size, DESCRIPTOR_TASK | DESCRIPTOR_PL0);
+	const int flags = DESCRIPTOR_TASK | DESCRIPTOR_PL0;
+	const descriptor_t desc = StubDescriptorGenerate(base, size, flags);
+	StubCpuSetDescriptor(slot, desc);
 }
 
 uint32_t StubGetSelectorCPU (const unsigned int ci)

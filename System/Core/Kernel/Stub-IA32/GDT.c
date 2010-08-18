@@ -14,12 +14,22 @@ void StubSetSegmentDescriptorBySelector(int selector, laddr_t base, size_t size,
 	GDT[di] = StubDescriptorGenerate(base, size, flags);
 }
 
+
+// CPU utility
+
+void StubCpuSetDescriptor(unsigned int slot, const descriptor_t desc)
+{
+	STUB_ASSERT(slot >= STUB_MAX_CPU_COUNT, "Invalid CPU slot");
+	STUB_ASSERT(GDT[GDT_CPU_BASE + slot].raw != 0, "Busy CPU slot");
+	GDT[GDT_CPU_BASE + slot] = desc;
+}
+
 // TSS utility
 
-void StubTssSetDescriptor(unsigned int slot, const descriptor_t td)
+void StubTssSetDescriptor(unsigned int slot, const descriptor_t desc)
 {
 	STUB_ASSERT(slot >= STUB_MAX_TASK_COUNT, "Invalid TSS slot");
-	GDT[GDT_TASK_BASE + slot] = td;
+	GDT[GDT_TASK_BASE + slot] = desc;
 }
 
 descriptor_t StubTssGetDescriptor(unsigned int slot)
