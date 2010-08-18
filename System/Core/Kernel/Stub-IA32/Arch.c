@@ -41,9 +41,6 @@ void StubSetGDT (volatile void *gdt, size_t gdt_size);
 // -----------------------------------------------------------------------------
 // Сегментинг (Сегменты, GDT и слоттинг задач, и контексты задач тоже)
 
-volatile descriptor_t *GDT __deprecated__ = NULL;
-static volatile tick_t *task_time = NULL;
-
 static
 void StubSetSegmentCPU(unsigned int slot, laddr_t base, size_t size)
 {
@@ -60,22 +57,13 @@ uint32_t StubGetSelectorCPU (const unsigned int ci)
 	return selector;
 }
 
+volatile descriptor_t *GDT __deprecated__ = NULL;
+
 void __init__ StubInitGDT ()
 {
-	// Нулевой дескриптор - все понятно...
-	// Далее два ядерных дескриптора (код и данные)
-	// 4 дескриптора отведем для приложений. (помимо кода и данных там может
-	// появиться стек, и еще что нибудь..
-
-	// Итого:
-	//  0 - 2047 системные дескрипторы...
-	// 2048 - 4095 дескрипторы процессоров (тоже нити только системные)
-	// 4096 - 8191 дескрипторы для нитей (слоты)
-
 	const size_t gdt_size = sizeof (descriptor_t) * GDT_SIZE;
 
 	GDT = StubMemoryAllocAligned (gdt_size, sizeof (descriptor_t));
-	// FIXME: RELEASE
 	STUB_ASSERT (GDT == nullptr, "Cannot alloc GDT");
 
 	StubMemoryClear ((descriptor_t *)GDT, gdt_size);
@@ -95,19 +83,24 @@ void __init__ StubInitGDT ()
 
 	StubSetGDT (GDT, gdt_size);
 
-	// Выделить память для таймеров слотов задач
-	const size_t task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
-	task_time = StubMemoryAllocAligned(task_time_size, sizeof(tick_t));
-	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
-
-	// Чистить эту память в принципе не обязательно, но для порядку почистим.
-	StubMemoryClear((tick_t *)task_time, task_time_size);
-
 	CorePrint ("GDT initialized.\n");
 }
 
 // -----------------------------------------------------------------------------
 // Таск контекстинг и слоттинг
+
+static volatile tick_t *task_time = NULL;
+
+void __init__ StubInitTaskSlots()
+{
+	const size_t task_time_size = sizeof(tick_t) * STUB_MAX_TASK_COUNT;
+	task_time = StubMemoryAllocAligned(task_time_size, sizeof(tick_t));
+	STUB_ASSERT (task_time == nullptr, "No memory for task slot time");
+
+	StubMemoryClear((tick_t *)task_time, task_time_size);
+
+	CorePrint ("Task slots initialized.\n");
+}
 
 // -----------------------------------------------------------------------------
 // Здесь платформенный контекст задачи.

@@ -25,4 +25,6 @@ void StubTaskBootstrapCreate();
 void StubInitGDT ();
 void StubInitIDT ();
 
+void StubInitTaskSlots();
+
 tick_t StubGetTSC (void);

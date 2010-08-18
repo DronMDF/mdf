@@ -171,6 +171,8 @@ void __init__ StubInit (const MultibootInfo * const info)
 	// Так что нету большой разницы когда их проинитить
 	StubInitGDT();
 	StubInitIDT();
+	
+	StubInitTaskSlots();
 
 	// Продетектим CPU чтобы смотреть на наличие фич
 	// StubCPUID();
