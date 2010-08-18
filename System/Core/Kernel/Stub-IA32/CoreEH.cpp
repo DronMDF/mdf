@@ -130,7 +130,7 @@ namespace std {
 	void terminate()
 	{
 	}
-};
+}
 
 namespace __cxxabiv1 {
 
@@ -158,6 +158,7 @@ void _Unwind_Resume(_Unwind_Exception *)
 extern "C"
 _Unwind_Reason_Code _Unwind_Resume_or_Rethrow(_Unwind_Exception *)
 {
+	return _URC_NO_REASON;
 }
 
 extern "C"
