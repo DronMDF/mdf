@@ -17,7 +17,7 @@ CORE = $(MDF_ROOT)/Develop/Library/IA32/MDF/Core.o
 FLAGS=-DSTUB
 
 # Типы преинклюдятся...
-FLAGS+= --include "$(MDF_DEV)/Include/IA32/MDF/Types.h"
+FLAGS+= -include "$(MDF_DEV)/Include/IA32/MDF/Types.h"
 
 # Стандартные инклюды нафиг не нужны, мои нужны.
 FLAGS+= -I $(MDF_DEV)/Include/MDF

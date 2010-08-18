@@ -14,7 +14,7 @@ OPREFIX = $(PREFIX)/Library/$(ARCH)
 # Инклюд вполне себе платформонезависим.
 IPREFIX = $(PREFIX)/Include
 
-CXXFLAGS += -fexceptions -frtti -DCORE --include "$(MDF_DEV)/Include/$(ARCH)/MDF/Types.h"
+CXXFLAGS += -fexceptions -frtti -DCORE -include "$(MDF_DEV)/Include/$(ARCH)/MDF/Types.h"
 
 all: $(OPREFIX)/MDF/Core.o $(IPREFIX)/MDF/Kernel.h \
 	$(IPREFIX)/MDF/Core.h $(IPREFIX)/MDF/Stub.h

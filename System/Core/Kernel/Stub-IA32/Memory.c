@@ -47,6 +47,17 @@ void *memmove(void *s1, const void *s2, size_t n)
 	return s1;
 }
 
+void *memset(void *s, int c, size_t n)
+{
+	unsigned char *_s = (unsigned char *)s;
+
+	for (size_t i = 0; i < n; i++) {
+		_s[i] = (unsigned char)c;
+	}
+
+	return s;
+}
+
 void StubMemoryCopy (void * const dst, const void * const src, const size_t count)
 {
 	STUB_ASSERT (src == nullptr, "No source buffer");

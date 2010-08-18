@@ -25,7 +25,7 @@ size_t CalcBlockSize(size_t size)
 unsigned int GetSizeIndex(size_t size)
 {
 	for (unsigned int i = 0; i < 10; i++) {
-		if (size <= 1 << (i + 2)) {
+		if (size <= 1U << (i + 2)) {
 			return i;
 		}
 	}

@@ -27,5 +27,5 @@ $(MDF_TEMP)/test_%.o : %.cpp $(wildcard *.h) $(wildcard ../*.h)
 
 $(MDF_TEMP)/test_core_%.o : ../%.cpp  $(wildcard ../*.h)
 	$(ECHO) Compile for localhost $(notdir $<)...
-	$(HOST_CXX) $(HOST_CXXFLAGS) --include Types.h \
+	$(HOST_CXX) $(HOST_CXXFLAGS) -include Types.h \
 		-DVERSION=\"$(VERSION)-test\" -c -o $@ $<

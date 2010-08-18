@@ -56,9 +56,7 @@ public:
 
 class __si_class_type_info : public __class_type_info {
 public:
-	virtual ~__si_class_type_info()
-	{
-	}
+	virtual ~__si_class_type_info();
 };
 
 class __vmi_class_type_info : public __class_type_info {
@@ -67,6 +65,10 @@ public:
 };
 
 // Почему-то при описании инлайн не генерируется ничего.
+__si_class_type_info::~__si_class_type_info()
+{
+}
+
 __vmi_class_type_info::~__vmi_class_type_info()
 {
 }

@@ -30,6 +30,7 @@ SECTIONS
 		. = ALIGN(0x1000);
 		__text_begin = .;
 		*(.text*)
+		*(.gnu.linkonce*)
 		__text_end = .;
 
 		. = ALIGN(16);
