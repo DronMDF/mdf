@@ -89,7 +89,8 @@ unsigned int StubTssGetSelector(unsigned int slot)
 unsigned int StubTssGetSlot(unsigned int selector)
 {
 	unsigned int slot = selector / sizeof (descriptor_t);
-	STUB_ASSERT(slot < GDT_TASK_BASE || slot >= GDT_TASK_BASE + STUB_MAX_TASK_COUNT,
-		    "Invalid TSS selector");
+	if (slot < GDT_TASK_BASE || slot >= GDT_TASK_BASE + STUB_MAX_TASK_COUNT) {
+		return SLOT_INVALID;
+	}
 	return slot - GDT_TASK_BASE;
 }

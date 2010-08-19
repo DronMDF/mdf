@@ -118,8 +118,6 @@ Task *StubGetTaskBySlot (unsigned int slot)
 // -----------------------------------------------------------------------------
 // Менеджер распределения слотов для задач.
 
-#define SLOT_INVALID	0xffffffff
-
 static
 bool StubTaskSlotRelease(unsigned int slot)
 {
@@ -246,6 +244,9 @@ Task *StubGetCurrentTask ()
 {
 	const unsigned int selector = StubGetCurrentTaskSelector();
 	const unsigned int slot = StubTssGetSlot(selector);
+	if (slot == SLOT_INVALID) {
+		return NULL;
+	}
 	return StubGetTaskBySlot(slot);
 }
 
