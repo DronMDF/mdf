@@ -6,11 +6,13 @@
 #include <Kernel.h>
 
 extern "C" {
-//#include "../Allocator.h"
+#include "../Allocator.h"
 
 // И это все не то, что нужно...
 size_t CalcBlockSize(size_t size);
 unsigned int GetSizeIndex(size_t size);
+
+AllocDir *StubAllocatorDirectoryAlloc(void *(*)());
 }
 
 BOOST_AUTO_TEST_SUITE(suiteAllocator)
@@ -42,24 +44,23 @@ BOOST_AUTO_TEST_CASE(testSizeIndex)
 
 // Уровень 3, аллокатор каталогов
 
-// static
-// AllocatorDirectory testDirectory;
-// 
-// void *testFindUnusedDirectory()
-// {
-// 	return &testDirectory;
-// }
-// 
-// BOOST_AUTO_TEST_CASE(testAllocDirectory)
-// {
-// 	AllocatorDirectory *dir = StubAllocatorDirectoryAlloc(testFindUnusedDirectory);
-// 	BOOST_REQUIRE_EQUAL(dir, &testDirectory);
-// 
-// 	const pages_per_dir = sizeof(dir->pages) / sizeof(dir->pages[0]);
-// 	BOOST_REQUIRE_EQIAL(dir->avail, pages_per_dir);
-// 	for (int i = 0; i < pages_per_dir; i++) {
-// 		BOOST_REQUIRE(dir->pages[i] == 0);
-// 	}
-// }
+static AllocDir testDirectory;
+
+void *testFindUnusedDirectory()
+{
+	return &testDirectory;
+}
+
+BOOST_AUTO_TEST_CASE(testAllocDirectory)
+{
+	AllocDir *dir = StubAllocatorDirectoryAlloc(testFindUnusedDirectory);
+	BOOST_REQUIRE_EQUAL(dir, &testDirectory);
+
+	const size_t pages_per_dir = sizeof(dir->pages) / sizeof(dir->pages[0]);
+	BOOST_REQUIRE_EQUAL(dir->avail, pages_per_dir);
+	for (size_t i = 0; i < pages_per_dir; i++) {
+		BOOST_REQUIRE(dir->pages[i] == 0);
+	}
+}
 
 BOOST_AUTO_TEST_SUITE_END()

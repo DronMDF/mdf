@@ -49,4 +49,9 @@ void StubMemoryCopy (void *dst, const void *src, size_t count)
 	memcpy(dst, src, count);
 }
 
+void StubMemoryClear(void *dst, size_t count)
+{
+	memset(dst, 0, count);
+}
+
 }

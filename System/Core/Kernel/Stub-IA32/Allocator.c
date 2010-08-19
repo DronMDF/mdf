@@ -6,6 +6,19 @@
 #include <Stub.h>
 #include "StubLocal.h"
 
+#include "Allocator.h"
+#include "Memory.h"
+
+// Третий уровень (каталоги)
+
+AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
+{
+	AllocDir *dir = getDir();
+	StubMemoryClear(dir, sizeof(AllocDir));
+	dir->avail = sizeof(dir->pages) / sizeof(dir->pages[0]);
+	return dir;
+}
+
 // По размеру нужно найти очередь, из в которой хранятся соответствующие дескрипторы.
 // Очереди у нас начинаются с размера 4
 // 4 8 16 32 64 128 256 512 1024 2048 4096
