@@ -5,10 +5,12 @@
 
 #include <Kernel.h>
 
-namespace {
-	extern "C" {
-		#include "../Allocator.c"
-	}
+extern "C" {
+//#include "../Allocator.h"
+
+// И это все не то, что нужно...
+size_t CalcBlockSize(size_t size);
+unsigned int GetSizeIndex(size_t size);
 }
 
 BOOST_AUTO_TEST_SUITE(suiteAllocator)
