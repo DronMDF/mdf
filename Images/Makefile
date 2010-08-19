@@ -3,12 +3,12 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-GRUB2_VERSION=1.98
-GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.gz
+GRUB2_VERSION=1.98-r2613
+GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.bz2
 
 GRUB2_ROOT=${CURDIR}/grub2
 
-GRUB2_MODULES=normal sh ls cat help multiboot elf configfile
+GRUB2_MODULES=normal ls cat help multiboot elf configfile
 
 MDF_ROOT=${CURDIR}/MDF.Root
 MDF_PACKAGES=Stub-IA32 Hello KernelInfo SchedulerTest TPCTest Console
@@ -28,7 +28,7 @@ iso2 mdf-current.iso : root grub2
 	mkdir -p ${MDF_TEMP}/iso2/boot/grub
 	mkdir -p ${MDF_TEMP}/iso2.tmp
 	${GRUB2_ROOT}/bin/grub-mkimage -o ${MDF_TEMP}/iso2.tmp/grub-image.tmp \
-		${GRUB2_MODULES} biosdisk iso9660
+		-O i386-pc ${GRUB2_MODULES} biosdisk iso9660
 	cp ${GRUB2_ROOT}/lib/grub/i386-pc/cdboot.img ${MDF_TEMP}/iso2/boot/grub/grub-image
 	dd if=${MDF_TEMP}/iso2.tmp/grub-image.tmp of=${MDF_TEMP}/iso2/boot/grub/grub-image seek=1
 	cp grub.cfg ${MDF_TEMP}/iso2/boot/grub/
@@ -99,24 +99,19 @@ rootclean:
 grub2 : ${GRUB2_ROOT}/grub-${GRUB2_VERSION}
 
 ${MDF_FILES}/${GRUB2_ARCHIVE} :
-	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE} -O $@
+	wget http://mdf.googlecode.com/files/${GRUB2_ARCHIVE} -O $@
 
-${MDF_FILES}/${GRUB2_ARCHIVE}.sig:
-	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig -O $@
+#${MDF_FILES}/${GRUB2_ARCHIVE}.sig:
+#	wget ftp://alpha.gnu.org/gnu/grub/${GRUB2_ARCHIVE}.sig -O $@
 
-${MDF_FILES}/grub-newreloc.patch.bz2:
-	wget http://mdf.googlecode.com/files/grub-newreloc.patch.bz2 -O $@
+#grub2sig: ${MDF_FILES}/${GRUB2_ARCHIVE} ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
+#	gpg --keyserver keys.gnupg.net --recv-keys E82E4209
+#	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
 
-grub2sig: ${MDF_FILES}/${GRUB2_ARCHIVE} ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
-	gpg --keyserver keys.gnupg.net --recv-keys E82E4209
-	gpg --verify ${MDF_FILES}/${GRUB2_ARCHIVE}.sig
-
-${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE} \
-		${MDF_FILES}/grub-newreloc.patch.bz2
+${GRUB2_ROOT}/grub-${GRUB2_VERSION} : ${MDF_FILES}/${GRUB2_ARCHIVE}
 	rm -rf ${MDF_TEMP}/grub-${GRUB2_VERSION} ${GRUB2_ROOT}
-	tar -xz -C ${MDF_TEMP} -f ${MDF_FILES}/${GRUB2_ARCHIVE} 
-	bzcat ${MDF_FILES}/grub-newreloc.patch.bz2 | \
-		patch -d ${MDF_TEMP}/grub-${GRUB2_VERSION} -p1
+	tar -xa -C ${MDF_TEMP} -f ${MDF_FILES}/${GRUB2_ARCHIVE} 
+	cd ${MDF_TEMP}/grub-${GRUB2_VERSION}; ./autogen.sh
 	cd ${MDF_TEMP}/grub-${GRUB2_VERSION}; ./configure \
 		--prefix=${GRUB2_ROOT} --disable-largefile --disable-werror
 	make -C ${MDF_TEMP}/grub-${GRUB2_VERSION} all install
