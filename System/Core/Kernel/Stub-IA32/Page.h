@@ -5,7 +5,7 @@
 
 #pragma once
 
-struct KernelInfoMemoryStat;
+struct KernelInfoMemory;
 
 // Менеджер страниц
 enum PAGE_FLAGS {
