@@ -35,10 +35,10 @@ SECTIONS
 
 		. = ALIGN(16);
 		__rodata_begin = .;
+		*(.rodata*)
 		__eh_frame = .;
 		*(.eh_frame*)
 		*(.gcc_except_table*)
-		*(.rodata*)
 		__rodata_end = .;
 	}
 
@@ -53,6 +53,7 @@ SECTIONS
 	.bss : {
 		__bss_begin = .;
 		*(.bss)
+		*(COMMON)
 		__bss_end = .;
 	}
 
