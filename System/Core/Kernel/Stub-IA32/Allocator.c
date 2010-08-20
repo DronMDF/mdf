@@ -24,6 +24,8 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 
 void *StubAllocatorAlloc(size_t size, AllocPage *page_queue, void *(*newPage)())
 {
+	// Пока тупые заглушки
+	page_queue->map[0] = 1;
 	return (void *)(page_queue->base);
 }
 

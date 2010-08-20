@@ -66,12 +66,16 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 	}
 }
 
+// Если в очередях есть доступные страницы - то StubAllocatorAlloc не должен 
+// обращаться к newPage вообще...
 BOOST_AUTO_TEST_CASE(testFirstAlloc)
 {
 	uint32_t map[4096 / 4 / 32] = { 0 };
 	AllocPage page4 = { 666, 0, map, 4 };
 	void *block = StubAllocatorAlloc(4, &page4, 0);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
+	// Первый блок должен быть стать занятым
+	BOOST_REQUIRE_EQUAL(map[0], 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

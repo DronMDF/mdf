@@ -8,7 +8,7 @@
 typedef struct AllocPage_ {
 	laddr_t base;
 	struct AllocPage_ *next;
-	uint32_t *map_ptr;
+	uint32_t *map;
 	size_t block_size;
 } AllocPage;
 
