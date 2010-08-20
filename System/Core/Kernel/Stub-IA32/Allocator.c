@@ -19,6 +19,14 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 	return dir;
 }
 
+
+// Первый уровень - блоки
+
+void *StubAllocatorAlloc(size_t size, AllocPage *page_queue, void *(*newPage)())
+{
+	return (void *)(page_queue->base);
+}
+
 // По размеру нужно найти очередь, из в которой хранятся соответствующие дескрипторы.
 // Очереди у нас начинаются с размера 4
 // 4 8 16 32 64 128 256 512 1024 2048 4096

@@ -5,8 +5,14 @@
 
 #pragma once
 
-typedef struct {
+typedef struct AllocPage_ {
+	laddr_t base;
+	struct AllocPage_ *next;
+	uint32_t *map_ptr;
+	size_t block_size;
 } AllocPage;
+
+STATIC_ASSERT(sizeof(AllocPage) == 16);
 
 typedef struct {
 	uint32_t avail;
@@ -14,4 +20,3 @@ typedef struct {
 } AllocDir;
 
 STATIC_ASSERT(sizeof(AllocDir) == 4096);
-

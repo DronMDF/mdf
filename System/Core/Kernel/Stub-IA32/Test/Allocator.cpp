@@ -12,7 +12,10 @@ extern "C" {
 size_t CalcBlockSize(size_t size);
 unsigned int GetSizeIndex(size_t size);
 
-AllocDir *StubAllocatorDirectoryAlloc(void *(*)());
+AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
+
+void *StubAllocatorAlloc(size_t size, AllocPage *page_queue, void *(*newPage)());
+
 }
 
 BOOST_AUTO_TEST_SUITE(suiteAllocator)
@@ -46,14 +49,14 @@ BOOST_AUTO_TEST_CASE(testSizeIndex)
 
 static AllocDir testDirectory;
 
-void *testFindUnusedDirectory()
+void *testGetDir()
 {
 	return &testDirectory;
 }
 
 BOOST_AUTO_TEST_CASE(testAllocDirectory)
 {
-	AllocDir *dir = StubAllocatorDirectoryAlloc(testFindUnusedDirectory);
+	AllocDir *dir = StubAllocatorDirectoryAlloc(testGetDir);
 	BOOST_REQUIRE_EQUAL(dir, &testDirectory);
 
 	const size_t pages_per_dir = sizeof(dir->pages) / sizeof(dir->pages[0]);
@@ -61,6 +64,14 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 	for (size_t i = 0; i < pages_per_dir; i++) {
 		BOOST_REQUIRE(dir->pages[i] == 0);
 	}
+}
+
+BOOST_AUTO_TEST_CASE(testFirstAlloc)
+{
+	uint32_t map[4096 / 4 / 32] = { 0 };
+	AllocPage page4 = { 666, 0, map, 4 };
+	void *block = StubAllocatorAlloc(4, &page4, 0);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
