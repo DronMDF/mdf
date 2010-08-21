@@ -70,13 +70,20 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 // обращаться к newPage вообще...
 BOOST_AUTO_TEST_CASE(testFirstAlloc)
 {
-	uint32_t map[4096 / 4 / 32] = { 0 };
-	AllocPage page4 = { 666, 0, map, 4 };
+	const size_t block_size = 4;
+	
+	uint32_t map[4096 / block_size / 32] = { 0 };
+	AllocPage page4 = { 666, 0, map, block_size };
 	AllocPage *pqueues[9] = { &page4, 0 };
-	void *block = StubAllocatorAlloc(4, pqueues, 0);
+	void *block = StubAllocatorAlloc(block_size, pqueues, 0);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);
+
+	void *block2 = StubAllocatorAlloc(block_size, pqueues, 0);
+	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page4.base + block_size));
+	// Второй блок тоже должен быть стать занятым
+	BOOST_REQUIRE_EQUAL(map[0], 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

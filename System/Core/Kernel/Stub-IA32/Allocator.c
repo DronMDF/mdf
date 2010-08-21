@@ -24,9 +24,24 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 
 void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(int))
 {
-	// Пока тупые заглушки
-	queues[0]->map[0] = 1;
-	return (void *)(queues[0]->base);
+	// Определить свободный блок
+	for (unsigned int i = 0; i < PAGE_SIZE / queues[0]->block_size / 32; i++) {
+		if (queues[0]->map[i] == 0xffffffff) {
+			continue;
+		}
+		
+		for (unsigned int j = 0; j < 32; j++) {
+			if ((queues[0]->map[i] & (1U << j)) != 0) {
+				continue;
+			}
+			
+			queues[0]->map[i] |= 1U << j;
+			const uint32_t offset = (i * 32 + j) * queues[0]->block_size;
+			return (void *)(queues[0]->base + offset);
+		}
+	}
+	
+	return 0;
 }
 
 // По размеру нужно найти очередь, из в которой хранятся соответствующие дескрипторы.
