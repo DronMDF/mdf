@@ -14,7 +14,7 @@ unsigned int GetSizeIndex(size_t size);
 
 AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
 
-void *StubAllocatorAlloc(size_t size, AllocPage *page_queue, void *(*newPage)());
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(int));
 
 }
 
@@ -72,7 +72,8 @@ BOOST_AUTO_TEST_CASE(testFirstAlloc)
 {
 	uint32_t map[4096 / 4 / 32] = { 0 };
 	AllocPage page4 = { 666, 0, map, 4 };
-	void *block = StubAllocatorAlloc(4, &page4, 0);
+	AllocPage *pqueues[9] = { &page4, 0 };
+	void *block = StubAllocatorAlloc(4, pqueues, 0);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);

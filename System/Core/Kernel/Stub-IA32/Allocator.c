@@ -22,11 +22,11 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 
 // Первый уровень - блоки
 
-void *StubAllocatorAlloc(size_t size, AllocPage *page_queue, void *(*newPage)())
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(int))
 {
 	// Пока тупые заглушки
-	page_queue->map[0] = 1;
-	return (void *)(page_queue->base);
+	queues[0]->map[0] = 1;
+	return (void *)(queues[0]->base);
 }
 
 // По размеру нужно найти очередь, из в которой хранятся соответствующие дескрипторы.
