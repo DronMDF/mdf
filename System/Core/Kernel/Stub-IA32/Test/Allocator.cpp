@@ -68,13 +68,14 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 
 // Если в очередях есть доступные страницы - то StubAllocatorAlloc не должен 
 // обращаться к newPage вообще...
-BOOST_AUTO_TEST_CASE(testFirstAlloc)
+BOOST_AUTO_TEST_CASE(testAlloc4)
 {
 	const size_t block_size = 4;
 	
 	uint32_t map[4096 / block_size / 32] = { 0 };
 	AllocPage page4 = { 666, 0, map, block_size };
-	AllocPage *pqueues[9] = { &page4, 0 };
+	AllocPage *pqueues[10] = { &page4, 0 };
+	
 	void *block = StubAllocatorAlloc(block_size, pqueues, 0);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 	// Первый блок должен быть стать занятым
@@ -82,6 +83,25 @@ BOOST_AUTO_TEST_CASE(testFirstAlloc)
 
 	void *block2 = StubAllocatorAlloc(block_size, pqueues, 0);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page4.base + block_size));
+	// Второй блок тоже должен быть стать занятым
+	BOOST_REQUIRE_EQUAL(map[0], 3);
+}
+
+BOOST_AUTO_TEST_CASE(testAlloc8)
+{
+	const size_t block_size = 8;
+	
+	uint32_t map[4096 / block_size / 32] = { 0 };
+	AllocPage page = { 666, 0, map, block_size };
+	AllocPage *pqueues[10] = { 0, &page, 0 };
+	
+	void *block = StubAllocatorAlloc(block_size, pqueues, 0);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page.base));
+	// Первый блок должен быть стать занятым
+	BOOST_REQUIRE_EQUAL(map[0], 1);
+
+	void *block2 = StubAllocatorAlloc(block_size, pqueues, 0);
+	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
 }
