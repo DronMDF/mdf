@@ -14,7 +14,8 @@ unsigned int GetSizeIndex(size_t size);
 
 AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(int));
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
+			 AllocPage *(*newPage)(size_t));
 
 }
 
@@ -104,6 +105,28 @@ BOOST_AUTO_TEST_CASE(testAlloc8)
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
+}
+
+AllocPage page;
+
+AllocPage *newPage(size_t size) {
+	page.base = 666U * PAGE_SIZE + size;
+	page.next = 0;
+	page.map = 0;
+	page.block_size = size;
+	return &page;
+}
+
+BOOST_AUTO_TEST_CASE(testAlloc4096)
+{
+	// Блоки такого размера не выискиваются в очередях, а непосредственно 
+	// выделяются из пула страниц
+	void *block = StubAllocatorAlloc(PAGE_SIZE, 0, newPage);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(667 * PAGE_SIZE));
+
+	// Две страницы!
+	void *block2 = StubAllocatorAlloc(PAGE_SIZE + 1, 0, newPage);
+	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(668 * PAGE_SIZE));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

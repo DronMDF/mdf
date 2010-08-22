@@ -38,9 +38,29 @@ unsigned int GetSizeIndex(size_t size)
 	return 10;
 }
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(int))
+size_t CalcBlockSize(size_t size) 
+{
+	size--;
+	size |= size >> 1;
+	size |= size >> 2;
+	size |= size >> 4;
+	size |= size >> 8;
+	size |= size >> 16;
+	return max(size + 1, 4);
+}
+
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
+			 AllocPage *(*newPage)(size_t))
 {
 	unsigned int qi = GetSizeIndex(size);
+	size_t asize = CalcBlockSize(size);
+	
+	if (asize >= PAGE_SIZE) {
+		// Блоки такого размера не хранятся в очередях и мапы им 
+		// отмечать не надо
+		AllocPage *page = newPage(asize);
+		return (void *)(page->base);
+	}
 	
 	// Определить свободный блок в странице
 	for (unsigned int i = 0; i < PAGE_SIZE / queues[qi]->block_size / 32; i++) {
@@ -60,18 +80,6 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(
 	}
 	
 	return 0;
-}
-
-// Эта пока в резерве
-size_t CalcBlockSize(size_t size) 
-{
-	size--;
-	size |= size >> 1;
-	size |= size >> 2;
-	size |= size >> 4;
-	size |= size >> 8;
-	size |= size >> 16;
-	return max(size + 1, 4);
 }
 
 void StubAllocatorInit(void *block)
