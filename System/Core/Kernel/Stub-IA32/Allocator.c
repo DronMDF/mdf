@@ -63,19 +63,21 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	}
 	
 	// Определить свободный блок в странице
-	for (unsigned int i = 0; i < PAGE_SIZE / queues[qi]->block_size / 32; i++) {
-		if (queues[qi]->map[i] == 0xffffffff) {
-			continue;
-		}
-		
-		for (unsigned int j = 0; j < 32; j++) {
-			if ((queues[qi]->map[i] & (1U << j)) != 0) {
+	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
+		for (unsigned int i = 0; i < PAGE_SIZE / page->block_size / 32; i++) {
+			if (page->map[i] == 0xffffffff) {
 				continue;
 			}
-			
-			queues[qi]->map[i] |= 1U << j;
-			const uint32_t offset = (i * 32 + j) * queues[qi]->block_size;
-			return (void *)(queues[qi]->base + offset);
+
+			for (unsigned int j = 0; j < 32; j++) {
+				if ((page->map[i] & (1U << j)) != 0) {
+					continue;
+				}
+
+				page->map[i] |= 1U << j;
+				const uint32_t offset = (i * 32 + j) * page->block_size;
+				return (void *)(page->base + offset);
+			}
 		}
 	}
 	
