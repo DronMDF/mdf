@@ -19,6 +19,28 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 	return dir;
 }
 
+// Второй уровень - страницы
+
+int StubAllocatorFindBlock(AllocPage *page)
+{
+	const int bpp = (int)(PAGE_SIZE / page->block_size);
+	const int bpm = sizeof(page->map[0]) * 8;
+	
+	for (int i = 0; i < bpp / bpm; i++) {
+		if (page->map[i] == 0xffffffff) {
+			continue;
+		}
+
+		for (int j = 0; j < bpm; j++) {
+			if ((page->map[i] & (1U << j)) == 0) {
+				return (i * bpm + j);
+			}
+		}
+	}
+
+	return -1;
+}
+
 
 // Первый уровень - блоки
 
@@ -64,20 +86,10 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	
 	// Определить свободный блок в странице
 	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
-		for (unsigned int i = 0; i < PAGE_SIZE / page->block_size / 32; i++) {
-			if (page->map[i] == 0xffffffff) {
-				continue;
-			}
-
-			for (unsigned int j = 0; j < 32; j++) {
-				if ((page->map[i] & (1U << j)) != 0) {
-					continue;
-				}
-
-				page->map[i] |= 1U << j;
-				const uint32_t offset = (i * 32 + j) * page->block_size;
-				return (void *)(page->base + offset);
-			}
+		int idx = StubAllocatorFindBlock(page);
+		if (idx >= 0) {
+			page->map[idx / 32] |= 1U << (idx % 32);
+			return (void *)(page->base + page->block_size * (size_t)idx);
 		}
 	}
 	
