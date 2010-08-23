@@ -21,6 +21,11 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 
 // Второй уровень - страницы
 
+AllocPage *StubAllocatorNewPage(size_t size)
+{
+	return 0;
+}
+
 int StubAllocatorFindBlock(AllocPage *page)
 {
 	const int bpp = (int)(PAGE_SIZE / page->block_size);
@@ -41,6 +46,11 @@ int StubAllocatorFindBlock(AllocPage *page)
 	return -1;
 }
 
+void StubAllocatorMarkBlock(AllocPage *page, int idx)
+{
+	STUB_ASSERT(idx >= (int)(PAGE_SIZE / page->block_size), "Invalid block index");
+	page->map[idx / 32] |= 1U << (idx % 32);
+}
 
 // Первый уровень - блоки
 
@@ -84,17 +94,22 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 		return (void *)(page->base);
 	}
 	
-	// Определить свободный блок в странице
 	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
 		int idx = StubAllocatorFindBlock(page);
 		if (idx >= 0) {
-			page->map[idx / 32] |= 1U << (idx % 32);
+			StubAllocatorMarkBlock(page, idx);
 			return (void *)(page->base + page->block_size * (size_t)idx);
 		}
 	}
 	
+	// TODO: Выделить новую страницу данного размера.
+	
 	return 0;
 }
+
+// Интерфейс модуля
+
+AllocPage *queues[9];
 
 void StubAllocatorInit(void *block)
 {
@@ -102,7 +117,7 @@ void StubAllocatorInit(void *block)
 
 void *StubAlloc(size_t size)
 {
-	return 0;
+	return StubAllocatorAlloc(size, queues, StubAllocatorNewPage);
 }
 
 void StubFree(void *ptr)
