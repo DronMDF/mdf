@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 	AllocPage page2 = { 0x666, 0, map2, block_size };
 	
 	uint32_t map1[map_size] = { 0 };
-	memset(&map1, 0xff, map_size * sizeof(uint32_t));	// Блок полностью занят
+	memset(&map1, 0xff, sizeof(map1));	// Блок полностью занят
 	AllocPage page1 = { 0x999, &page2, map1, block_size };
 	
 	AllocPage *pqueues[10] = { 0, 0, &page1, 0 };
@@ -162,6 +162,22 @@ BOOST_AUTO_TEST_CASE(testNewPageIntoQueue)
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[3], &testPage);
 	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
+}
+
+BOOST_AUTO_TEST_CASE(testAppendPageIntoQueue)
+{
+	const size_t block_size = 64;
+	uint32_t map[PAGE_SIZE / block_size / 32] = { 0 };
+	memset(&map, 0xff, sizeof(map));	// Блок полностью занят
+	AllocPage page = { 0x665, 0, map, block_size };
+	
+	AllocPage *pqueues[10] = { 0, 0, 0, 0, &page, 0 };
+
+	void *block = StubAllocatorAlloc(block_size, pqueues, newPage);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
+	BOOST_REQUIRE_EQUAL(pqueues[4], &testPage);
+	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
+	BOOST_REQUIRE_EQUAL(testPage.next, &page);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
