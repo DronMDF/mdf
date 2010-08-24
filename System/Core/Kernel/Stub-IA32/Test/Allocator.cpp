@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(testAlloc8)
 {
 	const size_t block_size = 8;
 	
-	uint32_t map[4096 / block_size / 32] = { 0 };
+	uint32_t map[PAGE_SIZE / block_size / 32] = { 0 };
 	AllocPage page = { 666, 0, map, block_size };
 	AllocPage *pqueues[10] = { 0, &page, 0 };
 	
@@ -109,9 +109,9 @@ BOOST_AUTO_TEST_CASE(testAlloc8)
 
 BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 {
-	const size_t block_size = 4;
+	const size_t block_size = 16;
 
-	const unsigned int map_size = 4096 / block_size / 32;
+	const unsigned int map_size = PAGE_SIZE / block_size / 32;
 	uint32_t map2[map_size] = { 0 };
 	AllocPage page2 = { 0x666, 0, map2, block_size };
 	
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 	memset(&map1, 0xff, map_size * sizeof(uint32_t));	// Блок полностью занят
 	AllocPage page1 = { 0x999, &page2, map1, block_size };
 	
-	AllocPage *pqueues[10] = { &page1, 0 };
+	AllocPage *pqueues[10] = { 0, 0, &page1, 0 };
 
 	void *block = StubAllocatorAlloc(block_size, pqueues, 0);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page2.base));
@@ -127,14 +127,18 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 	BOOST_REQUIRE_EQUAL(map2[0], 1);
 }
 
-AllocPage page;
+AllocPage testPage;
+uint32_t testMap[PAGE_SIZE / 4 / 32];
 
 AllocPage *newPage(size_t size) {
-	page.base = 666U * PAGE_SIZE + size;
-	page.next = 0;
-	page.map = 0;
-	page.block_size = size;
-	return &page;
+	memset(testMap, 0, sizeof(testMap));
+	
+	testPage.base = 666U * PAGE_SIZE + size;
+	testPage.next = 0;
+	testPage.map = testMap;
+	testPage.block_size = size;
+	
+	return &testPage;
 }
 
 BOOST_AUTO_TEST_CASE(testAlloc4096)
@@ -147,6 +151,17 @@ BOOST_AUTO_TEST_CASE(testAlloc4096)
 	// Две страницы!
 	void *block2 = StubAllocatorAlloc(PAGE_SIZE + 1, 0, newPage);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(668 * PAGE_SIZE));
+}
+
+BOOST_AUTO_TEST_CASE(testNewPageIntoQueue)
+{
+	const size_t block_size = 32;
+	AllocPage *pqueues[10] = { 0 };
+
+	void *block = StubAllocatorAlloc(block_size, pqueues, newPage);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
+	BOOST_REQUIRE_EQUAL(pqueues[3], &testPage);
+	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

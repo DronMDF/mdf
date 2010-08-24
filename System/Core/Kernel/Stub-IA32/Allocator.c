@@ -102,9 +102,12 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 		}
 	}
 	
-	// TODO: Выделить новую страницу данного размера.
-	
-	return 0;
+	AllocPage *page = newPage(asize);
+	page->next = queues[qi];
+	queues[qi] = page;
+
+	StubAllocatorMarkBlock(page, 0);
+	return (void *)(page->base);
 }
 
 // Интерфейс модуля
