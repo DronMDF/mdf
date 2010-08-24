@@ -3,7 +3,7 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-GRUB2_VERSION=1.98-r2613
+GRUB2_VERSION=newreloc-r2195
 GRUB2_ARCHIVE=grub-${GRUB2_VERSION}.tar.bz2
 
 GRUB2_ROOT=${CURDIR}/grub2
