@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 
 template<int size>
 struct fixturePage {
-	uint32_t map[PAGE_SIZE / size / 32];
+	enum { MAPSIZE = PAGE_SIZE / size / 32 };
+	uint32_t map[MAPSIZE > 0 ? MAPSIZE : 1];
 	AllocPage page;
 	
 	enum { BASE = 0x12345000 };
@@ -101,6 +102,13 @@ BOOST_FIXTURE_TEST_CASE(testGetBlockFromBeginPage, fixturePage<32>)
 	map[0] &= ~1U;
 	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
 			    reinterpret_cast<void *>(BASE));
+}
+
+BOOST_FIXTURE_TEST_CASE(testGetBlockFromEndPage, fixturePage<1024>)
+{
+	map[0] = ~1U << 3;	// 4-й бит равен нулю - последняя страница из четырех доступна
+	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
+			    reinterpret_cast<void *>(BASE + PAGE_SIZE - page.block_size));
 }
 
 // Уровень 1, очереди
