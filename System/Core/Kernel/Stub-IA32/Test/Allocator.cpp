@@ -8,11 +8,14 @@
 extern "C" {
 #include "../Allocator.h"
 
-// И это все не то, что нужно...
+AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
+
+// Уровень страниц
+void *StubAllocatorPageGetBlock(AllocPage *page);
+
+// Уровень очередей
 size_t CalcBlockSize(size_t size);
 unsigned int GetSizeIndex(size_t size);
-
-AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
 
 void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
 			 AllocPage *(*newPage)(size_t));
@@ -67,6 +70,32 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 	}
 }
 
+// Уровень 2 - страницы
+
+
+
+template<int size>
+struct fixturePage {
+	uint32_t map[PAGE_SIZE / size / 32];
+	AllocPage page;
+	
+	enum { BASE = 0x12345000 };
+	
+	fixturePage() {
+		page.base = BASE;
+		page.next = 0;
+		page.map = map;
+		page.block_size = size;
+	}
+};
+
+BOOST_FIXTURE_TEST_CASE(testGetBlockFromFullPage, fixturePage<16>)
+{
+	::memset(map, 0xff, sizeof(map));
+	BOOST_REQUIRE(StubAllocatorPageGetBlock(&page) == 0);
+}
+
+// Уровень 1, очереди
 // Если в очередях есть доступные страницы - то StubAllocatorAlloc не должен 
 // обращаться к newPage вообще...
 BOOST_AUTO_TEST_CASE(testAlloc4)

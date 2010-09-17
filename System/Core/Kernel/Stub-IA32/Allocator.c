@@ -59,6 +59,11 @@ void StubAllocatorMarkBlock(AllocPage *page, int idx)
 // 	} while (CAS(&(page->map[index]), old_value, new_value));
 }
 
+void *StubAllocatorPageGetBlock(AllocPage *page)
+{
+	return 0;
+}
+
 // Первый уровень - блоки
 
 // По размеру нужно найти очередь, из в которой хранятся соответствующие дескрипторы.
