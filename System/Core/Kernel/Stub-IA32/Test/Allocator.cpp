@@ -95,6 +95,14 @@ BOOST_FIXTURE_TEST_CASE(testGetBlockFromFullPage, fixturePage<16>)
 	BOOST_REQUIRE(StubAllocatorPageGetBlock(&page) == 0);
 }
 
+BOOST_FIXTURE_TEST_CASE(testGetBlockFromBeginPage, fixturePage<32>)
+{
+	::memset(map, 0xff, sizeof(map));
+	map[0] &= ~1U;
+	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
+			    reinterpret_cast<void *>(BASE));
+}
+
 // Уровень 1, очереди
 // Если в очередях есть доступные страницы - то StubAllocatorAlloc не должен 
 // обращаться к newPage вообще...

@@ -61,6 +61,12 @@ void StubAllocatorMarkBlock(AllocPage *page, int idx)
 
 void *StubAllocatorPageGetBlock(AllocPage *page)
 {
+	// Это надо будет все заинлайнить и привести к нормальному неблокируемому виду
+	int idx = StubAllocatorFindBlock(page);
+	if (idx >= 0) {
+		StubAllocatorMarkBlock(page, idx);
+		return (void *)(page->base + page->block_size * (size_t)idx);
+	}
 	return 0;
 }
 
@@ -112,10 +118,9 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	}
 	
 	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
-		int idx = StubAllocatorFindBlock(page);
-		if (idx >= 0) {
-			StubAllocatorMarkBlock(page, idx);
-			return (void *)(page->base + page->block_size * (size_t)idx);
+		void *block = StubAllocatorPageGetBlock(page);
+		if (block != NULL) {
+			return block;
 		}
 	}
 	
