@@ -50,6 +50,13 @@ void StubAllocatorMarkBlock(AllocPage *page, int idx)
 {
 	STUB_ASSERT(idx >= (int)(PAGE_SIZE / page->block_size), "Invalid block index");
 	page->map[idx / 32] |= 1U << (idx % 32);
+
+//	Неблокирующий алгоритм...
+// 	const int index = idx / 32;
+// 	do {
+// 		const uint32_t old_value = page->map[index];
+// 		const uint32_t new_value = old_value | 1U << (idx % 32);
+// 	} while (CAS(&(page->map[index]), old_value, new_value));
 }
 
 // Первый уровень - блоки
@@ -81,6 +88,11 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
+// TODO: Здесь неправильно, надо обращаться к странице, которая сама найдет
+//	блок и вернет его на этот уровень, если таковой имеется, или вернет NULL,
+//	если такового нету. А то неблокируемость не получается совершенно.
+//	Мы должны взять слово, убедиться что есть места и занять одно из них.
+//	А у нас большой разрыв между найти и занять.
 void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
 			 AllocPage *(*newPage)(size_t))
 {
