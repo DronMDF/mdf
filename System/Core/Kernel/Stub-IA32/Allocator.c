@@ -39,17 +39,23 @@ void *StubAllocatorPageGetBlock(AllocPage *page)
 	const int bpp = (int)(PAGE_SIZE / page->block_size);
 	const int bpm = sizeof(page->map[0]) * 8;
 	
-	for (int i = 0; i < max(bpp / bpm, 1); i++) {
-		if (page->map[i] == 0xffffffff) {
-			continue;
-		}
-
-		for (int j = 0; j < bpm; j++) {
-			if ((page->map[i] & (1U << j)) == 0) {
-				const int idx = i * bpm + j;
-				page->map[idx / 32] |= 1U << (idx % 32);
-				return (void *)(page->base + page->block_size * (size_t)idx);
+	for (int bi = 0; bi < bpp; bi += bpm) {
+		const int mi = bi / bpm;
+		const uint32_t mv = page->map[mi];
+		if (mv == 0xffffffff) continue;
+			
+		for (int biti = 0; biti < min(bpm, bpp - bi); biti++) {
+			const uint32_t bitv = 1U << biti;
+			if ((mv & bitv) != 0) continue;
+			if (!CAS(&(page->map[mi]), mv, mv | bitv)) {
+				// TODO: Нарушение совместного доступа. Можно 
+				// было бы попытаться перечитать mv, и пройтись 
+				// по нему снова, но пока можно просто пойти дальше.
+				break;
 			}
+
+			return (void *)(page->base + 
+					page->block_size * (size_t)(bi + biti));
 		}
 	}
 
