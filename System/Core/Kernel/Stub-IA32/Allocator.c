@@ -27,38 +27,12 @@ AllocPage *StubAllocatorNewPage(size_t size)
 	return 0;
 }
 
-int StubAllocatorFindBlock(AllocPage *page)
-{
-	const int bpp = (int)(PAGE_SIZE / page->block_size);
-	const int bpm = sizeof(page->map[0]) * 8;
-	
-	for (int i = 0; i < max(bpp / bpm, 1); i++) {
-		if (page->map[i] == 0xffffffff) {
-			continue;
-		}
-
-		for (int j = 0; j < bpm; j++) {
-			if ((page->map[i] & (1U << j)) == 0) {
-				return (i * bpm + j);
-			}
-		}
-	}
-
-	return -1;
-}
-
-void StubAllocatorMarkBlock(AllocPage *page, int idx)
-{
-	STUB_ASSERT(idx >= (int)(PAGE_SIZE / page->block_size), "Invalid block index");
-	page->map[idx / 32] |= 1U << (idx % 32);
-
 //	Неблокирующий алгоритм...
 // 	const int index = idx / 32;
 // 	do {
 // 		const uint32_t old_value = page->map[index];
 // 		const uint32_t new_value = old_value | 1U << (idx % 32);
 // 	} while (CAS(&(page->map[index]), old_value, new_value));
-}
 
 void *StubAllocatorPageGetBlock(AllocPage *page)
 {
@@ -73,7 +47,7 @@ void *StubAllocatorPageGetBlock(AllocPage *page)
 		for (int j = 0; j < bpm; j++) {
 			if ((page->map[i] & (1U << j)) == 0) {
 				const int idx = i * bpm + j;
-				StubAllocatorMarkBlock(page, idx);
+				page->map[idx / 32] |= 1U << (idx % 32);
 				return (void *)(page->base + page->block_size * (size_t)idx);
 			}
 		}
@@ -132,11 +106,13 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	}
 	
 	AllocPage *page = newPage(asize);
+	void *ptr = StubAllocatorPageGetBlock(page);
+	
+	// TODO: Здесь тоже надо делать CAS
 	page->next = queues[qi];
 	queues[qi] = page;
 
-	StubAllocatorMarkBlock(page, 0);
-	return (void *)(page->base);
+	return ptr;
 }
 
 // Интерфейс модуля

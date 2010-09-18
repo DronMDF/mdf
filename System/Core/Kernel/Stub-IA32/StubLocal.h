@@ -15,6 +15,9 @@
 
 #define VIDEO0_PAGE	0xb8000
 
+// Compare and swap
+bool CAS(uint32_t *ptr, uint32_t old_value, uint32_t new_value);
+
 int StubGetChar (void);
 bool StubSetConsole (const char *type);
 
