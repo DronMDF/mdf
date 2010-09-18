@@ -76,37 +76,48 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 
 template<int size>
 struct fixturePage {
-	enum { MAPSIZE = PAGE_SIZE / size / 32 };
+	enum { 
+		MAPSIZE = PAGE_SIZE / size / 32,
+		BPM = sizeof(uint32_t) * 8,
+		BASE = 0x12345000
+	};
 	uint32_t map[MAPSIZE > 0 ? MAPSIZE : 1];
 	AllocPage page;
 	
-	enum { BASE = 0x12345000 };
 	
 	fixturePage() {
 		page.base = BASE;
 		page.next = 0;
 		page.map = map;
 		page.block_size = size;
+		
+		::memset(map, 0xff, sizeof(map));
 	}
 };
 
 BOOST_FIXTURE_TEST_CASE(testGetBlockFromFullPage, fixturePage<16>)
 {
-	::memset(map, 0xff, sizeof(map));
 	BOOST_REQUIRE(StubAllocatorPageGetBlock(&page) == 0);
 }
 
 BOOST_FIXTURE_TEST_CASE(testGetBlockFromBeginPage, fixturePage<32>)
 {
-	::memset(map, 0xff, sizeof(map));
 	map[0] &= ~1U;
 	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
 			    reinterpret_cast<void *>(BASE));
 }
 
+BOOST_FIXTURE_TEST_CASE(testGetBlockFromEndPage4, fixturePage<4>)
+{
+	const int index = (int(PAGE_SIZE) - page.block_size) / page.block_size;
+	map[index / BPM] &= ~(1U << (index % BPM));
+	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
+			    reinterpret_cast<void *>(BASE + PAGE_SIZE - page.block_size));
+}
+
 BOOST_FIXTURE_TEST_CASE(testGetBlockFromEndPage, fixturePage<1024>)
 {
-	map[0] = ~1U << 3;	// 4-й бит равен нулю - последняя страница из четырех доступна
+	map[0] &= ~(1U << 3);	// 4-й бит равен нулю - последняя страница из четырех доступна
 	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
 			    reinterpret_cast<void *>(BASE + PAGE_SIZE - page.block_size));
 }
