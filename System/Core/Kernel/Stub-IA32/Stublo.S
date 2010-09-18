@@ -244,10 +244,27 @@ StubLock:
 	.section	.text
 	.globl		StubUnlock
 StubUnlock:
-	pushl	%ebx
-	movl	8(%esp), %ebx
+	pushl		%ebx
+	movl		8(%esp), %ebx
 	lock andl 	$0, (%ebx)	# с lock нельзя использовать mov :(
-	popl	%ebx
+	popl		%ebx
+	ret
+
+	.section	.text
+	.globl		CAS
+CAS:
+	pushl		%ebx
+	pushl		%ecx
+	movl		12(%esp), %ebx
+	movl		16(%esp), %eax
+	movl		20(%esp), %ecx
+	cmpxchgl	%ecx, (%ebx)
+	jz		1f
+	xorl		%eax, %eax
+	jmp		2f
+1:	movl		$1, %eax
+2:	popl		%ecx
+	popl		%ebx
 	ret
 
 # ------------------------------------------------------------------------------

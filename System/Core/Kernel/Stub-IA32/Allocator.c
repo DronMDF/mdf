@@ -32,10 +32,7 @@ int StubAllocatorFindBlock(AllocPage *page)
 	const int bpp = (int)(PAGE_SIZE / page->block_size);
 	const int bpm = sizeof(page->map[0]) * 8;
 	
-	CorePrint("bpp: %d, bpm: %d\n", bpp, bpm);
-	
 	for (int i = 0; i < max(bpp / bpm, 1); i++) {
-		CorePrint("map[%d]: 0x%08x\n", i, page->map[i]);
 		if (page->map[i] == 0xffffffff) {
 			continue;
 		}

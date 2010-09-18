@@ -54,4 +54,9 @@ void StubMemoryClear(void *dst, size_t count)
 	memset(dst, 0, count);
 }
 
+void CAS(uint32_t *ptr, uint32_t old_value, uint32_t new_value)
+{
+	*ptr = new_value;
+}
+
 }
