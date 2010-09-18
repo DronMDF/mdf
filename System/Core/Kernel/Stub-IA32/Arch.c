@@ -174,7 +174,7 @@ void StubTaskSlotUse(tss_t *tss)
 			offsetof (tss_t, iomap) + tss->iomap_size);
 	}
 
-	task_time[tss->slot] = StubGetTimestampCounter();
+	task_time[tss->slot] = StubGetCurrentClock();
 }
 
 // -----------------------------------------------------------------------------
@@ -261,18 +261,6 @@ void StubTaskExecute (const Task *task)
 // Здесь логика для CPU.
 // TODO: Может быть стоит логически разделить CPU и Task'и?
 // Тем более, что CPU будут проще.
-
-// static
-// uint64_t StubGetCPUHz ()
-// {
-// 	const uint32_t us = 10000;
-//
-// 	const tick_t start_tsc = StubGetTimestampCounter();
-// 	StubMicroSleep (us);
-// 	const tick_t end_tsc = StubGetTimestampCounter();
-//
-// 	return (end_tsc - start_tsc) * 1000000 / us;
-// }
 
 void StubTaskBootstrapCreate ()
 {

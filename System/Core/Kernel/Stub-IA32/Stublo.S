@@ -3,21 +3,7 @@
 # This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 #
 
-	.arch	i386
-
-	# Некоторые инструкции недопустимы на i386, их мы опишем явно.
-	# Опишем в виде макросов, чтобы не захламлять исходники.
-	.macro	cpuid_
-		.arch	i486
-		cpuid
-		.arch	i386
-	.endm
-
-	.macro	rdtsc_
-		.arch	i586
-		rdtsc
-		.arch	i386
-	.endm
+	.arch	i486
 
 	# Они превратятся в метки, но тут ничего не поделаешь
 	KERNEL_CODE_SELECTOR = 8
@@ -95,18 +81,12 @@ StubGetCPUFutures:
 	jz	1f
 
 	movl	$1, %eax
-	cpuid_
+	cpuid
 	movl	%edx, %eax
 
 1:	popl	%edx
 	popl	%ecx
 	popl	%ebx
-	ret
-
-	.section	.text
-	.global		StubGetTSC
-StubGetTSC:
-	rdtsc_
 	ret
 
 	.section	.init.text

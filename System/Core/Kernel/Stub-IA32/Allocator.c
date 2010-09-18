@@ -62,12 +62,23 @@ void StubAllocatorMarkBlock(AllocPage *page, int idx)
 
 void *StubAllocatorPageGetBlock(AllocPage *page)
 {
-	// Это надо будет все заинлайнить и привести к нормальному неблокируемому виду
-	int idx = StubAllocatorFindBlock(page);
-	if (idx >= 0) {
-		StubAllocatorMarkBlock(page, idx);
-		return (void *)(page->base + page->block_size * (size_t)idx);
+	const int bpp = (int)(PAGE_SIZE / page->block_size);
+	const int bpm = sizeof(page->map[0]) * 8;
+	
+	for (int i = 0; i < max(bpp / bpm, 1); i++) {
+		if (page->map[i] == 0xffffffff) {
+			continue;
+		}
+
+		for (int j = 0; j < bpm; j++) {
+			if ((page->map[i] & (1U << j)) == 0) {
+				const int idx = i * bpm + j;
+				StubAllocatorMarkBlock(page, idx);
+				return (void *)(page->base + page->block_size * (size_t)idx);
+			}
+		}
 	}
+
 	return 0;
 }
 

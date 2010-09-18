@@ -109,7 +109,7 @@ BOOST_FIXTURE_TEST_CASE(testGetBlockFromBeginPage, fixturePage<32>)
 
 BOOST_FIXTURE_TEST_CASE(testGetBlockFromEndPage4, fixturePage<4>)
 {
-	const int index = (int(PAGE_SIZE) - page.block_size) / page.block_size;
+	const unsigned int index = (PAGE_SIZE - page.block_size) / page.block_size;
 	map[index / BPM] &= ~(1U << (index % BPM));
 	BOOST_REQUIRE_EQUAL(StubAllocatorPageGetBlock(&page), 
 			    reinterpret_cast<void *>(BASE + PAGE_SIZE - page.block_size));
