@@ -114,9 +114,9 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	AllocPage *page = newPage(asize);
 	void *ptr = StubAllocatorPageGetBlock(page);
 	
-	// TODO: Здесь тоже надо делать CAS
-	page->next = queues[qi];
-	queues[qi] = page;
+	do {
+		page->next = queues[qi];
+	} while (!CAS((uint32_t *)&(queues[qi]), (uint32_t)(page->next), (uint32_t)page));
 
 	return ptr;
 }
