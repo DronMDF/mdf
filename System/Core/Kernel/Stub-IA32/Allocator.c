@@ -27,16 +27,9 @@ AllocPage *StubAllocatorNewPage(size_t size)
 	return 0;
 }
 
-//	Неблокирующий алгоритм...
-// 	const int index = idx / 32;
-// 	do {
-// 		const uint32_t old_value = page->map[index];
-// 		const uint32_t new_value = old_value | 1U << (idx % 32);
-// 	} while (CAS(&(page->map[index]), old_value, new_value));
-
 void *StubAllocatorPageGetBlock(AllocPage *page)
 {
-	const int bpp = (int)(PAGE_SIZE / page->block_size);
+	const int bpp = max((int)(PAGE_SIZE / page->block_size), 1);
 	const int bpm = sizeof(page->map[0]) * 8;
 	
 	for (int bi = 0; bi < bpp; bi += bpm) {
@@ -54,8 +47,7 @@ void *StubAllocatorPageGetBlock(AllocPage *page)
 				break;
 			}
 
-			return (void *)(page->base + 
-					page->block_size * (size_t)(bi + biti));
+			return (void *)(page->base + page->block_size * (size_t)(bi + biti));
 		}
 	}
 
@@ -91,19 +83,20 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
-			 AllocPage *(*newPage)(size_t))
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(size_t))
 {
 	unsigned int qi = GetSizeIndex(size);
 	size_t asize = CalcBlockSize(size);
 	
 	if (asize >= PAGE_SIZE) {
-		// Блоки такого размера не хранятся в очередях и мапы им 
-		// отмечать не надо
 		AllocPage *page = newPage(asize);
-		return (void *)(page->base);
+		return StubAllocatorPageGetBlock(page);
 	}
-	
+
+	// TODO: Анализировать стоит только первую страницу, а если в первой
+	//	странице нет свободных мест, то реорганизовывать очередь. И в
+	//	процессе реорганизации освободить совсем пустые, а самую
+	//	свободную из несовсем пустых поставить в голову.
 	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
 		void *block = StubAllocatorPageGetBlock(page);
 		if (block != NULL) {

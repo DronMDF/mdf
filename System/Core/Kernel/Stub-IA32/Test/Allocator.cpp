@@ -202,10 +202,13 @@ BOOST_AUTO_TEST_CASE(testAlloc4096)
 	// Блоки такого размера не выискиваются в очередях, а непосредственно 
 	// выделяются из пула страниц
 	void *block = StubAllocatorAlloc(PAGE_SIZE, 0, newPage);
+	BOOST_REQUIRE_EQUAL(testPage.block_size, PAGE_SIZE);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(667 * PAGE_SIZE));
 
 	// Две страницы!
 	void *block2 = StubAllocatorAlloc(PAGE_SIZE + 1, 0, newPage);
+	BOOST_REQUIRE_EQUAL(testPage.block_size, PAGE_SIZE * 2);
+	BOOST_REQUIRE_EQUAL(testPage.base, 668 * PAGE_SIZE);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(668 * PAGE_SIZE));
 }
 
