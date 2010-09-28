@@ -116,7 +116,7 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	
 	do {
 		page->next = queues[qi];
-	} while (!CAS((uint32_t *)&(queues[qi]), (uint32_t)(page->next), (uint32_t)page));
+	} while (!CAS(&(queues[qi]), page->next, page));
 
 	return ptr;
 }
