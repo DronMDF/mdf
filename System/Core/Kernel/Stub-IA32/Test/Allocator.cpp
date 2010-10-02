@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 AllocPage testPage;
 uint32_t testMap[PAGE_SIZE / 4 / 32];
 
-AllocPage *newPage(size_t size) {
+AllocPage *newPage(size_t size, const StubAllocatorAllocFunctions *funcs) {
 	memset(testMap, 0, sizeof(testMap));
 	
 	testPage.base = 666U * PAGE_SIZE + size;

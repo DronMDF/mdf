@@ -22,7 +22,7 @@ AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
 
 // Второй уровень - страницы
 
-AllocPage *StubAllocatorNewPage(size_t size)
+AllocPage *StubAllocatorNewPage(size_t size, const StubAllocatorAllocFunctions *funcs)
 {
 	// сперва нам надо выделить map и страницу. выделять их надо из того же 
 	// хипа, нужно вызвать функцию аллокации со специальным флагов - чтобы те
@@ -90,13 +90,14 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, const StubAllocatorAllocFunctions *funcs)
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
+			 const StubAllocatorAllocFunctions *funcs)
 {
 	unsigned int qi = GetSizeIndex(size);
 	size_t asize = CalcBlockSize(size);
 	
 	if (asize >= PAGE_SIZE) {
-		AllocPage *page = funcs->newPage(asize);
+		AllocPage *page = funcs->newPage(asize, funcs);
 		return StubAllocatorPageGetBlock(page);
 	}
 
@@ -111,7 +112,7 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues, const StubAllocatorAll
 		}
 	}
 	
-	AllocPage *page = funcs->newPage(asize);
+	AllocPage *page = funcs->newPage(asize, funcs);
 	void *ptr = StubAllocatorPageGetBlock(page);
 	
 	do {
@@ -132,7 +133,7 @@ void StubAllocatorInit(void *block)
 
 void *StubAlloc(size_t size)
 {
-	const static StubAllocatorAllocFunctions funcs = {
+	static const StubAllocatorAllocFunctions funcs = {
 		StubAllocatorNewPage
 	};
 
