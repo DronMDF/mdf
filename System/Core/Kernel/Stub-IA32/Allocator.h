@@ -20,3 +20,7 @@ typedef struct {
 } AllocDir;
 
 STATIC_ASSERT(sizeof(AllocDir) == 4096);
+
+typedef struct StubAllocatorAllocFunctions_ {
+	AllocPage *(*newPage)(size_t);
+} StubAllocatorAllocFunctions;

@@ -90,13 +90,13 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(size_t))
+void *StubAllocatorAlloc(size_t size, AllocPage **queues, const StubAllocatorAllocFunctions *funcs)
 {
 	unsigned int qi = GetSizeIndex(size);
 	size_t asize = CalcBlockSize(size);
 	
 	if (asize >= PAGE_SIZE) {
-		AllocPage *page = newPage(asize);
+		AllocPage *page = funcs->newPage(asize);
 		return StubAllocatorPageGetBlock(page);
 	}
 
@@ -111,7 +111,7 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues, AllocPage *(*newPage)(
 		}
 	}
 	
-	AllocPage *page = newPage(asize);
+	AllocPage *page = funcs->newPage(asize);
 	void *ptr = StubAllocatorPageGetBlock(page);
 	
 	do {
@@ -132,7 +132,11 @@ void StubAllocatorInit(void *block)
 
 void *StubAlloc(size_t size)
 {
-	return StubAllocatorAlloc(size, queues, StubAllocatorNewPage);
+	const static StubAllocatorAllocFunctions funcs = {
+		StubAllocatorNewPage
+	};
+
+	return StubAllocatorAlloc(size, queues, &funcs);
 }
 
 void StubFree(void *ptr)
