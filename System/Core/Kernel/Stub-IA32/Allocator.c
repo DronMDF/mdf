@@ -105,7 +105,7 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	//	странице нет свободных мест, то реорганизовывать очередь. И в
 	//	процессе реорганизации освободить совсем пустые, а самую
 	//	свободную из несовсем пустых поставить в голову.
-	for (AllocPage *page = queues[qi]; page != NULL; page = page->next) {
+	for (AllocPage *page = funcs->queues[qi]; page != NULL; page = page->next) {
 		void *block = StubAllocatorPageGetBlock(page);
 		if (block != NULL) {
 			return block;
@@ -116,8 +116,8 @@ void *StubAllocatorAlloc(size_t size, AllocPage **queues,
 	void *ptr = StubAllocatorPageGetBlock(page);
 	
 	do {
-		page->next = queues[qi];
-	} while (!CAS(&(queues[qi]), page->next, page));
+		page->next = funcs->queues[qi];
+	} while (!CAS(&(funcs->queues[qi]), page->next, page));
 
 	return ptr;
 }
