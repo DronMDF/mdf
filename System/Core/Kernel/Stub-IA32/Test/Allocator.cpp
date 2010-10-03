@@ -17,8 +17,7 @@ void *StubAllocatorPageGetBlock(AllocPage *page);
 size_t CalcBlockSize(size_t size);
 unsigned int GetSizeIndex(size_t size);
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
-			 const StubAllocatorAllocFunctions *funcs);
+void *StubAllocatorAlloc(size_t size, const StubAllocatorAllocFunctions *funcs);
 
 }
 
@@ -137,12 +136,12 @@ BOOST_AUTO_TEST_CASE(testAlloc4)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block2 = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page4.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
@@ -161,12 +160,12 @@ BOOST_AUTO_TEST_CASE(testAlloc8)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block2 = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
@@ -191,7 +190,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page2.base));
 	// Первый блок второй страницы должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map2[0], 1);
@@ -220,12 +219,12 @@ BOOST_AUTO_TEST_CASE(testAlloc4096)
 
 	// Блоки такого размера не выискиваются в очередях, а непосредственно 
 	// выделяются из пула страниц
-	void *block = StubAllocatorAlloc(PAGE_SIZE, 0, &afuncs);
+	void *block = StubAllocatorAlloc(PAGE_SIZE, &afuncs);
 	BOOST_REQUIRE_EQUAL(testPage.block_size, PAGE_SIZE);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(667 * PAGE_SIZE));
 
 	// Две страницы!
-	void *block2 = StubAllocatorAlloc(PAGE_SIZE + 1, 0, &afuncs);
+	void *block2 = StubAllocatorAlloc(PAGE_SIZE + 1, &afuncs);
 	BOOST_REQUIRE_EQUAL(testPage.block_size, PAGE_SIZE * 2);
 	BOOST_REQUIRE_EQUAL(testPage.base, 668 * PAGE_SIZE);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(668 * PAGE_SIZE));
@@ -241,7 +240,7 @@ BOOST_AUTO_TEST_CASE(testNewPageIntoQueue)
 		newPage
 	};
 
-	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[3], &testPage);
 	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
@@ -261,7 +260,7 @@ BOOST_AUTO_TEST_CASE(testAppendPageIntoQueue)
 		newPage
 	};
 
-	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[4], &testPage);
 	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
