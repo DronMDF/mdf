@@ -84,7 +84,6 @@ struct fixturePage {
 	uint32_t map[MAPSIZE > 0 ? MAPSIZE : 1];
 	AllocPage page;
 	
-	
 	fixturePage() {
 		page.base = BASE;
 		page.next = 0;
@@ -186,7 +185,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 AllocPage testPage;
 uint32_t testMap[PAGE_SIZE / 4 / 32];
 
-AllocPage *newPage(size_t size, const StubAllocatorAllocFunctions *funcs) {
+AllocPage *newPage(size_t size, const StubAllocatorAllocFunctions *) {
 	memset(testMap, 0, sizeof(testMap));
 	
 	testPage.base = 666U * PAGE_SIZE + size;
@@ -197,12 +196,13 @@ AllocPage *newPage(size_t size, const StubAllocatorAllocFunctions *funcs) {
 	return &testPage;
 }
 
-StubAllocatorAllocFunctions afuncs = {
-	newPage
-};
-
 BOOST_AUTO_TEST_CASE(testAlloc4096)
 {
+	StubAllocatorAllocFunctions afuncs = {
+		0,
+		newPage
+	};
+
 	// Блоки такого размера не выискиваются в очередях, а непосредственно 
 	// выделяются из пула страниц
 	void *block = StubAllocatorAlloc(PAGE_SIZE, 0, &afuncs);
@@ -221,6 +221,11 @@ BOOST_AUTO_TEST_CASE(testNewPageIntoQueue)
 	const size_t block_size = 32;
 	AllocPage *pqueues[10] = { 0 };
 
+	StubAllocatorAllocFunctions afuncs = {
+		pqueues,
+		newPage
+	};
+
 	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[3], &testPage);
@@ -235,6 +240,11 @@ BOOST_AUTO_TEST_CASE(testAppendPageIntoQueue)
 	AllocPage page = { 0x665, 0, map, block_size };
 	
 	AllocPage *pqueues[10] = { 0, 0, 0, 0, &page, 0 };
+
+	StubAllocatorAllocFunctions afuncs = {
+		pqueues,
+		newPage
+	};
 
 	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));

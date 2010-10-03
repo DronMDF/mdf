@@ -133,8 +133,9 @@ void StubAllocatorInit(void *block)
 
 void *StubAlloc(size_t size)
 {
-	static const StubAllocatorAllocFunctions funcs = {
-		StubAllocatorNewPage
+	const StubAllocatorAllocFunctions funcs = {
+		.queues = queues,
+		.newPage = StubAllocatorNewPage
 	};
 
 	return StubAllocatorAlloc(size, queues, &funcs);

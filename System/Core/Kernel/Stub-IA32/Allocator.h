@@ -23,5 +23,6 @@ STATIC_ASSERT(sizeof(AllocDir) == 4096);
 
 typedef struct StubAllocatorAllocFunctions_ StubAllocatorAllocFunctions;
 struct StubAllocatorAllocFunctions_ {
+	AllocPage **queues;
 	AllocPage *(*newPage)(size_t, const StubAllocatorAllocFunctions *funcs);
 };
