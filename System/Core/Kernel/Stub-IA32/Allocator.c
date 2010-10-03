@@ -90,7 +90,7 @@ size_t CalcBlockSize(size_t size)
 	return max(size + 1, 4);
 }
 
-void *StubAllocatorAlloc(size_t size, AllocPage **queues, 
+void *StubAllocatorAlloc(size_t size, AllocPage **unused, 
 			 const StubAllocatorAllocFunctions *funcs)
 {
 	unsigned int qi = GetSizeIndex(size);
@@ -138,7 +138,7 @@ void *StubAlloc(size_t size)
 		.newPage = StubAllocatorNewPage
 	};
 
-	return StubAllocatorAlloc(size, queues, &funcs);
+	return StubAllocatorAlloc(size, 0, &funcs);
 }
 
 void StubFree(void *ptr)

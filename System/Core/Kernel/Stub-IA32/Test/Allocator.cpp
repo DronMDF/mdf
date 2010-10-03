@@ -137,12 +137,12 @@ BOOST_AUTO_TEST_CASE(testAlloc4)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block2 = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page4.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
@@ -161,12 +161,12 @@ BOOST_AUTO_TEST_CASE(testAlloc8)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page.base));
 	// Первый блок должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block2 = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page.base + block_size));
 	// Второй блок тоже должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map[0], 3);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
 		0
 	};
 	
-	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page2.base));
 	// Первый блок второй страницы должен быть стать занятым
 	BOOST_REQUIRE_EQUAL(map2[0], 1);
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(testNewPageIntoQueue)
 		newPage
 	};
 
-	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[3], &testPage);
 	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(testAppendPageIntoQueue)
 		newPage
 	};
 
-	void *block = StubAllocatorAlloc(block_size, pqueues, &afuncs);
+	void *block = StubAllocatorAlloc(block_size, 0, &afuncs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(666 * PAGE_SIZE + block_size));
 	BOOST_REQUIRE_EQUAL(pqueues[4], &testPage);
 	BOOST_REQUIRE_EQUAL(testPage.map[0], 1);
