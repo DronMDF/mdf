@@ -131,9 +131,6 @@ struct fixtureQueue {
 	fixtureQueue() {
 		::memset(&queues, 0, sizeof(queues));
 		::memset(&funcs, 0, sizeof(funcs));
-		::memset(&page1.map, 0, sizeof(page1.map));
-		::memset(&page2.map, 0, sizeof(page2.map));
-		
 		funcs.queues = reinterpret_cast<AllocPage **>(&queues);
 	}
 };
@@ -141,6 +138,7 @@ struct fixtureQueue {
 BOOST_FIXTURE_TEST_CASE(testAlloc4, fixtureQueue<4>)
 {
 	queues[0] = &page1.page;
+	::memset(&page1.map, 0, sizeof(page1.map));
 
 	void *block = StubAllocatorAlloc(page1.page.block_size, &funcs);
 	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page1.page.base));
@@ -153,53 +151,32 @@ BOOST_FIXTURE_TEST_CASE(testAlloc4, fixtureQueue<4>)
 	BOOST_REQUIRE_EQUAL(page1.map[0], 3);
 }
 
-BOOST_AUTO_TEST_CASE(testAlloc8)
+BOOST_FIXTURE_TEST_CASE(testAlloc8, fixtureQueue<8>)
 {
-	const size_t block_size = 8;
+	queues[1] = &page1.page;
+	::memset(&page1.map, 0, sizeof(page1.map));
 	
-	uint32_t map[PAGE_SIZE / block_size / 32] = { 0 };
-	AllocPage page = { 666, 0, map, block_size };
-	AllocPage *pqueues[10] = { 0, &page, 0 };
-	
-	StubAllocatorAllocFunctions afuncs = {
-		pqueues,
-		0
-	};
-	
-	void *block = StubAllocatorAlloc(block_size, &afuncs);
-	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page.base));
+	void *block = StubAllocatorAlloc(page1.page.block_size, &funcs);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page1.page.base));
 	// Первый блок должен быть стать занятым
-	BOOST_REQUIRE_EQUAL(map[0], 1);
+	BOOST_REQUIRE_EQUAL(page1.map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, &afuncs);
-	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page.base + block_size));
+	void *block2 = StubAllocatorAlloc(page1.page.block_size, &funcs);
+	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page1.page.base + page1.page.block_size));
 	// Второй блок тоже должен быть стать занятым
-	BOOST_REQUIRE_EQUAL(map[0], 3);
+	BOOST_REQUIRE_EQUAL(page1.map[0], 3);
 }
 
-BOOST_AUTO_TEST_CASE(testAllocWalkByQueue)
+BOOST_FIXTURE_TEST_CASE(testAllocWalkByQueue, fixtureQueue<16>)
 {
-	const size_t block_size = 16;
-
-	const unsigned int map_size = PAGE_SIZE / block_size / 32;
-	uint32_t map2[map_size] = { 0 };
-	AllocPage page2 = { 0x666, 0, map2, block_size };
+	page1.page.next = &page2.page;
+	queues[2] = &page1.page;
+	::memset(&page2.map, 0, sizeof(page2.map));
 	
-	uint32_t map1[map_size] = { 0 };
-	memset(&map1, 0xff, sizeof(map1));	// Блок полностью занят
-	AllocPage page1 = { 0x999, &page2, map1, block_size };
-	
-	AllocPage *pqueues[10] = { 0, 0, &page1, 0 };
-
-	StubAllocatorAllocFunctions afuncs = {
-		pqueues,
-		0
-	};
-	
-	void *block = StubAllocatorAlloc(block_size, &afuncs);
-	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page2.base));
+	void *block = StubAllocatorAlloc(page2.page.block_size, &funcs);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page2.page.base));
 	// Первый блок второй страницы должен быть стать занятым
-	BOOST_REQUIRE_EQUAL(map2[0], 1);
+	BOOST_REQUIRE_EQUAL(page2.map[0], 1);
 }
 
 AllocPage testPage;
