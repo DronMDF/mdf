@@ -71,8 +71,6 @@ BOOST_AUTO_TEST_CASE(testAllocDirectory)
 
 // Уровень 2 - страницы
 
-
-
 template<int size>
 struct fixturePage {
 	enum { 
@@ -123,28 +121,36 @@ BOOST_FIXTURE_TEST_CASE(testGetBlockFromEndPage, fixturePage<1024>)
 // Уровень 1, очереди
 // Если в очередях есть доступные страницы - то StubAllocatorAlloc не должен 
 // обращаться к newPage вообще...
-BOOST_AUTO_TEST_CASE(testAlloc4)
+template <int size>
+struct fixtureQueue {
+	fixturePage<size> page1;
+	fixturePage<size> page2;
+	AllocPage *queues[10];
+	StubAllocatorAllocFunctions funcs;
+	
+	fixtureQueue() {
+		::memset(&queues, 0, sizeof(queues));
+		::memset(&funcs, 0, sizeof(funcs));
+		::memset(&page1.map, 0, sizeof(page1.map));
+		::memset(&page2.map, 0, sizeof(page2.map));
+		
+		funcs.queues = reinterpret_cast<AllocPage **>(&queues);
+	}
+};
+
+BOOST_FIXTURE_TEST_CASE(testAlloc4, fixtureQueue<4>)
 {
-	const size_t block_size = 4;
-	
-	uint32_t map[4096 / block_size / 32] = { 0 };
-	AllocPage page4 = { 666, 0, map, block_size };
-	AllocPage *pqueues[10] = { &page4, 0 };
+	queues[0] = &page1.page;
 
-	StubAllocatorAllocFunctions afuncs = {
-		pqueues,
-		0
-	};
-	
-	void *block = StubAllocatorAlloc(block_size, &afuncs);
-	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page4.base));
+	void *block = StubAllocatorAlloc(page1.page.block_size, &funcs);
+	BOOST_REQUIRE_EQUAL(block, reinterpret_cast<void *>(page1.page.base));
 	// Первый блок должен быть стать занятым
-	BOOST_REQUIRE_EQUAL(map[0], 1);
+	BOOST_REQUIRE_EQUAL(page1.map[0], 1);
 
-	void *block2 = StubAllocatorAlloc(block_size, &afuncs);
-	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page4.base + block_size));
+	void *block2 = StubAllocatorAlloc(page1.page.block_size, &funcs);
+	BOOST_REQUIRE_EQUAL(block2, reinterpret_cast<void *>(page1.page.base + page1.page.block_size));
 	// Второй блок тоже должен быть стать занятым
-	BOOST_REQUIRE_EQUAL(map[0], 3);
+	BOOST_REQUIRE_EQUAL(page1.map[0], 3);
 }
 
 BOOST_AUTO_TEST_CASE(testAlloc8)
