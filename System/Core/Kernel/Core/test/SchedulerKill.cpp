@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(destroy)
 		testThread(const testThread &);
 		testThread &operator = (const testThread &);
 	public:
-		testThread(ResourceProcess *process, bool *flag)
+		testThread(Process *process, bool *flag)
 			: ResourceThread(process), m_flag(flag) {}
 		virtual ~testThread() { *m_flag = true; }
 		virtual bool Deactivate() { return true; }

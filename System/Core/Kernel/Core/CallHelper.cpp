@@ -38,7 +38,7 @@ ResourceThread *CallHelper::getCallerThread(const Task *task) const
 
 InstanceProcess *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
 {
-	ResourceProcess *process = thread->getProcess();
+	Process *process = thread->getProcess();
 	STUB_ASSERT(process == 0, "no current process");
 
 	return process->FindInstance(id);

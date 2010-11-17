@@ -14,7 +14,7 @@ class Instance;
 class InstanceProcess;
 
 class Region;
-class ResourceProcess;
+class Process;
 class ResourceThread;
 class ResourceCall;
 class ResourceCustom;
@@ -51,7 +51,7 @@ public:
 
 	virtual Resource * asResource();
 	virtual Region *asRegion ();
-	virtual ResourceProcess *asProcess ();
+	virtual Process *asProcess ();
 	virtual ResourceThread *asThread ();
 	virtual ResourceCall *asCall ();
 	virtual ResourceCustom *asCustom ();

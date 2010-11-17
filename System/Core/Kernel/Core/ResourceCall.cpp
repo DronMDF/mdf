@@ -14,7 +14,7 @@
 
 using namespace Core;
 
-Resource *ResourceCall::Create(ResourceProcess *process, const void *param, size_t size)
+Resource *ResourceCall::Create(Process *process, const void *param, size_t size)
 {
 	if (process == 0) return 0;
 	if (param == 0) return 0;
@@ -25,7 +25,7 @@ Resource *ResourceCall::Create(ResourceProcess *process, const void *param, size
 	return new ResourceCall(process, cp->entry);
 }
 
-ResourceCall::ResourceCall(ResourceProcess *process, laddr_t entry)
+ResourceCall::ResourceCall(Process *process, laddr_t entry)
 	: m_process(process), m_entry(entry)
 {
 }

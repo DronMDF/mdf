@@ -11,11 +11,9 @@
 
 namespace Core {
 
-class ResourceRegion;
-class ResourceThread;
 class InstanceProcess;
 
-class ResourceProcess : public Resource
+class Process : public Resource
 {
 private:
 	laddr_t m_entry;
@@ -30,10 +28,10 @@ private:
 	InstanceProcess *createInstance(Resource *resource, uint32_t access, laddr_t base = 0) const;
 	
 public:
-	explicit ResourceProcess (laddr_t entry);
-	virtual ~ResourceProcess ();
+	explicit Process(laddr_t entry);
+	virtual ~Process ();
 
-	virtual ResourceProcess *asProcess ();
+	virtual Process *asProcess ();
 
 	virtual ResourceThread *Call ();
 	virtual int Attach(Resource *resource, uint32_t access, laddr_t base);

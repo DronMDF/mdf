@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultNoResource)
 
 BOOST_AUTO_TEST_CASE(testPageFaultResourceIsNotRegion)
 {
-	Resource *notregion = new ResourceProcess(0);
+	Resource *notregion = new Process(0);
 	InstanceProcess instance(notregion, 0, 0);
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);

@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 	const laddr_t entry = 6666;
 
 	testProcess process;
-	ResourceProcess *calledprocess = new testProcess(entry);
+	Process *calledprocess = new testProcess(entry);
 	process.Attach(calledprocess, RESOURCE_ACCESS_CALL, 0);
 	
 	testThread task(&process);

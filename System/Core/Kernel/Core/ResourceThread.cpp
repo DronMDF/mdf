@@ -22,7 +22,7 @@
 using namespace Core;
 
 // TODO: Этот конструктор вообще уже не нужен.
-ResourceThread::ResourceThread (ResourceProcess *process)
+ResourceThread::ResourceThread(Process *process)
 	: Resource(),
 	  m_process(process),
 	  m_task(0),
@@ -42,7 +42,7 @@ ResourceThread::ResourceThread (ResourceProcess *process)
 
 // TODO: А этот конструктор непонятно зачем использует ссылку на процесс,
 // И кроме того зачем-то инициализирует стек, это можно сделать и позже.
-ResourceThread::ResourceThread (ResourceProcess *process, laddr_t entry)
+ResourceThread::ResourceThread(Process *process, laddr_t entry)
 	: Resource(),
 	  m_process(process),
 	  m_task(StubTaskCreate (entry, this)),
@@ -153,12 +153,12 @@ void ResourceThread::setTimestamp(tick_t timestamp)
 	m_timestamp = timestamp;
 }
 
-void ResourceThread::setProcess(ResourceProcess *process)
+void ResourceThread::setProcess(Process *process)
 {
 	m_process = process;
 }
 
-ResourceProcess *ResourceThread::getProcess() const
+Process *ResourceThread::getProcess() const
 {
 	STUB_ASSERT(m_process == 0, "Thread without process");
 	return m_process;

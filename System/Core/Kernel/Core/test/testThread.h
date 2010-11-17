@@ -10,7 +10,7 @@
 class testThread : public Core::ResourceThread
 {
 public:
-	explicit testThread(Core::ResourceProcess *process = 0)
+	explicit testThread(Core::Process *process = 0)
 		: Core::ResourceThread(process)
 	{
 		Register();

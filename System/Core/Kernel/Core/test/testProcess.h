@@ -7,12 +7,10 @@
 
 #include "../include/Process.h"
 
-class testProcess : public Core::ResourceProcess
+class testProcess : public Core::Process
 {
 public:
-	testProcess(laddr_t entry = 0)
-		: Core::ResourceProcess(entry)
-	{
+	testProcess(laddr_t entry = 0) : Core::Process(entry) {
 		Register();
 	}
 };

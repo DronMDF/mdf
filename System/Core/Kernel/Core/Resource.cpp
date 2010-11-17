@@ -45,7 +45,7 @@ Region *Resource::asRegion()
 	return 0;
 }
 
-ResourceProcess *Resource::asProcess()
+Process *Resource::asProcess()
 {
 	return 0;
 }

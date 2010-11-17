@@ -9,23 +9,20 @@
 
 namespace Core {
 
-class ResourceThread;
-class ResourceProcess;
-
 class ResourceCall : public Resource
 {
 private:
-	ResourceProcess *m_process;
+	Process *m_process;
 	laddr_t m_entry;
 
-	ResourceCall(ResourceProcess *process, laddr_t entry);
+	ResourceCall(Process *process, laddr_t entry);
 
 	ResourceCall();
 	ResourceCall(const ResourceCall &);
 	ResourceCall & operator =(const ResourceCall &);
 
 public:
-	static Resource *Create(ResourceProcess *process, const void *param, size_t size);
+	static Resource *Create(Process *process, const void *param, size_t size);
 
 	virtual ResourceCall *asCall();
 

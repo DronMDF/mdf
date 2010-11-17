@@ -81,7 +81,7 @@ int CoreFind (const char *name __unused__, size_t name_size __unused__, id_t * c
 extern "C"
 int CoreCreate (const Task *task, int type, const void *param, size_t param_size, id_t *id)
 {
-	ResourceProcess *process = 0;
+	Process *process = 0;
 
 	if (task != 0) {
 		const void *thread_ptr = StubTaskGetThread(task);
@@ -118,7 +118,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 			if (param_size != sizeof (struct KernelCreateProcessParam))
 				return ERROR_INVALIDPARAM;
 
-			resource = new ResourceProcess(process_param->entry);
+			resource = new Process(process_param->entry);
 			break;
 
 		case RESOURCE_TYPE_THREAD:
@@ -245,7 +245,7 @@ int CoreModify (const Task *task, id_t id, int param_id, const void *param, size
 	// но пока неясно на кой она может понадобиться. В процессе вот реально
 	// понадобилась.
 
-	Core::ResourceProcess *process = thread->getProcess();
+	Core::Process *process = thread->getProcess();
 	return process->ModifyResource (id, param_id, param, param_size);
 }
 
@@ -264,7 +264,7 @@ int CoreInfo (const Task *task, id_t id, int info_id, void *info, size_t *info_s
 		return thread->Info(RESOURCE_INFO_THREAD_CURRENT, info, info_size);
 	}
 
-	const Core::ResourceProcess *process = thread->getProcess();
+	const Core::Process *process = thread->getProcess();
 	STUB_ASSERT (process == 0, "no process");
 
 	// TODO: Память должна быть доступна процессу для записи чтобы не вызывать фолтов.

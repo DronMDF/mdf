@@ -12,12 +12,11 @@ namespace Core {
 
 class InstanceThread;
 class InstanceCopyBack;
-class ResourceProcess;
 
 class ResourceThread : public Resource
 {
 private:
-	ResourceProcess *m_process;
+	Process *m_process;
 
 protected:
 	Task *m_task;
@@ -53,14 +52,14 @@ private:
 	InstanceThread *createInstance(Resource *resource, uint32_t event);
 	
 protected:
-	explicit ResourceThread (ResourceProcess *process = 0);
+	explicit ResourceThread(Process *process = 0);
 
 	virtual void Kill();
 
 public:
 	Link<ResourceThread> ScheduleLink;
 
-	ResourceThread (ResourceProcess *process, laddr_t entry);
+	ResourceThread(Process *process, laddr_t entry);
 	virtual ~ResourceThread();
 
 	virtual ResourceThread *asThread ();
@@ -76,8 +75,8 @@ public:
 
 	laddr_t getEntry() const;
 
-	void setProcess(ResourceProcess *process);
-	ResourceProcess *getProcess() const;
+	void setProcess(Process *process);
+	Process *getProcess() const;
 
 	void Sleep(timeout_t timeout);
 	void Wait(Resource *resource, uint32_t event);

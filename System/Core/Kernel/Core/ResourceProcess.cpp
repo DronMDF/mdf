@@ -19,7 +19,7 @@
 
 using namespace Core;
 
-ResourceProcess::ResourceProcess (laddr_t entry)
+Process::Process (laddr_t entry)
 	: m_entry(entry),
 	  m_instance_list(&InstanceProcess::ProcessLink),
 	  m_pagetable(USER_PAGETABLE_SIZE, Memory::ALLOC | Memory::ZEROING)
@@ -28,7 +28,7 @@ ResourceProcess::ResourceProcess (laddr_t entry)
 	//	Надо обеспечить альтернативный доступ к процессу
 }
 
-ResourceProcess::~ResourceProcess ()
+Process::~Process ()
 {
 	while (InstanceProcess *instance = m_instance_list.getFirst()) {
 		m_instance_list.Remove(instance);
@@ -36,12 +36,12 @@ ResourceProcess::~ResourceProcess ()
 	}
 }
 
-ResourceProcess *ResourceProcess::asProcess ()
+Process *Process::asProcess ()
 {
 	return this;
 }
 
-ResourceThread *ResourceProcess::Call ()
+ResourceThread *Process::Call ()
 {
 	// TODO: Данный вызов возможен только на неинициализированном процессе.
 	// Если в процессе уже есть нити или коллы, то данный вызов возвращает 0.
@@ -58,7 +58,7 @@ ResourceThread *ResourceProcess::Call ()
 	return thread;
 }
 
-bool ResourceProcess::CheckRegionPlace (const Region *region, laddr_t base) const
+bool Process::CheckRegionPlace (const Region *region, laddr_t base) const
 {
 	// Границы подгоняем до границ страниц
 	const laddr_t lowbound = base & LADDR_MASK;
@@ -94,7 +94,7 @@ bool ResourceProcess::CheckRegionPlace (const Region *region, laddr_t base) cons
 }
 
 // ubase - хранит базу в пространстве пользователя
-laddr_t ResourceProcess::selectRegionBase (const Region *region, laddr_t ubase) const
+laddr_t Process::selectRegionBase (const Region *region, laddr_t ubase) const
 {
 	STUB_ASSERT (region == 0, "setBase for non region");
 
@@ -120,7 +120,7 @@ laddr_t ResourceProcess::selectRegionBase (const Region *region, laddr_t ubase) 
 }
 
 // TODO: Эта база - юзерлевела... надо бы переделать в кернеллевел..
-int ResourceProcess::Attach (Resource *resource, uint32_t access, laddr_t ubase)
+int Process::Attach (Resource *resource, uint32_t access, laddr_t ubase)
 {
 	// Ищем данный ресурс среди имеющихся инстанций
 	for (InstanceProcess *instance = m_instance_list.getFirst();
@@ -145,7 +145,7 @@ int ResourceProcess::Attach (Resource *resource, uint32_t access, laddr_t ubase)
 	return SUCCESS;
 }
 
-int ResourceProcess::Detach(Resource *resource)
+int Process::Detach(Resource *resource)
 {
 	InstanceProcess *instance = FindInstance(resource->id());
 	if (instance == 0) return ERROR_INVALIDID;
@@ -155,7 +155,7 @@ int ResourceProcess::Detach(Resource *resource)
 	return SUCCESS;
 }
 
-const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
+const PageInstance *Process::PageFault (laddr_t addr, uint32_t *access)
 {
 	if (m_pagetable.inBounds(USER_PAGETABLE_BASE, addr))
 	{
@@ -180,7 +180,7 @@ const PageInstance *ResourceProcess::PageFault (laddr_t addr, uint32_t *access)
 }
 
 
-InstanceProcess *ResourceProcess::FindInstance (id_t id) const
+InstanceProcess *Process::FindInstance (id_t id) const
 {
 	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
@@ -193,7 +193,7 @@ InstanceProcess *ResourceProcess::FindInstance (id_t id) const
 	return 0;
 }
 
-int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, size_t param_size)
+int Process::ModifyResource(id_t id, int param_id, const void *param, size_t param_size)
 {
 	InstanceProcess *instance = FindInstance(id);
 	if (instance == 0) return ERROR_INVALIDID;
@@ -221,7 +221,7 @@ int ResourceProcess::ModifyResource(id_t id, int param_id, const void *param, si
 	return instance->Modify(param_id, param, param_size);
 }
 
-bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
+bool Process::copyIn(offset_t offset, const void *src, size_t size)
 {
 	for (InstanceProcess *instance = m_instance_list.getFirst();
 		instance != 0;
@@ -251,7 +251,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 	return false;
 }
 
-InstanceProcess *ResourceProcess::createInstance(Resource *resource,
+InstanceProcess *Process::createInstance(Resource *resource,
 		uint32_t access, laddr_t base) const
 {
 	return new InstanceProcess(resource, access, base);
