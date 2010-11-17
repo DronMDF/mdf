@@ -5,23 +5,23 @@
 
 #include "../include/SubScheduler.h"
 
-namespace Core { class ResourceThread; }
+namespace Core { class Thread; }
 
 struct nullSubScheduler : public Core::SubScheduler {
-	virtual Core::ResourceThread *getThread() { return 0; }
-	virtual void addThread(Core::ResourceThread *) { }
+	virtual Core::Thread *getThread() { return 0; }
+	virtual void addThread(Core::Thread *) { }
 };
 
 struct testSubScheduler : public Core::SubScheduler {
-	Core::ResourceThread *thread;
+	Core::Thread *thread;
 	
 	testSubScheduler() : thread(0) { }
 
-	virtual Core::ResourceThread *getThread() {
+	virtual Core::Thread *getThread() {
 		return 0;	// Это более универсальное решение.
 	};
 	
-	virtual void addThread(Core::ResourceThread *t) {
+	virtual void addThread(Core::Thread *t) {
 		BOOST_ASSERT(thread == 0);
 		thread = t;
 	}

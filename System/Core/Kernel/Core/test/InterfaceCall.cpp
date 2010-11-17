@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncWithoutCaller)
 	
 	BOOST_REQUIRE_EQUAL(CoreCall(0, process.id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	ResourceThread *thread = scheduler.getThread();
+	Thread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
@@ -48,13 +48,13 @@ BOOST_AUTO_TEST_CASE(testCallThreadAsyncByProcessInstance)
 	testScheduler scheduler;
 	
 	testProcess process;
-	ResourceThread *thread = new testThread(&process);
+	Thread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(thread),
 			thread->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	ResourceThread *st = scheduler.getThread();
+	Thread *st = scheduler.getThread();
 	BOOST_REQUIRE_EQUAL(st, thread);
 }
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncByProcessInstance)
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
 			call->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	ResourceThread *thread = scheduler.getThread();
+	Thread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(testCallProcessAsyncByProcessInstance)
 	BOOST_REQUIRE_EQUAL(CoreCall(reinterpret_cast<Task *>(&task),
 			calledprocess->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	ResourceThread *thread = scheduler.getThread();
+	Thread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), calledprocess);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(testCallParametersDeliver)
 		test_msg.c_str(), test_msg.size(), 
 		RESOURCE_CALL_ASYNC | RESOURCE_CALL_COPY), SUCCESS);
 
-	ResourceThread *thread = scheduler.getThread();
+	Thread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 
 	uint32_t access = RESOURCE_ACCESS_READ;
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(testCallSync)
 // 			process.id(), 0, 0, 0), SUCCESS);
 // 
 // //	TODO: Обработчик уже вызван... и я не могу это отследить... пока...
-// // 	ResourceThread *thread = scheduler.getThread();
+// // 	Thread *thread = scheduler.getThread();
 // // 	BOOST_REQUIRE(thread != 0);
 // // 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 // // 	
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncWithoutCaller)
 
 	BOOST_REQUIRE_EQUAL(CoreCall(0, call->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);
 
-	ResourceThread *thread = scheduler.getThread();
+	Thread *thread = scheduler.getThread();
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getProcess(), &process);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), entry);

@@ -33,7 +33,7 @@ public:
 
 	virtual Process *asProcess ();
 
-	virtual ResourceThread *Call ();
+	virtual Thread *Call ();
 	virtual int Attach(Resource *resource, uint32_t access, laddr_t base);
 	virtual int Detach(Resource *resource);
 

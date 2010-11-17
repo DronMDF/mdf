@@ -21,17 +21,17 @@ private:
 	ThreadList m_queue;
 
 public:
-	testSubScheduler() : SubScheduler(), m_queue(&ResourceThread::ScheduleLink) {}
+	testSubScheduler() : SubScheduler(), m_queue(&Thread::ScheduleLink) {}
 	virtual ~testSubScheduler() {}
 
-	virtual void addThread(ResourceThread *thread)
+	virtual void addThread(Thread *thread)
 	{
 		addThreadOrdered(thread, &m_queue);
 	}
 
-	virtual ResourceThread *getThread()
+	virtual Thread *getThread()
 	{
-		ResourceThread *thread = m_queue.getFirst();
+		Thread *thread = m_queue.getFirst();
 		if (thread != 0) m_queue.Remove(thread);
 		return thread;
 	}
@@ -41,20 +41,20 @@ BOOST_AUTO_TEST_CASE(lifo)
 {
 	class testLIFOScheduler : public testSubScheduler {
 	private:
-		virtual bool checkThreadUrgency(const ResourceThread *,
-			const ResourceThread *) const
+		virtual bool checkThreadUrgency(const Thread *,
+			const Thread *) const
 		{
 			return true;
 		}
 	} scheduler;
 
-	class testThread : public ResourceThread {} thread1, thread2;
+	class testThread : public Thread {} thread1, thread2;
 
 	scheduler.addThread(&thread1);
 	scheduler.addThread(&thread2);
 
-	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread2));
-	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread1));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<Thread *>(&thread2));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<Thread *>(&thread1));
 	BOOST_REQUIRE(scheduler.getThread() == 0);
 }
 
@@ -62,20 +62,20 @@ BOOST_AUTO_TEST_CASE(fifo)
 {
 	class testFIFOScheduler : public testSubScheduler {
 	private:
-		virtual bool checkThreadUrgency(const ResourceThread *,
-			const ResourceThread *) const
+		virtual bool checkThreadUrgency(const Thread *,
+			const Thread *) const
 		{
 			return false;
 		}
 	} scheduler;
 
-	class testThread : public ResourceThread {} thread1, thread2;
+	class testThread : public Thread {} thread1, thread2;
 
 	scheduler.addThread(&thread1);
 	scheduler.addThread(&thread2);
 
-	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread1));
-	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<ResourceThread *>(&thread2));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<Thread *>(&thread1));
+	BOOST_REQUIRE_EQUAL(scheduler.getThread(), static_cast<Thread *>(&thread2));
 	BOOST_REQUIRE(scheduler.getThread() == 0);
 }
 

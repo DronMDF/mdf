@@ -10,7 +10,7 @@
 namespace Core {
 
 class Resource;
-class ResourceThread;
+class Thread;
 
 class Instance {
 private:

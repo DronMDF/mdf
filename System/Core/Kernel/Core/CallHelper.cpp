@@ -25,18 +25,18 @@ CallHelper::~CallHelper()
 {
 }
 
-ResourceThread *CallHelper::getCallerThread(const Task *task) const
+Thread *CallHelper::getCallerThread(const Task *task) const
 {
 	if (task == 0) return 0;
 	
-	ResourceThread *thread =
-		reinterpret_cast<ResourceThread *>(StubTaskGetThread(task));
+	Thread *thread =
+		reinterpret_cast<Thread *>(StubTaskGetThread(task));
 	STUB_ASSERT(thread == 0, "No current thread");
 
 	return thread;
 }
 
-InstanceProcess *CallHelper::getCalledInstance(ResourceThread *thread, id_t id) const
+InstanceProcess *CallHelper::getCalledInstance(Thread *thread, id_t id) const
 {
 	Process *process = thread->getProcess();
 	STUB_ASSERT(process == 0, "no current process");

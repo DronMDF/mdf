@@ -15,7 +15,7 @@ InstanceProcess::InstanceProcess(Resource *resource, uint32_t access, laddr_t ba
 {
 }
 
-ResourceThread *InstanceProcess::Call()
+Thread *InstanceProcess::Call()
 {
 	if (!allow(RESOURCE_ACCESS_CALL)) return 0;
 	return resource()->Call();

@@ -19,15 +19,15 @@ protected:
 	//	Тогда эту очередь в приват.
 	ThreadList m_infinity;
 
-	virtual bool checkThreadUrgency(const ResourceThread *thread,
-		const ResourceThread *exist) const;
+	virtual bool checkThreadUrgency(const Thread *thread,
+		const Thread *exist) const;
 
 public:
 	SchedulerInactive();
 	virtual ~SchedulerInactive();
 
-	virtual void addThread(ResourceThread *thread);
-	virtual ResourceThread *getThread();
+	virtual void addThread(Thread *thread);
+	virtual Thread *getThread();
 };
 
 } // namespace Core

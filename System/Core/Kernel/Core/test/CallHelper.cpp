@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(testGetCalledInstance)
 	testCallHelper helper;
 
 	testProcess process;
-	ResourceThread *thread = new testThread(&process);
+	Thread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
 	InstanceProcess *inst = helper.getCalledInstance(thread, thread->id());
@@ -89,11 +89,11 @@ BOOST_AUTO_TEST_CASE(testCheckCalledAccessInKernelMode)
 BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
 {
 	testProcess process;
-	ResourceThread *thread = new testThread(&process);
+	Thread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_CALL, 0);
 
 	struct inCallHelper : public testCallHelper, private visit_mock {
-		InstanceProcess *getCalledInstance(ResourceThread *thread, id_t id) const {
+		InstanceProcess *getCalledInstance(Thread *thread, id_t id) const {
 			visit();
 			return testCallHelper::getCalledInstance(thread, id);
 		}
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(testCheckCalledAccessInUserMode)
 BOOST_AUTO_TEST_CASE(testCheckNoAccess)
 {
 	testProcess process;
-	ResourceThread *thread = new testThread(&process);
+	Thread *thread = new testThread(&process);
 	process.Attach(thread, RESOURCE_ACCESS_READ, 0);
 
 	CallHelper helper(reinterpret_cast<Task *>(thread));
@@ -183,15 +183,15 @@ BOOST_AUTO_TEST_CASE(testSetCopyBack)
 {
 	class inlineThread : public testThread, private visit_mock {
 	public:
-		void setCopyBack(ResourceThread *thread, laddr_t buffer) {
+		void setCopyBack(Thread *thread, laddr_t buffer) {
 			visit();
-			BOOST_REQUIRE_EQUAL(thread, reinterpret_cast<ResourceThread *>(0x105EAD));
+			BOOST_REQUIRE_EQUAL(thread, reinterpret_cast<Thread *>(0x105EAD));
 			BOOST_REQUIRE_EQUAL(buffer, 0xADD0000);
 		}
 	} thread;
 
 	testCallHelper helper;
-	helper.m_caller = reinterpret_cast<ResourceThread *>(0x105EAD);
+	helper.m_caller = reinterpret_cast<Thread *>(0x105EAD);
 	helper.m_called = &thread;
 
 	helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 20);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
 {
 	class inlineThread : public testThread {
 	public:
-		void setCopyBack(ResourceThread *, laddr_t) {
+		void setCopyBack(Thread *, laddr_t) {
 			throw 0;
 		}
 	} thread;
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(testSetCopyBackValidity)
 	helper.m_caller = 0;
 	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 20));
 
-	helper.m_caller = reinterpret_cast<ResourceThread *>(0x105EAD);
+	helper.m_caller = reinterpret_cast<Thread *>(0x105EAD);
 	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(0, 20));
 	BOOST_REQUIRE_NO_THROW(helper.setCopyBack(reinterpret_cast<void *>(0xADD0000), 0));
 }
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(testRunSinchronized)
 
 	helper.runSinchronized();
 	BOOST_REQUIRE_EQUAL(caller.getWakeupstamp(), TIMESTAMP_FUTURE);
-	BOOST_REQUIRE_EQUAL(subsched->thread, static_cast<ResourceThread *>(&caller));
+	BOOST_REQUIRE_EQUAL(subsched->thread, static_cast<Thread *>(&caller));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -11,7 +11,7 @@
 namespace Core {
 	
 class Resource;
-class ResourceThread;
+class Thread;
 
 class InstanceProcess : public Instance {
 private:
@@ -28,7 +28,7 @@ public:
 	bool inBounds(laddr_t addr) const;
 	const PageInstance *PageFault(laddr_t addr, uint32_t *access);
 	
-	ResourceThread *Call();
+	Thread *Call();
 	int Modify(int paramid, const void *param, size_t size);
 	int Info(int infoid, void *info, size_t *size) const;
 

@@ -7,18 +7,18 @@
 
 #include "../include/Thread.h"
 
-class testThread : public Core::ResourceThread
+class testThread : public Core::Thread
 {
 public:
 	explicit testThread(Core::Process *process = 0)
-		: Core::ResourceThread(process)
+		: Core::Thread(process)
 	{
 		Register();
 	}
 
-	using Core::ResourceThread::m_txa;
-	using Core::ResourceThread::m_txa_offset;
-	using Core::ResourceThread::m_txa_access;
+	using Core::Thread::m_txa;
+	using Core::Thread::m_txa_offset;
+	using Core::Thread::m_txa_access;
 	
-	using Core::ResourceThread::Kill;
+	using Core::Thread::Kill;
 };

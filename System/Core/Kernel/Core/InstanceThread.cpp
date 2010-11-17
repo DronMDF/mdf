@@ -9,7 +9,7 @@
 
 using namespace Core;
 
-InstanceThread::InstanceThread(Resource *resource, uint32_t event, ResourceThread *thread)
+InstanceThread::InstanceThread(Resource *resource, uint32_t event, Thread *thread)
 	: Instance(resource), m_event(event), m_thread(thread)
 {
 }

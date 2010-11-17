@@ -17,7 +17,7 @@
 using namespace Core;
 
 SchedulerKill::SchedulerKill()
-	: m_queue(&ResourceThread::ScheduleLink)
+	: m_queue(&Thread::ScheduleLink)
 {
 }
 
@@ -26,16 +26,16 @@ SchedulerKill::~SchedulerKill()
 	STUB_ASSERT(m_queue.getSize() > 0, "Destroy full scheduler");
 }
 
-void SchedulerKill::addThread(ResourceThread *thread)
+void SchedulerKill::addThread(Thread *thread)
 {
 	m_queue.Insert(thread);
 }
 
-ResourceThread *SchedulerKill::getThread()
+Thread *SchedulerKill::getThread()
 {
-	for (ResourceThread *thread = m_queue.getFirst(); thread != 0; )
+	for (Thread *thread = m_queue.getFirst(); thread != 0; )
 	{
-		ResourceThread *dthread = thread;
+		Thread *dthread = thread;
 		thread = m_queue.getNext(thread);
 
 		if (dthread->Deactivate()) {

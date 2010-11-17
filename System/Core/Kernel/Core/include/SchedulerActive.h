@@ -16,19 +16,19 @@ private:
 	ThreadList m_queue;
 
 protected:
-	uint32_t getThreadIndex(const ResourceThread *thread) const;
+	uint32_t getThreadIndex(const Thread *thread) const;
 
 	// Возвращает true, если thread более приоритетен, нежели exist.
 	// Название не очень удачное но другого что-то не придумал.
-	virtual bool checkThreadUrgency(const ResourceThread *thread,
-		const ResourceThread *exist) const;
+	virtual bool checkThreadUrgency(const Thread *thread,
+		const Thread *exist) const;
 
 public:
 	SchedulerActive();
 	virtual ~SchedulerActive();
 
-	virtual void addThread(ResourceThread *thread);
-	virtual ResourceThread *getThread();
+	virtual void addThread(Thread *thread);
+	virtual Thread *getThread();
 };
 
 } // namespace Core

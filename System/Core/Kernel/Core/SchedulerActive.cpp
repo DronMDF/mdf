@@ -23,7 +23,7 @@ using namespace Core;
 // когда других дел нет.
 
 SchedulerActive::SchedulerActive()
-	: m_queue(&ResourceThread::ScheduleLink)
+	: m_queue(&Thread::ScheduleLink)
 {
 }
 
@@ -32,7 +32,7 @@ SchedulerActive::~SchedulerActive()
 	STUB_ASSERT(m_queue.getSize() > 0, "Destroy full scheduler");
 }
 
-uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
+uint32_t SchedulerActive::getThreadIndex(const Thread *thread) const
 {
 	STUB_ASSERT(StubGetCurrentClock() < thread->getTimestamp(),
 		"Thread timestamp in the future");
@@ -45,8 +45,8 @@ uint32_t SchedulerActive::getThreadIndex(const ResourceThread *thread) const
 	return min(index, 0xffffffffU);
 }
 
-bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,
-		const ResourceThread *exist) const
+bool SchedulerActive::checkThreadUrgency(const Thread *thread,
+		const Thread *exist) const
 {
 	STUB_ASSERT(StubGetCurrentClock() < thread->getTimestamp(),
 		"New thread timestamp in the future");
@@ -70,7 +70,7 @@ bool SchedulerActive::checkThreadUrgency(const ResourceThread *thread,
 	return false;
 }
 
-void SchedulerActive::addThread(ResourceThread *thread)
+void SchedulerActive::addThread(Thread *thread)
 {
 	STUB_ASSERT(thread == 0, "thread invalid");
 
@@ -83,9 +83,9 @@ void SchedulerActive::addThread(ResourceThread *thread)
 //	CorePrint("\n");
 }
 
-ResourceThread *SchedulerActive::getThread()
+Thread *SchedulerActive::getThread()
 {
-	if (ResourceThread *thread = m_queue.getFirst()) {
+	if (Thread *thread = m_queue.getFirst()) {
 		m_queue.Remove(thread);
 		return thread;
 	}

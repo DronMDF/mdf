@@ -13,7 +13,7 @@ namespace Core {
 class InstanceThread;
 class InstanceCopyBack;
 
-class ResourceThread : public Resource
+class Thread : public Resource
 {
 private:
 	Process *m_process;
@@ -44,25 +44,25 @@ private:
 	InstanceCopyBack *m_copyback_instance;
 
 private:
-	ResourceThread (const ResourceThread &);
-	ResourceThread & operator = (const ResourceThread &);
+	Thread (const Thread &);
+	Thread & operator = (const Thread &);
 
 	void setStack(offset_t request, size_t request_size, uint32_t access);
 
 	InstanceThread *createInstance(Resource *resource, uint32_t event);
 	
 protected:
-	explicit ResourceThread(Process *process = 0);
+	explicit Thread(Process *process = 0);
 
 	virtual void Kill();
 
 public:
-	Link<ResourceThread> ScheduleLink;
+	Link<Thread> ScheduleLink;
 
-	ResourceThread(Process *process, laddr_t entry);
-	virtual ~ResourceThread();
+	Thread(Process *process, laddr_t entry);
+	virtual ~Thread();
 
-	virtual ResourceThread *asThread ();
+	virtual Thread *asThread ();
 
 	void setRequest(const void *request, size_t size, uint32_t access);
 
@@ -90,16 +90,16 @@ public:
 
 	const PageInstance *PageFault (laddr_t addr, uint32_t *access);
 
-	virtual ResourceThread *Call ();
+	virtual Thread *Call ();
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info (int info_id, void *info, size_t *info_size) const;
 
-	bool createRequestArea(ResourceThread *caller,
+	bool createRequestArea(Thread *caller,
 			       laddr_t offset, laddr_t size, uint32_t access);
 	virtual bool copyIn(laddr_t dst, const void *src, size_t size);
 
-	virtual void setCopyBack(ResourceThread *thread, laddr_t buffer);
+	virtual void setCopyBack(Thread *thread, laddr_t buffer);
 };
 
 } // namespace Core

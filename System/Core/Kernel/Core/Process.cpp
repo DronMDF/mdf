@@ -41,12 +41,12 @@ Process *Process::asProcess ()
 	return this;
 }
 
-ResourceThread *Process::Call ()
+Thread *Process::Call ()
 {
 	// TODO: Данный вызов возможен только на неинициализированном процессе.
 	// Если в процессе уже есть нити или коллы, то данный вызов возвращает 0.
 
-	ResourceThread *thread = new ResourceThread(this, m_entry);
+	Thread *thread = new Thread(this, m_entry);
 	STUB_ASSERT(thread == 0, "Unable to alloc thread");
 
 	thread->Register();

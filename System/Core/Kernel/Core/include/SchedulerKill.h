@@ -7,7 +7,7 @@
 
 namespace Core {
 
-class ResourceThread;
+class Thread;
 
 class SchedulerKill : public SubScheduler
 {
@@ -18,8 +18,8 @@ public:
 	SchedulerKill();
 	virtual ~SchedulerKill();
 
-	virtual void addThread(ResourceThread *thread);
-	virtual ResourceThread *getThread();
+	virtual void addThread(Thread *thread);
+	virtual Thread *getThread();
 };
 
 } // namespace Core

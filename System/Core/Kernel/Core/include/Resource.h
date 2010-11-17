@@ -15,7 +15,7 @@ class InstanceProcess;
 
 class Region;
 class Process;
-class ResourceThread;
+class Thread;
 class ResourceCall;
 class ResourceCustom;
 
@@ -52,7 +52,7 @@ public:
 	virtual Resource * asResource();
 	virtual Region *asRegion ();
 	virtual Process *asProcess ();
-	virtual ResourceThread *asThread ();
+	virtual Thread *asThread ();
 	virtual ResourceCall *asCall ();
 	virtual ResourceCustom *asCustom ();
 
@@ -60,7 +60,7 @@ public:
 
 	// Call сильно атрофированный метод, можно ли его приравнять к методам
 	// API, уж не знаю. Да всеравно..
-	virtual ResourceThread *Call ();
+	virtual Thread *Call ();
 	virtual int Attach(Resource *resource, uint32_t access, laddr_t base);
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 	virtual int Info(int info_id, void *info, size_t *info_size) const;

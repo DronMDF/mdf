@@ -24,7 +24,7 @@ using namespace Core;
 BOOST_AUTO_TEST_SUITE(scheduler_new)
 
 struct testSubScheduler : public SubScheduler {
-	ResourceThread *thread;
+	Thread *thread;
 
 	bool add_visited;
 	bool get_visited;
@@ -32,14 +32,14 @@ struct testSubScheduler : public SubScheduler {
 	testSubScheduler() : thread(0), add_visited(false), get_visited(false)
 	{}
 
-	virtual ResourceThread *getThread() {
+	virtual Thread *getThread() {
 		get_visited = true;
-		ResourceThread *t = thread;
+		Thread *t = thread;
 		thread = 0;	// Нити отдаем с концами.
 		return t;
 	};
 
-	virtual void addThread(ResourceThread *t) {
+	virtual void addThread(Thread *t) {
 		thread = t;
 		add_visited = true;
 	}

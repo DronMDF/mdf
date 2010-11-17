@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(call)
 	Resource *call = ResourceCall::Create(&process, &cp, sizeof(cp));
 	BOOST_REQUIRE(call != 0);
 
-	ResourceThread *thread = call->Call();
+	Thread *thread = call->Call();
 	BOOST_REQUIRE(thread != 0);
 	BOOST_REQUIRE_EQUAL(thread->getEntry(), 0x1000);
 }

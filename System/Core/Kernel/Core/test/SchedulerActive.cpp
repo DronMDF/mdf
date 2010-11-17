@@ -19,10 +19,10 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteSchedulerActive)
 
-class testThread : public ResourceThread {
+class testThread : public Thread {
 public:
 	testThread(tick_t timestamp, uint32_t priority = 128)
-		: ResourceThread()
+		: Thread()
 	{
 		setTimestamp(timestamp);
 		setPriority(priority);

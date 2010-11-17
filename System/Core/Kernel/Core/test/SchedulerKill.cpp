@@ -25,10 +25,10 @@ BOOST_AUTO_TEST_SUITE(kill_scheduler)
 BOOST_AUTO_TEST_CASE(enqueue)
 {
 	SchedulerKill scheduler;
-	class testThread : public ResourceThread {
+	class testThread : public Thread {
 	public:
 		bool visited;
-		testThread() : ResourceThread(), visited(false) {}
+		testThread() : Thread(), visited(false) {}
 
 		virtual bool Deactivate() {
 			visited = true;
@@ -64,14 +64,14 @@ BOOST_AUTO_TEST_CASE(destroy)
 		};
 	} process;
 
-	class testThread : public ResourceThread {
+	class testThread : public Thread {
 	private:
 		bool *m_flag;
 		testThread(const testThread &);
 		testThread &operator = (const testThread &);
 	public:
 		testThread(Process *process, bool *flag)
-			: ResourceThread(process), m_flag(flag) {}
+			: Thread(process), m_flag(flag) {}
 		virtual ~testThread() { *m_flag = true; }
 		virtual bool Deactivate() { return true; }
 	} *thread = new testThread(&process, &deleted);

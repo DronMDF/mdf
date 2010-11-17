@@ -60,7 +60,7 @@ BOOST_FIXTURE_TEST_CASE(create, create_fixture)
 	BOOST_REQUIRE(resource != 0);
 	BOOST_REQUIRE_EQUAL(resource->id(), id);
 
-	ResourceThread *thread = resource->asThread();
+	Thread *thread = resource->asThread();
 	BOOST_REQUIRE(thread != 0);
 }
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(kill)
 BOOST_AUTO_TEST_CASE(deactivate)
 {
 	struct inThread : public testThread {
-		using ResourceThread::m_task;
+		using Thread::m_task;
 	} thread;
 
 	// При вызове метода Deactivate должен произойти вызов StubTaskDestroy,

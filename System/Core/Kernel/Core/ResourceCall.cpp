@@ -40,9 +40,9 @@ laddr_t ResourceCall::getEntry() const
 	return m_entry;
 }
 
-ResourceThread *ResourceCall::Call()
+Thread *ResourceCall::Call()
 {
-	ResourceThread *thread = new ResourceThread(m_process, m_entry);
+	Thread *thread = new Thread(m_process, m_entry);
 	STUB_ASSERT(thread == 0, "Unable to alloc thread");
 
 	thread->Register();

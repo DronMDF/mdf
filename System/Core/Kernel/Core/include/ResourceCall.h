@@ -28,7 +28,7 @@ public:
 
 	laddr_t getEntry() const;
 
-	virtual ResourceThread *Call();
+	virtual Thread *Call();
 };
 
 } // namespace Core;

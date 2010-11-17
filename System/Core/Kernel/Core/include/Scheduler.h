@@ -7,7 +7,7 @@
 
 namespace Core {
 
-class ResourceThread;
+class Thread;
 class SubScheduler;
 
 // Этот класс конструируется где угодно а очереди у него статические.
@@ -21,11 +21,11 @@ public:
 	Scheduler();
 	virtual ~Scheduler();
 
-	void addActiveThread(ResourceThread *thread);
-	void addInactiveThread(ResourceThread *thread);
-	void addKillThread(ResourceThread *thread);
+	void addActiveThread(Thread *thread);
+	void addInactiveThread(Thread *thread);
+	void addKillThread(Thread *thread);
 
-	ResourceThread *getThread();
+	Thread *getThread();
 };
 
 } // namespace Core

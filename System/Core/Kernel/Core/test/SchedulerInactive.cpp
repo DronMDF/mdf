@@ -19,9 +19,9 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(inactive_scheduler)
 
-class testThread : public ResourceThread {
+class testThread : public Thread {
 public:
-	testThread(timeout_t ts) : ResourceThread() {
+	testThread(timeout_t ts) : Thread() {
 		setTimestamp(StubGetCurrentClock() - ts);
 		Sleep(ts);
 	}
@@ -31,7 +31,7 @@ class testSchedulerInactive : public SchedulerInactive {
 public:
 	using SchedulerInactive::checkThreadUrgency;
 
-	void Remove(ResourceThread *thread) {
+	void Remove(Thread *thread) {
 		BOOST_REQUIRE(thread->ScheduleLink.isLinked(&m_infinity));
 		m_infinity.Remove(thread);
 	}

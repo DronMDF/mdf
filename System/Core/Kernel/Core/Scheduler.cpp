@@ -15,7 +15,7 @@
 using namespace Core;
 
 namespace Core {
-	class ResourceThread;
+	class Thread;
 }
 
 // -----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ Scheduler::~Scheduler()
 }
 
 // Эти методы очень похожи, просто оперируют разными очередями.
-void Scheduler::addActiveThread(ResourceThread *thread)
+void Scheduler::addActiveThread(Thread *thread)
 {
 	if (m_actives == 0) {
 		m_actives = new SchedulerActive();
@@ -41,7 +41,7 @@ void Scheduler::addActiveThread(ResourceThread *thread)
 	m_actives->addThread(thread);
 }
 
-void Scheduler::addInactiveThread(ResourceThread *thread)
+void Scheduler::addInactiveThread(Thread *thread)
 {
 	if (m_inactives == 0) {
 		m_inactives = new SchedulerInactive();
@@ -50,7 +50,7 @@ void Scheduler::addInactiveThread(ResourceThread *thread)
 	m_inactives->addThread(thread);
 }
 
-void Scheduler::addKillThread(ResourceThread *thread)
+void Scheduler::addKillThread(Thread *thread)
 {
 	if (m_killed == 0) {
 		m_killed = new SchedulerKill();
@@ -59,7 +59,7 @@ void Scheduler::addKillThread(ResourceThread *thread)
 	m_killed->addThread(thread);
 }
 
-ResourceThread *Scheduler::getThread()
+Thread *Scheduler::getThread()
 {
 	if (m_killed != 0) {
 		// Из этого планировщика нити не возвращаются никогда!
@@ -68,7 +68,7 @@ ResourceThread *Scheduler::getThread()
 
 	if (m_inactives != 0) {
 		// Из этого планировщика нити перекачиваются в active
-		while (ResourceThread *thread = m_inactives->getThread()) {
+		while (Thread *thread = m_inactives->getThread()) {
 			addActiveThread(thread);
 		}
 	}

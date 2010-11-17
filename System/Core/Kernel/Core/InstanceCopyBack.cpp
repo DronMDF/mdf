@@ -17,7 +17,7 @@ InstanceCopyBack::InstanceCopyBack(Resource *caller, laddr_t dst)
 void InstanceCopyBack::copyIn(const void *src, size_t size) const
 {
 	if (Resource *resource = this->resource()) {
-		if (ResourceThread *thread = resource->asThread()) {
+		if (Thread *thread = resource->asThread()) {
 			thread->copyIn(m_dst, src, size);
 		}
 	}

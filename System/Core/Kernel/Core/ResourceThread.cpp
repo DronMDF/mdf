@@ -22,7 +22,7 @@
 using namespace Core;
 
 // TODO: Этот конструктор вообще уже не нужен.
-ResourceThread::ResourceThread(Process *process)
+Thread::Thread(Process *process)
 	: Resource(),
 	  m_process(process),
 	  m_task(0),
@@ -42,7 +42,7 @@ ResourceThread::ResourceThread(Process *process)
 
 // TODO: А этот конструктор непонятно зачем использует ссылку на процесс,
 // И кроме того зачем-то инициализирует стек, это можно сделать и позже.
-ResourceThread::ResourceThread(Process *process, laddr_t entry)
+Thread::Thread(Process *process, laddr_t entry)
 	: Resource(),
 	  m_process(process),
 	  m_task(StubTaskCreate (entry, this)),
@@ -64,7 +64,7 @@ ResourceThread::ResourceThread(Process *process, laddr_t entry)
 	setStack (0, 0, 0);
 }
 
-ResourceThread::~ResourceThread()
+Thread::~Thread()
 {
 	// Если нить не вышла корректно - доставки результата уже не будет.
 	delete m_copyback_instance;
@@ -72,12 +72,12 @@ ResourceThread::~ResourceThread()
 	delete m_txa;
 }
 
-ResourceThread *ResourceThread::asThread()
+Thread *Thread::asThread()
 {
 	return this;
 }
 
-void ResourceThread::setStack(offset_t request, size_t request_size, uint32_t access)
+void Thread::setStack(offset_t request, size_t request_size, uint32_t access)
 {
 	struct StubStackFrame stack_frame;
 
@@ -88,7 +88,7 @@ void ResourceThread::setStack(offset_t request, size_t request_size, uint32_t ac
 		       &stack_frame, sizeof(struct StubStackFrame));
 }
 
-void ResourceThread::setRequest(const void *request, size_t size, uint32_t access)
+void Thread::setRequest(const void *request, size_t size, uint32_t access)
 {
 	// Запрос всегда находится в текущем линейном пространстве.
 	STUB_ASSERT (m_txa != 0, "Request already exist");
@@ -128,48 +128,48 @@ void ResourceThread::setRequest(const void *request, size_t size, uint32_t acces
 	}
 }
 
-uint32_t ResourceThread::getPriority() const
+uint32_t Thread::getPriority() const
 {
 	return m_priority;
 }
 
-void ResourceThread::setPriority(uint32_t priority)
+void Thread::setPriority(uint32_t priority)
 {
 	m_priority = priority;
 }
 
-tick_t ResourceThread::getTimestamp() const
+tick_t Thread::getTimestamp() const
 {
 	return m_timestamp;
 }
 
-tick_t ResourceThread::getWakeupstamp() const
+tick_t Thread::getWakeupstamp() const
 {
 	return m_wakeupstamp;
 }
 
-void ResourceThread::setTimestamp(tick_t timestamp)
+void Thread::setTimestamp(tick_t timestamp)
 {
 	m_timestamp = timestamp;
 }
 
-void ResourceThread::setProcess(Process *process)
+void Thread::setProcess(Process *process)
 {
 	m_process = process;
 }
 
-Process *ResourceThread::getProcess() const
+Process *Thread::getProcess() const
 {
 	STUB_ASSERT(m_process == 0, "Thread without process");
 	return m_process;
 }
 
-laddr_t ResourceThread::getEntry() const
+laddr_t Thread::getEntry() const
 {
 	return m_entry;
 }
 
-void ResourceThread::Sleep(timeout_t timeout)
+void Thread::Sleep(timeout_t timeout)
 {
 	if (timeout == TIMEOUT_INFINITY) {
 		m_wakeupstamp = TIMESTAMP_FUTURE;
@@ -178,7 +178,7 @@ void ResourceThread::Sleep(timeout_t timeout)
 	}
 }
 
-void ResourceThread::Wait(Resource *resource, uint32_t event)
+void Thread::Wait(Resource *resource, uint32_t event)
 {
 	STUB_ASSERT(resource == this, "Wait youself?");
 	m_event_instance = createInstance(resource, event);
@@ -186,12 +186,12 @@ void ResourceThread::Wait(Resource *resource, uint32_t event)
 	// TODO: Здесь же можно поставить на ожидание в планировщике.
 }
 
-bool ResourceThread::isActive () const
+bool Thread::isActive () const
 {
 	return false;
 }
 
-void ResourceThread::Run()
+void Thread::Run()
 {
 	delete m_event_instance;
 	m_event_instance = 0;
@@ -200,7 +200,7 @@ void ResourceThread::Run()
 	StubTaskRun(m_task);
 }
 
-void ResourceThread::Activate()
+void Thread::Activate()
 {
 	// Идею синхронных иннстанций я пока не выносил, поэтому после активации
 	// 	инстанция, слушающая события, удаляется.
@@ -211,7 +211,7 @@ void ResourceThread::Activate()
 	Scheduler().addActiveThread(this);
 }
 
-bool ResourceThread::Deactivate()
+bool Thread::Deactivate()
 {
 	if (StubTaskDestroy(m_task)) {
 		m_task = 0;
@@ -221,7 +221,7 @@ bool ResourceThread::Deactivate()
 	return false;
 }
 
-void ResourceThread::Kill()
+void Thread::Kill()
 {
 	event(RESOURCE_EVENT_THREAD_EXIT);
 
@@ -229,7 +229,7 @@ void ResourceThread::Kill()
 
 	// Вызвать очередную нить, или Halt.
 	// TODO: А может быть заставить Scheduler хальтить при отсутствии нитей?
-	ResourceThread *thread = Scheduler().getThread();
+	Thread *thread = Scheduler().getThread();
 	if (thread != 0) {
 		thread->Run();
 	} else {
@@ -237,7 +237,7 @@ void ResourceThread::Kill()
 	}
 }
 
-const PageInstance *ResourceThread::PageFault(laddr_t addr, uint32_t *access)
+const PageInstance *Thread::PageFault(laddr_t addr, uint32_t *access)
 {
 	if (addr == USER_MEMORY_BASE + RETMAGIC) {
 		// Нить вышла корректно
@@ -268,7 +268,7 @@ const PageInstance *ResourceThread::PageFault(laddr_t addr, uint32_t *access)
 	return m_process->PageFault(addr, access);
 }
 
-int ResourceThread::Modify(int param_id, const void *param, size_t param_size)
+int Thread::Modify(int param_id, const void *param, size_t param_size)
 {
 	if (param_id == RESOURCE_MODIFY_THREAD_PRIORITY) {
 		if (param_size < sizeof(uint32_t))
@@ -282,7 +282,7 @@ int ResourceThread::Modify(int param_id, const void *param, size_t param_size)
 	return Resource::Modify(param_id, param, param_size);
 }
 
-int ResourceThread::Info(int info_id, void *info, size_t *info_size) const
+int Thread::Info(int info_id, void *info, size_t *info_size) const
 {
 	if (info_id == RESOURCE_INFO_THREAD_CURRENT) {
 		const id_t id = this->id();
@@ -293,14 +293,14 @@ int ResourceThread::Info(int info_id, void *info, size_t *info_size) const
 	return Resource::Info(info_id, info, info_size);
 }
 
-ResourceThread *ResourceThread::Call ()
+Thread *Thread::Call ()
 {
 	// TODO: Указатель должен возвращаться только для неинициализированных нитей.
 	// Запущенная нить возвращает 0.
 	return this;
 }
 
-bool ResourceThread::createRequestArea(ResourceThread *caller,
+bool Thread::createRequestArea(Thread *caller,
 	laddr_t offset, laddr_t size, uint32_t access)
 {
 	if (m_txa != 0) return false;
@@ -319,7 +319,7 @@ bool ResourceThread::createRequestArea(ResourceThread *caller,
 	return true;
 }
 
-bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
+bool Thread::copyIn(laddr_t dst, const void *src, size_t size)
 {
 	if (m_stack.inBounds(USER_STACK_BASE, dst)) {
 		return m_stack.copyIn(dst - USER_STACK_BASE, src, size);
@@ -332,12 +332,12 @@ bool ResourceThread::copyIn(laddr_t dst, const void *src, size_t size)
 	return m_process->copyIn(dst, src, size);
 }
 
-void ResourceThread::setCopyBack(ResourceThread *thread, laddr_t buffer)
+void Thread::setCopyBack(Thread *thread, laddr_t buffer)
 {
 	m_copyback_instance = new InstanceCopyBack(thread, buffer);
 }
 
-InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t event)
+InstanceThread *Thread::createInstance(Resource *resource, uint32_t event)
 {
 	return new InstanceThread(resource, event, this);
 }
@@ -345,8 +345,8 @@ InstanceThread *ResourceThread::createInstance(Resource *resource, uint32_t even
 extern "C"
 const PageInstance *CoreThreadPageFault (const Task *task, laddr_t addr, uint32_t *access)
 {
-	Core::ResourceThread *thread =
-		reinterpret_cast<Core::ResourceThread *>(StubTaskGetThread(task));
+	Core::Thread *thread =
+		reinterpret_cast<Core::Thread *>(StubTaskGetThread(task));
 
 	const PageInstance *instance = thread->PageFault(addr, access);
 

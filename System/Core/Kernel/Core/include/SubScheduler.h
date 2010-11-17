@@ -9,30 +9,30 @@
 
 namespace Core {
 	
-class ResourceThread;
+class Thread;
 
 // Все субпланировщики соответствуют интерфейсы субщедулера (который я возможно
 // еще расширю).
 
 class SubScheduler {
 protected:
-	typedef List<ResourceThread> ThreadList;
+	typedef List<Thread> ThreadList;
 
 	// для упорядоченных очередей (не важно по какому критерию)
 	// существует этот шаблонный метод.
-	void addThreadOrdered(ResourceThread *thread, ThreadList *list) const;
+	void addThreadOrdered(Thread *thread, ThreadList *list) const;
 
 	// Критерий упорядочивания задается этой функцией.
 	// Эту функцию можно было бы сделать чисто абстрактной,
 	// Но дочерние классы к этому не готовы.
-	virtual bool checkThreadUrgency(const ResourceThread *thread,
-		const ResourceThread *exist) const;
+	virtual bool checkThreadUrgency(const Thread *thread,
+		const Thread *exist) const;
 
 public:
 	virtual ~SubScheduler();
 
-	virtual void addThread(ResourceThread *thread) = 0;
-	virtual ResourceThread *getThread() = 0;
+	virtual void addThread(Thread *thread) = 0;
+	virtual Thread *getThread() = 0;
 };
 
 } // namespace Core

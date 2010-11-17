@@ -14,8 +14,8 @@
 using namespace Core;
 
 SchedulerInactive::SchedulerInactive()
-	: m_imminent(&ResourceThread::ScheduleLink),
-	  m_infinity(&ResourceThread::ScheduleLink)
+	: m_imminent(&Thread::ScheduleLink),
+	  m_infinity(&Thread::ScheduleLink)
 {
 }
 
@@ -25,8 +25,8 @@ SchedulerInactive::~SchedulerInactive()
 	STUB_ASSERT(m_infinity.getSize() > 0, "Destroy full scheduler");
 }
 
-bool SchedulerInactive::checkThreadUrgency(const ResourceThread *thread,
-		const ResourceThread *exist) const
+bool SchedulerInactive::checkThreadUrgency(const Thread *thread,
+		const Thread *exist) const
 {
 	if (thread->getWakeupstamp() <= exist->getWakeupstamp())
 		return true;
@@ -34,7 +34,7 @@ bool SchedulerInactive::checkThreadUrgency(const ResourceThread *thread,
 	return false;
 }
 
-void SchedulerInactive::addThread(ResourceThread *thread)
+void SchedulerInactive::addThread(Thread *thread)
 {
 	STUB_ASSERT(thread == 0, "thread invalid");
 
@@ -46,9 +46,9 @@ void SchedulerInactive::addThread(ResourceThread *thread)
 	addThreadOrdered(thread, &m_imminent);
 }
 
-ResourceThread *SchedulerInactive::getThread()
+Thread *SchedulerInactive::getThread()
 {
-	if (ResourceThread *thread = m_imminent.getFirst()) {
+	if (Thread *thread = m_imminent.getFirst()) {
 		if (thread->getWakeupstamp() <= StubGetCurrentClock()) {
 			m_imminent.Remove(thread);
 			return thread;

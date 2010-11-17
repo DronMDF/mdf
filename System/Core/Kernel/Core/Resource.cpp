@@ -50,7 +50,7 @@ Process *Resource::asProcess()
 	return 0;
 }
 
-ResourceThread *Resource::asThread ()
+Thread *Resource::asThread ()
 {
 	return 0;
 }
@@ -85,7 +85,7 @@ void Resource::SetName (const unsigned char * const name, const size_t namelen)
 	}
 }
 
-ResourceThread *Resource::Call ()
+Thread *Resource::Call ()
 {
 	return 0;
 }

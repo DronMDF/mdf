@@ -15,14 +15,14 @@ SubScheduler::~SubScheduler()
 {
 }
 
-void SubScheduler::addThreadOrdered(ResourceThread *thread, SubScheduler::ThreadList *list) const
+void SubScheduler::addThreadOrdered(Thread *thread, SubScheduler::ThreadList *list) const
 {
 	if (list->getFirst() == 0) {
 		list->Insert(thread);
 		return;
 	}
 	
-	for (ResourceThread *ethread = list->getFirst(); ;
+	for (Thread *ethread = list->getFirst(); ;
 		ethread = list->getNext(ethread))
 	{
 		if (checkThreadUrgency(thread, ethread)) {
@@ -37,8 +37,8 @@ void SubScheduler::addThreadOrdered(ResourceThread *thread, SubScheduler::Thread
 	}
 }
 
-bool SubScheduler::checkThreadUrgency(const ResourceThread *,
-	const ResourceThread *) const
+bool SubScheduler::checkThreadUrgency(const Thread *,
+	const Thread *) const
 {
 	return true;
 }

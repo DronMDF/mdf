@@ -10,7 +10,7 @@ typedef struct _Task Task;
 namespace Core {
 
 class Resource;
-class ResourceThread;
+class Thread;
 class InstanceProcess;
 	
 class CallHelper {
@@ -19,11 +19,11 @@ private:
 	CallHelper &operator=(const CallHelper &);
 
 protected:
-	ResourceThread *m_caller;
-	ResourceThread *m_called;
+	Thread *m_caller;
+	Thread *m_called;
 	
-	ResourceThread *getCallerThread(const Task *task) const;
-	virtual InstanceProcess *getCalledInstance(ResourceThread *thread, id_t id) const;
+	Thread *getCallerThread(const Task *task) const;
+	virtual InstanceProcess *getCalledInstance(Thread *thread, id_t id) const;
 
 public:
 	CallHelper(const Task *task);

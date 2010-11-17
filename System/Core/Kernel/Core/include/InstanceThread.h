@@ -10,18 +10,18 @@
 namespace Core {
 	
 class Resource;
-class ResourceThread;
+class Thread;
 
 class InstanceThread : public Instance {
 private:
 	uint32_t m_event;
-	ResourceThread *m_thread;
+	Thread *m_thread;
 
 	InstanceThread(const InstanceThread &);
 	InstanceThread &operator =(const InstanceThread &);
 
 public:
-	InstanceThread(Resource *resource, uint32_t event, ResourceThread *thread);
+	InstanceThread(Resource *resource, uint32_t event, Thread *thread);
 
 	virtual void event(uint32_t eid);
 };

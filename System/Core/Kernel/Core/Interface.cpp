@@ -23,8 +23,8 @@ using namespace Core;
 extern "C"
 int CoreWait (const Task *outask, id_t id, uint32_t event, timeout_t timeout)
 {
-	Core::ResourceThread *outhread =
-		reinterpret_cast<Core::ResourceThread *>(StubTaskGetThread(outask));
+	Core::Thread *outhread =
+		reinterpret_cast<Core::Thread *>(StubTaskGetThread(outask));
 
 	if (outhread != 0) {
 		STUB_ASSERT(outhread->ScheduleLink.isLinked(), "Thread in list");
@@ -59,7 +59,7 @@ int CoreWait (const Task *outask, id_t id, uint32_t event, timeout_t timeout)
 	// Промежуток add-get должен быть атомарным (блокировка?), Или поступить
 	// корректнее и не ставить нить в очередь, если ее нечем заменить.
 
-	Core::ResourceThread *inthread = Scheduler().getThread();
+	Core::Thread *inthread = Scheduler().getThread();
 	if (inthread != 0) {
 		if (inthread != outhread) {
 			inthread->Run();
@@ -86,8 +86,8 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 	if (task != 0) {
 		const void *thread_ptr = StubTaskGetThread(task);
 		STUB_ASSERT (thread_ptr == 0, "No thread");
-		const ResourceThread *thread =
-			reinterpret_cast<const ResourceThread *>(thread_ptr);
+		const Thread *thread =
+			reinterpret_cast<const Thread *>(thread_ptr);
 
 		process = thread->getProcess();
 		STUB_ASSERT(process == 0, "no current process");
@@ -125,7 +125,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 			if (param_size != sizeof (struct KernelCreateThreadParam))
 				return ERROR_INVALIDPARAM;
 
-			resource = new ResourceThread(process, thread_param->entry);
+			resource = new Thread(process, thread_param->entry);
 			break;
 
 		case RESOURCE_TYPE_CALL:
@@ -188,12 +188,12 @@ int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size,
 extern "C"
 int CoreAttach (const Task *task, id_t rid, id_t pid, uint32_t access, uint32_t spec)
 {
-	Core::ResourceThread *thread = 0;
+	Core::Thread *thread = 0;
 
 	if (task != 0) {
 		void *thread_ptr = StubTaskGetThread(task);
 		STUB_ASSERT (thread_ptr == 0, "No thread!");
-		thread = reinterpret_cast<Core::ResourceThread *>(thread_ptr);
+		thread = reinterpret_cast<Core::Thread *>(thread_ptr);
 	}
 
 	// TODO: У текущего процесса должен быть доступ ATTACH к ресурсу res
@@ -238,8 +238,8 @@ int CoreModify (const Task *task, id_t id, int param_id, const void *param, size
 	const void *thread_ptr = StubTaskGetThread(task);
 	STUB_ASSERT (thread_ptr == 0, "No thread");
 
-	const Core::ResourceThread *thread =
-		reinterpret_cast<const Core::ResourceThread *>(thread_ptr);
+	const Core::Thread *thread =
+		reinterpret_cast<const Core::Thread *>(thread_ptr);
 
 	// TODO: Можно было бы и в Thread сделать функцию ModifyResource,
 	// но пока неясно на кой она может понадобиться. В процессе вот реально
@@ -257,8 +257,8 @@ int CoreInfo (const Task *task, id_t id, int info_id, void *info, size_t *info_s
 	const void *thread_ptr = StubTaskGetThread(task);
 	STUB_ASSERT (thread_ptr == 0, "No thread");
 
-	const Core::ResourceThread *thread =
-		reinterpret_cast<const Core::ResourceThread *>(thread_ptr);
+	const Core::Thread *thread =
+		reinterpret_cast<const Core::Thread *>(thread_ptr);
 
 	if (info_id == RESOURCE_INFO_THREAD_CURRENT) {
 		return thread->Info(RESOURCE_INFO_THREAD_CURRENT, info, info_size);
