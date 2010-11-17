@@ -58,7 +58,7 @@ ResourceThread *ResourceProcess::Call ()
 	return thread;
 }
 
-bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t base) const
+bool ResourceProcess::CheckRegionPlace (const Region *region, laddr_t base) const
 {
 	// Границы подгоняем до границ страниц
 	const laddr_t lowbound = base & LADDR_MASK;
@@ -80,7 +80,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 		Resource *resource = instance->resource();
 		if (resource == 0) continue;
 		
-		ResourceRegion *exregion = resource->asRegion();
+		Region *exregion = resource->asRegion();
 		if (exregion == 0) continue;
 
 		laddr_t raddr = instance->addr();
@@ -94,7 +94,7 @@ bool ResourceProcess::CheckRegionPlace (const ResourceRegion *region, laddr_t ba
 }
 
 // ubase - хранит базу в пространстве пользователя
-laddr_t ResourceProcess::selectRegionBase (const ResourceRegion *region, laddr_t ubase) const
+laddr_t ResourceProcess::selectRegionBase (const Region *region, laddr_t ubase) const
 {
 	STUB_ASSERT (region == 0, "setBase for non region");
 
@@ -231,7 +231,7 @@ bool ResourceProcess::copyIn(offset_t offset, const void *src, size_t size)
 		
 		// TODO: Всякая вот эта вот рутина просится в ResourceInstance
 		Resource *resource = instance->resource();
-		ResourceRegion *region = resource->asRegion();
+		Region *region = resource->asRegion();
 		if (region == 0) continue;
 
 		const laddr_t limit = instance->addr() + region->offset() + region->size();

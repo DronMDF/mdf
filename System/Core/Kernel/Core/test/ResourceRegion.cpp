@@ -17,9 +17,9 @@ using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteRegion)
 
-struct testRegion : public ResourceRegion {
-	testRegion(size_t size) : ResourceRegion(size, 0) {}
-	using ResourceRegion::bindRegion;
+struct testRegion : public Region {
+	testRegion(size_t size) : Region(size, 0) {}
+	using Region::bindRegion;
 };
 
 struct fixtureRegionParam {
@@ -28,14 +28,14 @@ struct fixtureRegionParam {
 
 BOOST_FIXTURE_TEST_CASE(testCreate, fixtureRegionParam)
 {
-	ResourceRegion region(size(), 0);
+	Region region(size(), 0);
 	BOOST_REQUIRE_EQUAL(region.size(), size());
 	BOOST_REQUIRE_EQUAL(region.offset(), 0);
 }
 
 BOOST_FIXTURE_TEST_CASE(testRegionBinding, fixtureRegionParam)
 {
-	ResourceRegion parent(size(), 0);
+	Region parent(size(), 0);
 	testRegion child(size() / 2);
 	child.bindRegion(&parent, size() / 2, size() / 2, 0);
 	BOOST_REQUIRE_EQUAL(child.offset(), size() / 2);
@@ -49,7 +49,7 @@ struct RegionFixture1 {
 
 BOOST_FIXTURE_TEST_CASE(testCopyIn, RegionFixture1)
 {
-	ResourceRegion region(SKIP + SIZE, 0);
+	Region region(SKIP + SIZE, 0);
 	BOOST_REQUIRE(region.copyIn(SKIP, data, SIZE));
 
 	uint32_t access = 0;
@@ -68,7 +68,7 @@ BOOST_FIXTURE_TEST_CASE(testCopyIn, RegionFixture1)
 
 BOOST_FIXTURE_TEST_CASE(testCopyInOverload, RegionFixture1)
 {
-	ResourceRegion region(SKIP + SIZE, 0);
+	Region region(SKIP + SIZE, 0);
 	BOOST_REQUIRE(!region.copyIn(SKIP + 1, data, SIZE));
 }
 
@@ -127,9 +127,9 @@ enum {
 	BIND_OFFSET = 5000
 };
 
-struct testFoltedRegion : public ResourceRegion, private visit_mock {
+struct testFoltedRegion : public Region, private visit_mock {
 	static PageInstance page;
-	testFoltedRegion() : ResourceRegion(MOTHER_SIZE, RESOURCE_ACCESS_READ) {}
+	testFoltedRegion() : Region(MOTHER_SIZE, RESOURCE_ACCESS_READ) {}
 	virtual const PageInstance *PageFault(offset_t offset, uint32_t *) {
 		visit(); return (offset == MOTHER_OFFSET) ? &page : 0;
 	}

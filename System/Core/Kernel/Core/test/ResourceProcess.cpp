@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE(detach)
 	BOOST_REQUIRE(deleted);
 }
 
-struct testRegion : public ResourceRegion, private visit_mock {
+struct testRegion : public Region, private visit_mock {
 	bool m_first, m_last;
 	testRegion(bool first, bool last)
-		: ResourceRegion(PAGE_SIZE, 0), m_first(first), m_last(last) 
+		: Region(PAGE_SIZE, 0), m_first(first), m_last(last)
 	{ 
 		Register(); 
 	}
@@ -70,7 +70,7 @@ struct testRegion : public ResourceRegion, private visit_mock {
 		visit();
 		if (m_first) BOOST_REQUIRE(offset == 0 && size >= PAGE_SIZE / 2);
 		if (m_last) BOOST_REQUIRE(offset <= PAGE_SIZE / 2 && offset + size == PAGE_SIZE);
-		return ResourceRegion::copyIn(offset, src, size);
+		return Region::copyIn(offset, src, size);
 	}
 };
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(testCopyIn)
 {
 	testProcess process;
 	
-	ResourceRegion *region = new testRegion(true, true);
+	Region *region = new testRegion(true, true);
 	process.Attach(region, 0, PAGE_SIZE);	// USER_MEMORY_BASE + PAGE_SIZE
 
 	char data[PAGE_SIZE];
@@ -91,9 +91,9 @@ BOOST_AUTO_TEST_CASE(testCopyInInterReg)
 {
 	testProcess process;
 	
-	ResourceRegion *region1 = new testRegion(false, true);
-	ResourceRegion *region2 = new testRegion(true, true);
-	ResourceRegion *region3 = new testRegion(true, false);
+	Region *region1 = new testRegion(false, true);
+	Region *region2 = new testRegion(true, true);
+	Region *region3 = new testRegion(true, false);
 	
 	process.Attach(region1, 0, PAGE_SIZE);	// from USER_MEMORY_BASE
 	process.Attach(region2, 0, PAGE_SIZE + PAGE_SIZE);
@@ -107,10 +107,8 @@ BOOST_AUTO_TEST_CASE(testCopyInInterReg)
 }
 
 // TODO: А так же сбои по отсутствию инстанций или по дыркам между регионами.
-struct testHoleRegion : public ResourceRegion {
-	testHoleRegion(size_t size) 
-		: ResourceRegion(size, 0) 
-	{ 
+struct testHoleRegion : public Region {
+	testHoleRegion(size_t size) : Region(size, 0) {
 		Register(); 
 	}
 	virtual bool copyIn(offset_t, const void *, size_t) {
@@ -122,8 +120,8 @@ BOOST_AUTO_TEST_CASE(testCopyInHoleReg)
 {
 	testProcess process;
 	
-	ResourceRegion *region1 = new testHoleRegion(PAGE_SIZE - 1);
-	ResourceRegion *region2 = new testHoleRegion(PAGE_SIZE);
+	Region *region1 = new testHoleRegion(PAGE_SIZE - 1);
+	Region *region2 = new testHoleRegion(PAGE_SIZE);
 	
 	process.Attach(region1, 0, PAGE_SIZE);	// from USER_MEMORY_BASE
 	// Здесь между регионамы - дырка... размером один байт

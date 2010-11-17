@@ -28,7 +28,7 @@ const PageInstance *InstanceRegion::PageFault(laddr_t addr, uint32_t *access)
 	STUB_ASSERT(addr < m_position || addr >= m_position + m_size, "Check bounds first");
 	
 	if (Resource *res = resource()) {
-		if (ResourceRegion *region = res->asRegion()) {
+		if (Region *region = res->asRegion()) {
 			return region->PageFault(addr - m_position + m_offset, access);
 		}
 	}

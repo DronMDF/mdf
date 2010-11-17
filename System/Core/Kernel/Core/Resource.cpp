@@ -40,7 +40,7 @@ Resource *Resource::asResource()
 	return this;
 }
 
-ResourceRegion *Resource::asRegion()
+Region *Resource::asRegion()
 {
 	return 0;
 }

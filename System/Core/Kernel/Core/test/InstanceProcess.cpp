@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultResourceIsNotRegion)
 
 BOOST_AUTO_TEST_CASE(testPageFaultRegionNoAccess)
 {
-	Resource *region = new ResourceRegion(1000, RESOURCE_ACCESS_READ);
+	Resource *region = new Region(1000, RESOURCE_ACCESS_READ);
 	InstanceProcess instance(region, RESOURCE_ACCESS_READ, 0);
 	uint32_t access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionNoAccess)
 
 BOOST_AUTO_TEST_CASE(testPageFaultRegionNoAddress)
 {
-	Resource *region = new ResourceRegion(1000, RESOURCE_ACCESS_READ);
+	Resource *region = new Region(1000, RESOURCE_ACCESS_READ);
 	InstanceProcess instance(region, RESOURCE_ACCESS_READ, 0);
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(1000, &access) == 0);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionNoAddress)
 
 BOOST_AUTO_TEST_CASE(testPageFaultRegionNoInBounds)
 {
-	Resource *region = new ResourceRegion(1000, RESOURCE_ACCESS_READ);
+	Resource *region = new Region(1000, RESOURCE_ACCESS_READ);
 	InstanceProcess instance(region, RESOURCE_ACCESS_READ, PAGE_SIZE);
 	uint32_t access = RESOURCE_ACCESS_READ;
 	BOOST_REQUIRE(instance.PageFault(3000, &access) == 0);
@@ -67,8 +67,8 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionNoInBounds)
 
 BOOST_AUTO_TEST_CASE(testPageFaultRegionSuccess)
 {
-	struct testRegion : public ResourceRegion, visit_mock {
-		testRegion(): ResourceRegion(1000, RESOURCE_ACCESS_READ) {}
+	struct testRegion : public Region, visit_mock {
+		testRegion(): Region(1000, RESOURCE_ACCESS_READ) {}
 		virtual const PageInstance *PageFault(offset_t, uint32_t *) {
 			visit(); return reinterpret_cast<PageInstance *>(666);
 		}
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(testPageFaultRegionSuccess)
 
 BOOST_AUTO_TEST_CASE(testBounds)
 {
-	Resource *region = new ResourceRegion(1000, 0);
+	Resource *region = new Region(1000, 0);
 	InstanceProcess instance(region, RESOURCE_ACCESS_READ, PAGE_SIZE);
 	BOOST_REQUIRE(!instance.inBounds(PAGE_SIZE - 500));
 	BOOST_REQUIRE(!instance.inBounds(PAGE_SIZE + 1500));

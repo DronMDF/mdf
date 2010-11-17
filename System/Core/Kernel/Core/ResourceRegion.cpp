@@ -11,7 +11,7 @@
 
 using namespace Core;
 
-ResourceRegion::ResourceRegion(size_t size, uint32_t access)
+Region::Region(size_t size, uint32_t access)
 	: m_memory(0),
 	  m_size(size),
 	  m_offset(0),
@@ -22,17 +22,17 @@ ResourceRegion::ResourceRegion(size_t size, uint32_t access)
 {
 }
 
-ResourceRegion::~ResourceRegion ()
+Region::~Region ()
 {
 	delete m_memory;
 }
 
-ResourceRegion *ResourceRegion::asRegion ()
+Region *Region::asRegion ()
 {
 	return this;
 }
 
-Memory *ResourceRegion::getMemory()
+Memory *Region::getMemory()
 {
 	if (m_memory == 0) {
 		m_memory = new Memory(m_offset + m_size, Memory::ALLOC);
@@ -48,7 +48,7 @@ Memory *ResourceRegion::getMemory()
 // m_size		     ------+------+---	<- область региона
 // skip			     ------|	  |	<- смещение в регионе
 
-int ResourceRegion::bindPhysical(paddr_t poffset, size_t psize, offset_t skip)
+int Region::bindPhysical(paddr_t poffset, size_t psize, offset_t skip)
 {
 	if (m_binded) return ERROR_BUSY;
 	if (poffset % PAGE_SIZE != (m_offset + skip) % PAGE_SIZE) return ERROR_UNALIGN;
@@ -69,8 +69,7 @@ int ResourceRegion::bindPhysical(paddr_t poffset, size_t psize, offset_t skip)
 // m_size		     ------+----+-----	<- область региона
 // skip			     ------|	|	<- смещение в регионе.
 
-int ResourceRegion::bindRegion(ResourceRegion *parent, offset_t poffset, 
-			       size_t psize, offset_t position)
+int Region::bindRegion(Region *parent, offset_t poffset, size_t psize, offset_t position)
 {
 	if (m_binded) return ERROR_BUSY;
 	if (position + psize > m_size) return ERROR_INVALIDPARAM;
@@ -88,7 +87,7 @@ int ResourceRegion::bindRegion(ResourceRegion *parent, offset_t poffset,
 	return SUCCESS;
 }
 
-int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
+int Region::Modify (int param_id, const void *param, size_t param_size)
 {
 	if (param_size != sizeof (KernelModifyRegionBindParam)) {
 		return ERROR_INVALIDPARAM;
@@ -108,7 +107,7 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 		Resource *resource = FindResource(bindparam->id);
 		if (resource == 0) return ERROR_INVALIDID;
 	
-		ResourceRegion *parent = resource->asRegion();
+		Region *parent = resource->asRegion();
 		if (parent == 0) return ERROR_INVALIDID;
 
 		return bindRegion(parent, min(bindparam->offset, parent->size()),
@@ -118,7 +117,7 @@ int ResourceRegion::Modify (int param_id, const void *param, size_t param_size)
 	return Resource::Modify(param_id, param, param_size);
 }
 
-bool ResourceRegion::inBounds(laddr_t addr, laddr_t base) const
+bool Region::inBounds(laddr_t addr, laddr_t base) const
 {
 	STUB_ASSERT ((base - m_offset) % PAGE_SIZE != 0, "Region is not aligned");
 	
@@ -127,7 +126,7 @@ bool ResourceRegion::inBounds(laddr_t addr, laddr_t base) const
 	return true;
 }
 
-const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInstance *page)
+const PageInstance *Region::CopyOnWrite(offset_t offset, const PageInstance *page)
 {
 	PageInfo *pp = StubGetPageByInstance(page);
 	STUB_ASSERT (pp == 0, "Missing parent page");
@@ -153,7 +152,7 @@ const PageInstance *ResourceRegion::CopyOnWrite(offset_t offset, const PageInsta
 //       Это позволить делать окна на существующие регионы с соответствующими
 //	 правами
 
-const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
+const PageInstance *Region::PageFault(offset_t offset, uint32_t *access)
 {
 	*access &= m_access;
 
@@ -186,17 +185,17 @@ const PageInstance *ResourceRegion::PageFault(offset_t offset, uint32_t *access)
 	return getMemory()->PageFault(m_offset + offset);
 }
 
-offset_t ResourceRegion::offset() const
+offset_t Region::offset() const
 {
 	return m_offset;
 }
 
-size_t ResourceRegion::size() const
+size_t Region::size() const
 {
 	return m_size;
 }
 
-bool ResourceRegion::copyIn(offset_t offset, const void *src, size_t size)
+bool Region::copyIn(offset_t offset, const void *src, size_t size)
 {
 	STUB_ASSERT(size > m_size, "Overload region");
 	return getMemory()->copyIn(m_offset + offset, src, size);

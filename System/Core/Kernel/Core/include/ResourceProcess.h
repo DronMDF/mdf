@@ -23,8 +23,8 @@ private:
 
 	Memory m_pagetable;
 
-	bool CheckRegionPlace (const ResourceRegion *region, laddr_t base) const;
-	laddr_t selectRegionBase (const ResourceRegion *region, laddr_t ubase) const;
+	bool CheckRegionPlace (const Region *region, laddr_t base) const;
+	laddr_t selectRegionBase (const Region *region, laddr_t ubase) const;
 
 	/// Создаем инстанцию на ресурс
 	InstanceProcess *createInstance(Resource *resource, uint32_t access, laddr_t base = 0) const;

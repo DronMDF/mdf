@@ -13,7 +13,7 @@ namespace Core {
 class Instance;
 class InstanceProcess;
 
-class ResourceRegion;
+class Region;
 class ResourceProcess;
 class ResourceThread;
 class ResourceCall;
@@ -50,7 +50,7 @@ public:
 	using ResourceId::Register;
 
 	virtual Resource * asResource();
-	virtual ResourceRegion *asRegion ();
+	virtual Region *asRegion ();
 	virtual ResourceProcess *asProcess ();
 	virtual ResourceThread *asThread ();
 	virtual ResourceCall *asCall ();

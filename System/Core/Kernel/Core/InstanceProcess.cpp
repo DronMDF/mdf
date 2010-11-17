@@ -59,7 +59,7 @@ const PageInstance *InstanceProcess::PageFault(laddr_t addr, uint32_t *access)
 {
 	if (resource() == 0) return 0;
 	
-	ResourceRegion *region = resource()->asRegion();
+	Region *region = resource()->asRegion();
 	if (region == 0) return 0;
 	if (!allow(*access)) {
 		*access &= getAccess();
@@ -73,9 +73,10 @@ const PageInstance *InstanceProcess::PageFault(laddr_t addr, uint32_t *access)
 
 bool InstanceProcess::inBounds(laddr_t addr) const
 {
+	// TODO: А что эта функция делает в Process???
 	if (resource() == 0) return false;
 
-	const ResourceRegion *region = resource()->asRegion();
+	const Region *region = resource()->asRegion();
 	if (region == 0) return false;	// Не регион
 	if (m_addr == 0) return false;	// Не замаплен
 		
@@ -94,7 +95,7 @@ void InstanceProcess::setAddr(laddr_t addr)
 	STUB_ASSERT(m_addr != 0, "Adress already defined");
 	if (resource() == 0) return;
 	
-	if (const ResourceRegion *region = resource()->asRegion()) {
+	if (const Region *region = resource()->asRegion()) {
 		m_addr = addr;
 		STUB_ASSERT((m_addr - region->offset()) % PAGE_SIZE != 0,
 			    "Unaligned region base");

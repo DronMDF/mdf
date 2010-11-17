@@ -111,7 +111,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 			if (param_size != sizeof (struct KernelCreateRegionParam))
 				return ERROR_INVALIDPARAM;
 
-			resource = new ResourceRegion(region_param->size, region_param->access);
+			resource = new Region(region_param->size, region_param->access);
 			break;
 
 		case RESOURCE_TYPE_PROCESS:

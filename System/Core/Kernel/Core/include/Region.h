@@ -16,7 +16,7 @@ namespace Core {
 // psize - размер подкючаемой области родительской сущности
 // skip - расстояние от начала региона
 	
-class ResourceRegion : public Resource
+class Region : public Resource
 {
 protected:
 	Memory *m_memory;
@@ -28,15 +28,15 @@ private:
 	uint32_t m_access;	// Ограничение ресурса на доступ.
 	bool m_binded;		// Регион забинден
 
-	ResourceRegion *m_parent;
+	Region *m_parent;
 	offset_t m_parent_offset;
 
 private:
-	ResourceRegion();
-	ResourceRegion(const ResourceRegion &);
-	ResourceRegion & operator =(const ResourceRegion &);
+	Region();
+	Region(const Region &);
+	Region & operator =(const Region &);
 
-	virtual ResourceRegion *asRegion ();
+	virtual Region *asRegion ();
 
 	const PageInstance *CopyOnWrite(offset_t offset, const PageInstance *page);
 
@@ -46,8 +46,8 @@ protected:
 	int bindPhysical(paddr_t poffset, size_t psize, offset_t skip);
 	
 public:
-	ResourceRegion(size_t size, uint32_t access);
-	virtual ~ResourceRegion();
+	Region(size_t size, uint32_t access);
+	virtual ~Region();
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);
 
@@ -60,8 +60,7 @@ public:
 
 	virtual bool copyIn(offset_t offset, const void *src, size_t size);
 
-	int bindRegion(ResourceRegion *parent, offset_t poffset, 
-		       size_t psize, offset_t skip);
+	int bindRegion(Region *parent, offset_t poffset, size_t psize, offset_t skip);
 };
 
 } // namespace Core

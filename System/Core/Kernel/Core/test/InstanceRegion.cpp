@@ -26,7 +26,7 @@ enum {
 	MOTHER_ACCESS = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE
 };
 
-template <typename R = ResourceRegion>
+template <typename R = Region>
 struct fixtureInstanceRegion {
 	InstanceRegion instance;
 	fixtureInstanceRegion()
@@ -50,9 +50,9 @@ BOOST_FIXTURE_TEST_CASE(testPageFaultAccessDeny, fixtureInstanceRegion<>)
 	BOOST_REQUIRE_EQUAL(access, uint32_t(INSTANCE_ACCESS));
 }
 
-struct MockRegion : public ResourceRegion, private visit_mock {
+struct MockRegion : public Region, private visit_mock {
 	static PageInstance page;
-	MockRegion(size_t size, uint32_t access) : ResourceRegion(size, access) {}
+	MockRegion(size_t size, uint32_t access) : Region(size, access) {}
 	virtual const PageInstance *PageFault(offset_t offset, uint32_t *) {
 		visit();
 		BOOST_REQUIRE_EQUAL(offset, offset_t(MOTHER_OFFSET));
