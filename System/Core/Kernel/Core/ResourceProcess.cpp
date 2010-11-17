@@ -13,7 +13,7 @@
 
 #include "include/InstanceProcess.h"
 #include "include/Resource.h"
-#include "include/ResourceRegion.h"
+#include "include/Region.h"
 #include "include/ResourceProcess.h"
 #include "include/ResourceThread.h"
 

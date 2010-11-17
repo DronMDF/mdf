@@ -5,7 +5,7 @@
 
 #include "include/Kernel.h"
 #include "include/Resource.h"
-#include "include/ResourceRegion.h"
+#include "include/Region.h"
 #include "include/InstanceProcess.h"
 
 using namespace Core;

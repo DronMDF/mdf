@@ -7,7 +7,7 @@
 #include "include/CoreLocal.h"
 #include "include/Resources.h"	// только для Core::FindResources
 
-#include "include/ResourceRegion.h"
+#include "include/Region.h"
 
 using namespace Core;
 

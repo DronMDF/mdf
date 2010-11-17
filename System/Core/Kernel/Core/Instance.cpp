@@ -8,7 +8,7 @@
 
 #include "include/Instance.h"
 #include "include/Resource.h"
-#include "include/ResourceRegion.h"
+#include "include/Region.h"
 
 using namespace Core;
 

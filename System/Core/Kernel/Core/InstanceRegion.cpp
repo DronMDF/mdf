@@ -4,7 +4,7 @@
 //
 
 #include "include/InstanceRegion.h"
-#include "include/ResourceRegion.h"
+#include "include/Region.h"
 
 using namespace Core;
 

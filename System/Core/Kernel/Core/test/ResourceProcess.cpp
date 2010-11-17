@@ -14,7 +14,7 @@
 #include "../include/Memory.h"
 #include "../include/Instance.h"
 #include "../include/Resource.h"
-#include "../include/ResourceRegion.h"
+#include "../include/Region.h"
 #include "../include/ResourceThread.h"
 
 #include "testProcess.h"
