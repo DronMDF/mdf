@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncByProcessInstance)
 	const laddr_t entry = 6666;
 
 	testProcess process;
-	Resource *call = ResourceCall::Create(&process, &entry, sizeof(laddr_t));
+	Resource *call = CallPoint::Create(&process, &entry, sizeof(laddr_t));
 	call->Register();
 	process.Attach(call, RESOURCE_ACCESS_CALL, 0);
 
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(testCallCallAsyncWithoutCaller)
 	
 	testProcess process;
 	const laddr_t entry = 6666;
-	Resource *call = ResourceCall::Create(&process, &entry, sizeof(laddr_t));
+	Resource *call = CallPoint::Create(&process, &entry, sizeof(laddr_t));
 	call->Register();
 
 	BOOST_REQUIRE_EQUAL(CoreCall(0, call->id(), 0, 0, RESOURCE_CALL_ASYNC), SUCCESS);

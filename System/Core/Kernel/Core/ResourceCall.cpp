@@ -14,7 +14,7 @@
 
 using namespace Core;
 
-Resource *ResourceCall::Create(Process *process, const void *param, size_t size)
+Resource *CallPoint::Create(Process *process, const void *param, size_t size)
 {
 	if (process == 0) return 0;
 	if (param == 0) return 0;
@@ -22,25 +22,25 @@ Resource *ResourceCall::Create(Process *process, const void *param, size_t size)
 
 	const KernelCreateCallParam *cp =
 		reinterpret_cast<const KernelCreateCallParam *>(param);
-	return new ResourceCall(process, cp->entry);
+	return new CallPoint(process, cp->entry);
 }
 
-ResourceCall::ResourceCall(Process *process, laddr_t entry)
+CallPoint::CallPoint(Process *process, laddr_t entry)
 	: m_process(process), m_entry(entry)
 {
 }
 
-ResourceCall *ResourceCall::asCall()
+CallPoint *CallPoint::asCall()
 {
 	return this;
 }
 
-laddr_t ResourceCall::getEntry() const
+laddr_t CallPoint::getEntry() const
 {
 	return m_entry;
 }
 
-Thread *ResourceCall::Call()
+Thread *CallPoint::Call()
 {
 	Thread *thread = new Thread(m_process, m_entry);
 	STUB_ASSERT(thread == 0, "Unable to alloc thread");

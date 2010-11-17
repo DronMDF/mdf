@@ -9,22 +9,22 @@
 
 namespace Core {
 
-class ResourceCall : public Resource
+class CallPoint : public Resource
 {
 private:
 	Process *m_process;
 	laddr_t m_entry;
 
-	ResourceCall(Process *process, laddr_t entry);
+	CallPoint(Process *process, laddr_t entry);
 
-	ResourceCall();
-	ResourceCall(const ResourceCall &);
-	ResourceCall & operator =(const ResourceCall &);
+	CallPoint();
+	CallPoint(const CallPoint &);
+	CallPoint & operator =(const CallPoint &);
 
 public:
 	static Resource *Create(Process *process, const void *param, size_t size);
 
-	virtual ResourceCall *asCall();
+	virtual CallPoint *asCall();
 
 	laddr_t getEntry() const;
 

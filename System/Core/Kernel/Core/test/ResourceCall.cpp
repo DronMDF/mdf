@@ -47,12 +47,12 @@ BOOST_AUTO_TEST_CASE(static_creator)
 	testProcess process;
 
 	// Контроль параметров
-	BOOST_REQUIRE(ResourceCall::Create(0, &cp, sizeof(cp)) == 0);
-	BOOST_REQUIRE(ResourceCall::Create(&process, 0, sizeof(cp)) == 0);
-	BOOST_REQUIRE(ResourceCall::Create(&process, &cp, sizeof(cp) + 1) == 0);
+	BOOST_REQUIRE(CallPoint::Create(0, &cp, sizeof(cp)) == 0);
+	BOOST_REQUIRE(CallPoint::Create(&process, 0, sizeof(cp)) == 0);
+	BOOST_REQUIRE(CallPoint::Create(&process, &cp, sizeof(cp) + 1) == 0);
 
-	scoped_ptr<Resource> resource(ResourceCall::Create(&process, &cp, sizeof(cp)));
-	ResourceCall *call = resource->asCall();
+	scoped_ptr<Resource> resource(CallPoint::Create(&process, &cp, sizeof(cp)));
+	CallPoint *call = resource->asCall();
 	BOOST_REQUIRE(call != 0);
 
 	BOOST_REQUIRE_EQUAL(call->getEntry(), 0x1000);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(call)
 	testProcess process;
 
 	struct KernelCreateCallParam cp = { 0x1000 };
-	Resource *call = ResourceCall::Create(&process, &cp, sizeof(cp));
+	Resource *call = CallPoint::Create(&process, &cp, sizeof(cp));
 	BOOST_REQUIRE(call != 0);
 
 	Thread *thread = call->Call();

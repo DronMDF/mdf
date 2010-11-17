@@ -133,7 +133,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 			if (param_size != sizeof(KernelCreateCallParam))
 				return ERROR_INVALIDPARAM;
 
-			resource = ResourceCall::Create(process, param, param_size);
+			resource = CallPoint::Create(process, param, param_size);
 			break;
 
 		case RESOURCE_TYPE_CUSTOM:

@@ -55,7 +55,7 @@ Thread *Resource::asThread ()
 	return 0;
 }
 
-ResourceCall *Resource::asCall ()
+CallPoint *Resource::asCall ()
 {
 	return 0;
 }
