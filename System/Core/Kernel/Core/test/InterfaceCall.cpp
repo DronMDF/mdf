@@ -10,7 +10,7 @@
 #include "Types.h"
 #include "../include/Kernel.h"
 #include "../include/Core.h"
-#include "../include/ResourceCall.h"
+#include "../include/Call.h"
 
 #include "testResource.h"
 #include "testProcess.h"
