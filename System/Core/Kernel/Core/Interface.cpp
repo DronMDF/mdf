@@ -13,7 +13,7 @@
 #include "include/Region.h"
 #include "include/Process.h"
 #include "include/Thread.h"
-#include "include/Call.h"
+#include "include/CallPoint.h"
 
 using namespace Core;
 
