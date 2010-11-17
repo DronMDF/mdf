@@ -15,7 +15,7 @@
 #include "../include/Instance.h"
 #include "../include/Resource.h"
 #include "../include/Region.h"
-#include "../include/ResourceThread.h"
+#include "../include/Thread.h"
 
 #include "testProcess.h"
 #include "TestHelpers.h"

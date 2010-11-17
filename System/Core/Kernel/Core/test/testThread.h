@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../include/ResourceThread.h"
+#include "../include/Thread.h"
 
 class testThread : public Core::ResourceThread
 {

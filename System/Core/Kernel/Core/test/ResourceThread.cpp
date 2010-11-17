@@ -17,7 +17,7 @@
 #include "../include/InstanceProcess.h"
 #include "../include/Resource.h"
 #include "../include/Process.h"
-#include "../include/ResourceThread.h"
+#include "../include/Thread.h"
 
 #include "testThread.h"
 #include "testProcess.h"

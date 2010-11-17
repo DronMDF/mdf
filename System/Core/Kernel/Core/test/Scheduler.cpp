@@ -10,7 +10,7 @@
 
 #include "../include/Memory.h"
 #include "../include/Resource.h"
-#include "../include/ResourceThread.h"
+#include "../include/Thread.h"
 #include "../include/List.h"
 #include "../include/Scheduler.h"
 #include "../include/SubScheduler.h"

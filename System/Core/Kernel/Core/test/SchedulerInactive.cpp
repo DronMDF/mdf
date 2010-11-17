@@ -11,7 +11,7 @@
 #include "../include/Link.h"
 #include "../include/Memory.h"
 #include "../include/Resource.h"
-#include "../include/ResourceThread.h"
+#include "../include/Thread.h"
 #include "../include/SubScheduler.h"
 #include "../include/SchedulerInactive.h"
 

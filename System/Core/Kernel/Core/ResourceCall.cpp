@@ -9,7 +9,7 @@
 #include "include/Memory.h"
 #include "include/Resource.h"
 #include "include/Process.h"
-#include "include/ResourceThread.h"
+#include "include/Thread.h"
 #include "include/ResourceCall.h"
 
 using namespace Core;

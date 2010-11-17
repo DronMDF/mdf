@@ -11,7 +11,7 @@
 #include "include/CoreLocal.h"
 
 #include "include/Resource.h"
-#include "include/ResourceThread.h"
+#include "include/Thread.h"
 
 using namespace Core;
 

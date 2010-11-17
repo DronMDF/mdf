@@ -4,7 +4,7 @@
 //
 
 #include "include/Kernel.h"
-#include "include/ResourceThread.h"
+#include "include/Thread.h"
 #include "include/InstanceThread.h"
 
 using namespace Core;

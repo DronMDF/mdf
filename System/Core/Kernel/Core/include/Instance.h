@@ -11,7 +11,6 @@ namespace Core {
 
 class Resource;
 class ResourceThread;
-class InstanceProcess;	// Временно, пока ProcessLink не перенесу.
 
 class Instance {
 private:

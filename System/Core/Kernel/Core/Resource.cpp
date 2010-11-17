@@ -10,7 +10,7 @@
 
 #include "include/Instance.h"
 #include "include/Resource.h"
-#include "include/ResourceThread.h"
+#include "include/Thread.h"
 
 #include "include/CoreLocal.h"
 
