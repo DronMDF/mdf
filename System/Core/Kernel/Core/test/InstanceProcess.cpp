@@ -9,7 +9,7 @@
 #include "../include/Kernel.h"
 #include "../include/InstanceProcess.h"
 #include "../include/Region.h"
-#include "../include/ResourceProcess.h"
+#include "../include/Process.h"
 #include "TestHelpers.h"
 
 using namespace boost;

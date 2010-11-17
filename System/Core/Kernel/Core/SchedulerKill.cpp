@@ -7,7 +7,7 @@
 #include "include/List.h"
 #include "include/Memory.h"
 #include "include/Resource.h"
-#include "include/ResourceProcess.h"
+#include "include/Process.h"
 #include "include/ResourceThread.h"
 #include "include/SubScheduler.h"
 #include "include/SchedulerKill.h"
