@@ -196,19 +196,19 @@ void __cxa_free_exception(void *thrown_exception)
 	StubMemoryFree(thrown_exception);
 }
 
-namespace {
-
-void __unexpected_handler()
-{
-	STUB_FATAL("Unexpected exception handler");
-}
-
-void __terminate_handler()
-{
-	STUB_FATAL("Terminate exception handler");
-}
-
-} // local namespace
+// namespace {
+// 
+// void __unexpected_handler()
+// {
+// 	STUB_FATAL("Unexpected exception handler");
+// }
+// 
+// void __terminate_handler()
+// {
+// 	STUB_FATAL("Terminate exception handler");
+// }
+// 
+// } // local namespace
 
 extern "C"
 void *__cxa_begin_catch(_Unwind_Exception *)
@@ -233,6 +233,12 @@ void __cxa_throw (void *thrown_exception, std::type_info *, void (*dtor)(void *)
 	}
 
 	STUB_FATAL("Unable to catch exception");
+}
+
+extern "C"
+void __attribute__((noreturn)) __cxa_call_unexpected(_Unwind_Exception *)
+{
+	STUB_FATAL("Unexpected call");
 }
 
 } // namespace __cxxabiv1

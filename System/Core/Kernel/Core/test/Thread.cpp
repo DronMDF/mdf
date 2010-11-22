@@ -48,7 +48,7 @@ struct create_fixture {
 		BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 	}
 
-	virtual ~create_fixture() {};
+	virtual ~create_fixture() {}
 };
 
 BOOST_FIXTURE_TEST_CASE(create, create_fixture)

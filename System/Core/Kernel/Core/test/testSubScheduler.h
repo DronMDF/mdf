@@ -19,7 +19,7 @@ struct testSubScheduler : public Core::SubScheduler {
 
 	virtual Core::Thread *getThread() {
 		return 0;	// Это более универсальное решение.
-	};
+	}
 	
 	virtual void addThread(Core::Thread *t) {
 		BOOST_ASSERT(thread == 0);

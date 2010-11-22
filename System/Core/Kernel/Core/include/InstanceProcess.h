@@ -15,7 +15,7 @@ class Thread;
 
 class InstanceProcess : public Instance {
 private:
-	uint32_t m_addr;
+	laddr_t m_addr;
 	
 public:
 	Link<InstanceProcess> ProcessLink;

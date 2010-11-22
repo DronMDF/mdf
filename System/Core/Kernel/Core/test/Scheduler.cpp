@@ -37,7 +37,7 @@ struct testSubScheduler : public SubScheduler {
 		Thread *t = thread;
 		thread = 0;	// Нити отдаем с концами.
 		return t;
-	};
+	}
 
 	virtual void addThread(Thread *t) {
 		thread = t;

@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(destroy)
 		virtual int Detach(Resource *resource) {
 			delete resource;
 			return SUCCESS;
-		};
+		}
 	} process;
 
 	class testThread : public Thread {
