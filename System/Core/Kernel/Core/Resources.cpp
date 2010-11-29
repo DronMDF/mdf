@@ -39,7 +39,7 @@ int InfoIndependent (int info_id __unused__, void *info __unused__, size_t *info
 Resource *FindResource (const id_t id)
 {
 	// Но пока текущий процесс у нас не поддерживается. :)
-	return ResourceStorage().Find(id);
+	return Storage().Find(id);
 }
 
 } // namespace Core

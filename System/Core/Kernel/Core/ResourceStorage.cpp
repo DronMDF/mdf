@@ -10,16 +10,16 @@
 
 using namespace Core;
 
-List<ResourceId> *ResourceStorage::m_resources_list = 0;
+List<ResourceId> *Storage::m_resources_list = 0;
 
-ResourceStorage::ResourceStorage()
+Storage::Storage()
 {
 	if (m_resources_list == 0) {
 		m_resources_list = new List<ResourceId>(&ResourceId::StorageLink);
 	}
 }
 
-ResourceId *ResourceStorage::_Find(id_t id) const
+ResourceId *Storage::_Find(id_t id) const
 {
 	for (ResourceId *resource = m_resources_list->getFirst();
 	     resource != 0; resource = m_resources_list->getNext(resource))
@@ -31,7 +31,7 @@ ResourceId *ResourceStorage::_Find(id_t id) const
 	return 0;
 }
 
-void ResourceStorage::Register(ResourceId *resource)
+void Storage::Register(ResourceId *resource)
 {
 	// Это весьма прямолинейный способ, но зато он на 100% уникален :)
 	while (true) {
@@ -45,12 +45,12 @@ void ResourceStorage::Register(ResourceId *resource)
 	m_resources_list->Insert(resource);
 }
 
-void ResourceStorage::Unregister(ResourceId *resource)
+void Storage::Unregister(ResourceId *resource)
 {
 	m_resources_list->Remove(resource);
 }
 
-Resource *ResourceStorage::Find(id_t id)
+Resource *Storage::Find(id_t id)
 {
 	if (ResourceId *rid = _Find(id)) {
 		return rid->asResource();

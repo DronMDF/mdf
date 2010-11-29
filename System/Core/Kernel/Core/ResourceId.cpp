@@ -16,14 +16,14 @@ ResourceId::ResourceId()
 ResourceId::~ResourceId()
 {
 	if (m_id != 0) {
-		ResourceStorage().Unregister(this);
+		Storage().Unregister(this);
 	}
 }
 
 void ResourceId::Register()
 {
 	STUB_ASSERT(m_id != 0, "Resource already registered");
-	ResourceStorage().Register(this);
+	Storage().Register(this);
 }
 
 void ResourceId::setId(id_t id)

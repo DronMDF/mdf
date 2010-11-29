@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(finding)
 
 BOOST_AUTO_TEST_CASE(finding2)
 {
-	ResourceStorage storage;
+	Storage storage;
 	id_t id = 0;
 
 	{

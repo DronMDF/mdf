@@ -14,7 +14,7 @@ class Resource;
 
 // TODO: Блокировки пока оставим.
 
-class ResourceStorage
+class Storage
 {
 private:
 	static List<ResourceId> *m_resources_list;
@@ -22,7 +22,7 @@ private:
 	ResourceId *_Find(id_t id) const;
 
 public:
-	ResourceStorage();
+	Storage();
 
 	void Register(ResourceId *resource);
 	void Unregister(ResourceId *resource);
