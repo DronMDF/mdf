@@ -13,7 +13,7 @@
 #include "../include/Core.h"
 
 #include "../include/ResourceId.h"
-#include "../include/ResourceStorage.h"
+#include "../include/Storage.h"
 #include "../include/Resources.h"
 
 using namespace std;

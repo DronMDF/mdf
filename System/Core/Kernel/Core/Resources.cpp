@@ -5,7 +5,7 @@
 
 #include "include/Kernel.h"
 #include "include/CoreLocal.h"
-#include "include/ResourceStorage.h"
+#include "include/Storage.h"
 
 #include "include/Resources.h"
 

@@ -5,7 +5,7 @@
 
 #include "include/List.h"
 #include "include/ResourceId.h"
-#include "include/ResourceStorage.h"
+#include "include/Storage.h"
 #include "include/CoreLocal.h"
 
 using namespace Core;

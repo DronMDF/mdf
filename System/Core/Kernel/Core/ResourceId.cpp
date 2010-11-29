@@ -4,7 +4,7 @@
 //
 
 #include "include/ResourceId.h"
-#include "include/ResourceStorage.h"
+#include "include/Storage.h"
 
 using namespace Core;
 
