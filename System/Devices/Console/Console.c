@@ -72,17 +72,18 @@ volatile uint16_t *getVideoMemory()
 
 static int GetPortAccess(uint16_t first_port, uint16_t last_port)
 {
-	const struct KernelCreateRegionParam cpar = {
-		.size = last_port - first_port + 1,
+	id_t rid = INVALID_ID;
+	
+	int rv = KernelCreate(RESOURCE_TYPE_CUSTOM, 0, 0, &rid);
+	if (rv != SUCCESS) return rv;
+
+	const struct KernelModifyCustomIoBindParam bind_params = {
+		.first = first_port,
+		.last = last_port,
 		.access = RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE,
 	};
 
-	id_t rid = INVALID_ID;
-	
-	int rv = KernelCreate(RESOURCE_TYPE_REGION, &cpar, sizeof(cpar), &rid);
-	if (rv != SUCCESS) return rv;
-
-	rv = KernelModify(rid, RESOURCE_MODIFY_REGION_PORTBIND, &first_port, sizeof(uint16_t));
+	rv = KernelModify(rid, RESOURCE_MODIFY_CUSTOM_IOBIND, &bind_params, sizeof(bind_params));
 	if (rv != SUCCESS) {
 		KernelDetach(rid, 0);
 		return rv;
