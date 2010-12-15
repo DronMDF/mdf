@@ -8,9 +8,9 @@
 all: $(MDF_IMAGE)/System/Test/SchedulerTest \
 	$(MDF_IMAGE)/System/Test/SchedulerTest.sym
 
-$(MDF_IMAGE)/System/Test/SchedulerTest: SchedulerTest.c $(MDF_TEMP)/unittest
+$(MDF_IMAGE)/System/Test/SchedulerTest: SchedulerTest.c #$(MDF_TEMP)/unittest
 	# Прогоняем тесты
-	$(MDF_TEMP)/unittest
+	#$(MDF_TEMP)/unittest
 	# а потом уже линкуем...
 	$(ECHO) Link $@...
 	$(MKDIR) -p $(dir $@)
