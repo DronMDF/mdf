@@ -17,7 +17,7 @@ class Region;
 class Process;
 class Thread;
 class CallPoint;
-class ResourceCustom;
+class Custom;
 
 class Event;
 
@@ -54,7 +54,7 @@ public:
 	virtual Process *asProcess ();
 	virtual Thread *asThread ();
 	virtual CallPoint *asCall ();
-	virtual ResourceCustom *asCustom ();
+	virtual Custom *asCustom ();
 
 	// Методы API...
 

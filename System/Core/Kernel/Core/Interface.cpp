@@ -14,6 +14,7 @@
 #include "include/Process.h"
 #include "include/Thread.h"
 #include "include/CallPoint.h"
+#include "include/Custom.h"
 
 using namespace Core;
 
@@ -94,8 +95,9 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 	}
 
 	// TODO: Память должна быть доступна на чтение чтобы не вызывать исключений.
-	if (param == 0 || param_size == 0)
+	if (type != RESOURCE_TYPE_CUSTOM && (param == 0 || param_size == 0)) {
 		return ERROR_INVALIDPARAM;
+	}
 
 	const struct KernelCreateRegionParam *region_param =
 		reinterpret_cast<const struct KernelCreateRegionParam *>(param);
@@ -137,7 +139,8 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 			break;
 
 		case RESOURCE_TYPE_CUSTOM:
-			return ERROR_NOTIMPLEMENT;
+			resource = Custom::Create();
+			break;
 
 		default:
 			return ERROR_INVALIDPARAM;

@@ -60,7 +60,7 @@ CallPoint *Resource::asCall ()
 	return 0;
 }
 
-ResourceCustom *Resource::asCustom ()
+Custom *Resource::asCustom()
 {
 	return 0;
 }

@@ -7,16 +7,7 @@
 
 #include "Resource.h"
 
-// TODO: Этот инклюд почти уже можно переименовывать в Custom.h
-
 namespace Core {
-
-// -----------------------------------------------------------------------------
-// Конечные ресурсы
-
-class ResourceCustom : public Resource
-{
-};
 
 // Чтобы не светить интерфейс хранилища ресурсов - вынесем одну функцию.
 Resource *FindResource (const id_t id);
