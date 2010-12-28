@@ -106,6 +106,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 		return ERROR_INVALIDPARAM;
 	}
 
+	// TODO: Сделать отдельные криейторы на каждый тип
 	const struct KernelCreateRegionParam *region_param =
 		reinterpret_cast<const struct KernelCreateRegionParam *>(param);
 	const struct KernelCreateProcessParam *process_param =
@@ -122,38 +123,28 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 
 			resource = new Region(region_param->size, region_param->access);
 			break;
-
 		case RESOURCE_TYPE_PROCESS:
 			if (param_size != sizeof (struct KernelCreateProcessParam))
 				return ERROR_INVALIDPARAM;
 
 			resource = new Process(process_param->entry);
 			break;
-
 		case RESOURCE_TYPE_THREAD:
 			if (param_size != sizeof (struct KernelCreateThreadParam))
 				return ERROR_INVALIDPARAM;
 
 			resource = new Thread(process, thread_param->entry);
 			break;
-
 		case RESOURCE_TYPE_CALL:
-			// TODO: Это удобнее через исключения выбросить изнутри.
-			if (param_size != sizeof(KernelCreateCallParam))
-				return ERROR_INVALIDPARAM;
-
 			resource = CallPoint::Create(process, param, param_size);
 			break;
-
 		case RESOURCE_TYPE_CUSTOM:
 			resource = Custom::Create();
 			break;
-
-		default:
-			return ERROR_INVALIDPARAM;
 	}
 
-	STUB_ASSERT (resource == 0, "Unable to create resource");
+	if (resource == 0) return ERROR_INVALIDPARAM;
+	
 	resource->Register();
 	*id = resource->id();
 
@@ -168,6 +159,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 extern "C"
 int CoreCall (const Task *task, id_t id, const void *buffer, size_t buffer_size, uint32_t flags)
 {
+	// TODO: Хелпер надо убить и разрулить локальными функциями
 	CallHelper helper(task);
 
 	if (!helper.checkCalledAccess(id)) return ERROR_ACCESS;
@@ -234,34 +226,21 @@ extern "C"
 int CoreModify (const Task *task, id_t id, int param_id, const void *param, size_t param_size)
 {
 	// TODO: Память должна быть доступна для чтения чтобы не вызывать фолтов.
-	//if (!readable(param, param_size))
-	//	return ERROR_INVALIDPARAM;
-
 	if (task == 0) {
-		// Прямой доступ к ресурсам - без родителя.
-		Core::Resource *resource = Core::FindResource(id);
+		Resource *resource = FindResource(id);
 		if (resource == 0) return ERROR_INVALIDID;
 
 		return resource->Modify(param_id, param, param_size);
 	}
-
-	const void *thread_ptr = StubTaskGetThread(task);
-	STUB_ASSERT (thread_ptr == 0, "No thread");
-
-	const Core::Thread *thread =
-		reinterpret_cast<const Core::Thread *>(thread_ptr);
-
-	// TODO: Можно было бы и в Thread сделать функцию ModifyResource,
-	// но пока неясно на кой она может понадобиться. В процессе вот реально
-	// понадобилась.
-
-	Core::Process *process = thread->getProcess();
+	
+	Process *process = getProcessByTask(task);
 	return process->ModifyResource (id, param_id, param, param_size);
 }
 
 extern "C"
 int CoreInfo (const Task *task, id_t id, int info_id, void *info, size_t *info_size)
 {
+	// TODO: Здесь помогла бы функция getThreadByTask, но потом.
 	STUB_ASSERT (task == 0, "No task");
 
 	const void *thread_ptr = StubTaskGetThread(task);

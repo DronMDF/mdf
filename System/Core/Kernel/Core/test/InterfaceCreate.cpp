@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2000-2010 ������ ������ <dron@infosec.ru>
+// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
@@ -15,6 +15,7 @@ BOOST_AUTO_TEST_CASE(testCreateCustom)
 {
 	id_t id = INVALID_ID;
 	BOOST_REQUIRE_EQUAL(CoreCreate(0, RESOURCE_TYPE_CUSTOM, 0, 0, &id), SUCCESS);
+	// TODO: Память наверное утекла, нужен Detach
 }
 
 BOOST_AUTO_TEST_SUITE_END()
