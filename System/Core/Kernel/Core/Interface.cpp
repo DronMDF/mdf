@@ -79,20 +79,27 @@ int CoreFind (const char *name __unused__, size_t name_size __unused__, id_t * c
 	return ERROR_NOTIMPLEMENT;
 }
 
+static
+Process *getProcessByTask(const Task *task)
+{
+	// TODO: Можно вернуть NullProcess, который ничего не делает и все разрешает
+	if (task == 0) return 0;
+
+	const void *thread_ptr = StubTaskGetThread(task);
+	STUB_ASSERT (thread_ptr == 0, "No current thread");
+	
+	const Thread *thread = reinterpret_cast<const Thread *>(thread_ptr);
+
+	Process *process = thread->getProcess();
+	STUB_ASSERT(process == 0, "No current process");
+	
+	return process;
+}
+
 extern "C"
 int CoreCreate (const Task *task, int type, const void *param, size_t param_size, id_t *id)
 {
-	Process *process = 0;
-
-	if (task != 0) {
-		const void *thread_ptr = StubTaskGetThread(task);
-		STUB_ASSERT (thread_ptr == 0, "No thread");
-		const Thread *thread =
-			reinterpret_cast<const Thread *>(thread_ptr);
-
-		process = thread->getProcess();
-		STUB_ASSERT(process == 0, "no current process");
-	}
+	Process *process = getProcessByTask(task);
 
 	// TODO: Память должна быть доступна на чтение чтобы не вызывать исключений.
 	if (type != RESOURCE_TYPE_CUSTOM && (param == 0 || param_size == 0)) {
