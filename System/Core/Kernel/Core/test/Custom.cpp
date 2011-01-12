@@ -7,6 +7,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "Types.h"
+#include "Kernel.h"
 #include "../include/Custom.h"
 
 using namespace boost;
@@ -17,8 +18,13 @@ BOOST_AUTO_TEST_SUITE(suiteCustom)
 BOOST_AUTO_TEST_CASE(testCreateCustom)
 {
 	scoped_ptr<Resource> res(Custom::Create());
-	// Если ресурс вдруг окажется не Custom - указатели разъедутся (доходчиво ли?)
-	BOOST_REQUIRE_EQUAL(res->asCustom(), res->asResource());
+	BOOST_REQUIRE(res->asCustom() != 0);
+}
+
+BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidParam)
+{
+	scoped_ptr<Resource> res(Custom::Create());
+	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, 0, 0), ERROR_INVALIDPARAM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
