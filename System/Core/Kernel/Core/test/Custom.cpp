@@ -21,6 +21,17 @@ BOOST_AUTO_TEST_CASE(testCreateCustom)
 	BOOST_REQUIRE(res->asCustom() != 0);
 }
 
+BOOST_AUTO_TEST_CASE(testBindPortToCustom)
+{
+	scoped_ptr<Resource> res(Custom::Create());
+	// В тестовом режиме любые порты будем считать доступными
+	const KernelModifyCustomIoBindParam bind_params = { 
+		10, 20, RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE 
+	};
+	int rv = res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &bind_params, sizeof(bind_params));
+	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
+}
+
 BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidParam)
 {
 	scoped_ptr<Resource> res(Custom::Create());
