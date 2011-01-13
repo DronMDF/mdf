@@ -7,7 +7,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "Types.h"
-#include "Kernel.h"
+#include "../include/Kernel.h"
 #include "../include/Custom.h"
 
 using namespace boost;
