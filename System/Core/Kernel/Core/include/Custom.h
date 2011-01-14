@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// Copyright (c) 2000-2010 п░п╫п╢я─п╣п╧ п▓п╟п╩я▐п╣п╡ <dron@infosec.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
@@ -15,10 +15,12 @@ public:
 	static Resource *Create();
 	virtual Custom *asCustom();
 
+	virtual int Modify(int param_id, const void *param, size_t param_size);
+	
 private:
 	Custom();
 	
-	// Недоступно
+	// п²п╣п╢п╬я│я┌я┐п©п╫п╬
 	Custom(const Custom &);
 	Custom & operator =(const Custom &);
 };
