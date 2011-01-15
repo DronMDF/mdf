@@ -107,8 +107,6 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 	}
 
 	// TODO: Сделать отдельные криейторы на каждый тип
-	const struct KernelCreateRegionParam *region_param =
-		reinterpret_cast<const struct KernelCreateRegionParam *>(param);
 	const struct KernelCreateProcessParam *process_param =
 		reinterpret_cast<const struct KernelCreateProcessParam *>(param);
 	const struct KernelCreateThreadParam *thread_param =
@@ -118,10 +116,7 @@ int CoreCreate (const Task *task, int type, const void *param, size_t param_size
 
 	switch (type) {
 		case RESOURCE_TYPE_REGION:
-			if (param_size != sizeof (struct KernelCreateRegionParam))
-				return ERROR_INVALIDPARAM;
-
-			resource = new Region(region_param->size, region_param->access);
+			resource = Region::Create(param, param_size);
 			break;
 		case RESOURCE_TYPE_PROCESS:
 			if (param_size != sizeof (struct KernelCreateProcessParam))

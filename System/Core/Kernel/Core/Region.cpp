@@ -11,6 +11,19 @@
 
 using namespace Core;
 
+
+Region *Region::Create(const void *param, size_t param_size)
+{
+	if (param == 0 || param_size != sizeof(KernelCreateRegionParam)) {
+		return 0;
+	}
+
+	const KernelCreateRegionParam *region_param =
+		reinterpret_cast<const KernelCreateRegionParam *>(param);
+
+	return new Region(region_param->size, region_param->access);
+}
+
 Region::Region(size_t size, uint32_t access)
 	: m_memory(0),
 	  m_size(size),
@@ -89,21 +102,27 @@ int Region::bindRegion(Region *parent, offset_t poffset, size_t psize, offset_t 
 
 int Region::Modify (int param_id, const void *param, size_t param_size)
 {
-	if (param_size != sizeof (KernelModifyRegionBindParam)) {
-		return ERROR_INVALIDPARAM;
-	}
-
-	if (param == 0) return ERROR_INVALIDPARAM;
-
-	const KernelModifyRegionBindParam *bindparam = 
-		reinterpret_cast<const KernelModifyRegionBindParam *>(param);
-	
+	// TODO: Здесь дублирование, но позже разберусь.
 	if (param_id == RESOURCE_MODIFY_REGION_PHYSICALBIND) {
+		if (param == 0 || param_size != sizeof(KernelModifyRegionBindParam)) {
+			return ERROR_INVALIDPARAM;
+		}
+
+		const KernelModifyRegionBindParam *bindparam = 
+			reinterpret_cast<const KernelModifyRegionBindParam *>(param);
+	
 		return bindPhysical(bindparam->offset, bindparam->size, 
 				    bindparam->shift);
 	}
 	
 	if (param_id == RESOURCE_MODIFY_REGION_REGIONBIND) {
+		if (param == 0 || param_size != sizeof(KernelModifyRegionBindParam)) {
+			return ERROR_INVALIDPARAM;
+		}
+
+		const KernelModifyRegionBindParam *bindparam = 
+			reinterpret_cast<const KernelModifyRegionBindParam *>(param);
+	
 		Resource *resource = FindResource(bindparam->id);
 		if (resource == 0) return ERROR_INVALIDID;
 	

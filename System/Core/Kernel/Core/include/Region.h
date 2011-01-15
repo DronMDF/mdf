@@ -18,6 +18,13 @@ namespace Core {
 	
 class Region : public Resource
 {
+public:
+	static Region *Create(const void *param, size_t param_size);
+
+	// Конструктор используется в других тестах, потом его запрячем.
+	Region(size_t size, uint32_t access);
+	
+	
 protected:
 	Memory *m_memory;
 		
@@ -46,7 +53,6 @@ protected:
 	int bindPhysical(paddr_t poffset, size_t psize, offset_t skip);
 	
 public:
-	Region(size_t size, uint32_t access);
 	virtual ~Region();
 
 	virtual int Modify(int param_id, const void *param, size_t param_size);

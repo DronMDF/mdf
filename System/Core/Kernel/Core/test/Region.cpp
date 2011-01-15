@@ -4,6 +4,7 @@
 //
 
 #include <stdexcept>
+#include <boost/scoped_ptr.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "Types.h"
@@ -13,6 +14,7 @@
 #include "TestHelpers.h"
 
 using namespace std;
+using namespace boost;
 using namespace Core;
 
 BOOST_AUTO_TEST_SUITE(suiteRegion)
@@ -149,6 +151,14 @@ BOOST_AUTO_TEST_CASE(testBindRegionPageFault)
 // 	// Вызвать пейджфолт и посмотреть как это будет.
 // 	uint32_t access = 0;
 // 	BOOST_REQUIRE_EQUAL(region.PageFault(BIND_OFFSET, &access), &testFoltedRegion::page);
+}
+
+BOOST_AUTO_TEST_CASE(testRegionSetName)
+{
+	const KernelCreateRegionParam param = { 1, 0 };
+	scoped_ptr<Resource> region(Region::Create(&param, sizeof(param)));
+	const char name[] = "NAME";
+	BOOST_REQUIRE_EQUAL(region->Modify(RESOURCE_MODIFY_NAME, name, sizeof(name)), SUCCESS);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
