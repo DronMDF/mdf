@@ -29,6 +29,19 @@ int Custom::Modify(int param_id, const void *param, size_t param_size)
 		if (param_size != sizeof(KernelModifyCustomIoBindParam)) {
 			return ERROR_INVALIDPARAM;
 		}
+
+		const KernelModifyCustomIoBindParam *bind_param = 
+			reinterpret_cast<const KernelModifyCustomIoBindParam *>(param);
+	
+		// TODO: Спросить у Стаба, можно ли заюзать этот диапазон 
+		//	(если можно - бронируем паралельно)
+		
+		// Потом просто фиксируем параметры в структуре. чтобы по портфолту 
+		//	кора могла оветить - наши порты или нет.
+		
+		// С другой стороны порты может контролировать сама кора, чтобы 
+		//	 Стаб этим не нагружать. Тогда при инициализации стаб должен
+		//	Уведомить кору о своем диапазоне портов (допустимом)
 		
 		return SUCCESS;
 	}
