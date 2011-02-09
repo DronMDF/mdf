@@ -32,10 +32,18 @@ BOOST_AUTO_TEST_CASE(testBindPortToCustom)
 	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 }
 
-BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidParam)
+BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidPtr)
 {
 	scoped_ptr<Resource> res(Custom::Create());
-	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, 0, 0), ERROR_INVALIDPARAM);
+	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, 0,
+		sizeof(KernelModifyCustomIoBindParam)), ERROR_INVALIDPARAM);
+}
+
+BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidSize)
+{
+	scoped_ptr<Resource> res(Custom::Create());
+	const KernelModifyCustomIoBindParam b;
+	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &b, 0), ERROR_INVALIDPARAM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
