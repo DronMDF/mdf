@@ -25,10 +25,10 @@ BOOST_AUTO_TEST_CASE(testBindPortToCustom)
 {
 	scoped_ptr<Resource> res(Custom::Create());
 	// В тестовом режиме любые порты будем считать доступными
-	const KernelModifyCustomIoBindParam bind_params = { 
+	const KernelModifyCustomIoBindParam b = {
 		10, 20, RESOURCE_ACCESS_READ | RESOURCE_ACCESS_WRITE 
 	};
-	int rv = res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &bind_params, sizeof(bind_params));
+	int rv = res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &b, sizeof(b));
 	BOOST_REQUIRE_EQUAL(rv, SUCCESS);
 }
 
@@ -44,6 +44,13 @@ BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidSize)
 	scoped_ptr<Resource> res(Custom::Create());
 	const KernelModifyCustomIoBindParam b;
 	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &b, 0), ERROR_INVALIDPARAM);
+}
+
+BOOST_AUTO_TEST_CASE(testBindPortToCustomInvalidRange)
+{
+	scoped_ptr<Resource> res(Custom::Create());
+	const KernelModifyCustomIoBindParam b = { 20, 10, 0};
+	BOOST_REQUIRE_EQUAL(res->Modify(RESOURCE_MODIFY_CUSTOM_IOBIND, &b, sizeof(b)), ERROR_INVALIDPARAM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

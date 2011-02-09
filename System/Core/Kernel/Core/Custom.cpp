@@ -32,10 +32,15 @@ int Custom::Modify(int param_id, const void *param, size_t param_size)
 
 		const KernelModifyCustomIoBindParam *bind_param = 
 			reinterpret_cast<const KernelModifyCustomIoBindParam *>(param);
-	
+
+		if (bind_param->first > bind_param->last) {
+			return ERROR_INVALIDPARAM;
+		}
+			
 		// TODO: Спросить у Стаба, можно ли заюзать этот диапазон 
 		//	(если можно - бронируем паралельно)
-		
+
+		//binding = new PortBinding(bind_param);
 		// Потом просто фиксируем параметры в структуре. чтобы по портфолту 
 		//	кора могла оветить - наши порты или нет.
 		
