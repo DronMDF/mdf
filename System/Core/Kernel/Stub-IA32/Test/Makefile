@@ -5,7 +5,7 @@
 
 IFLAGS=-I $(MDF_ROOT)/Develop/Include/MDF --include Types.h
 
-STUB_SOURCES = Allocator.c Descriptor.c Multiboot.c Utils.c
+STUB_SOURCES = Allocator.c Descriptor.c IO.c Multiboot.c Utils.c
 STUB_OBJECTS=$(addprefix stub_, $(addsuffix .o, $(basename $(STUB_SOURCES))))
 
 UT_SOURCES=$(filter-out Runner.cpp, $(wildcard *.cpp))
