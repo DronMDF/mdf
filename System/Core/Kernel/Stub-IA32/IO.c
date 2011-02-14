@@ -12,19 +12,23 @@ void StubIOInit()
 	StubMemoryClear(stubIOMap, sizeof(stubIOMap));
 }
 
-int StubIOReserve(int first, int last)
+int StubIOReserve(unsigned int first, unsigned int last)
 {
-	for (int i = first; i <= last; i++) {
-		const int idx = i / sizeof(uint32_t);
-		const int offs = i % sizeof(uint32_t);
-		if (stubIOMap[idx] & (1 << offs) != 0) {
+	if (first > last) {
+		return ERROR_INVALIDPARAM;
+	}
+	
+	for (unsigned int i = first; i <= last; i++) {
+		const unsigned int idx = i / sizeof(uint32_t);
+		const unsigned int offs = i % sizeof(uint32_t);
+		if ((stubIOMap[idx] & (1 << offs)) != 0) {
 			return ERROR_BUSY;
 		}
 	}
 
-	for (int i = first; i <= last; i++) {
-		const int idx = i / sizeof(uint32_t);
-		const int offs = i % sizeof(uint32_t);
+	for (unsigned int i = first; i <= last; i++) {
+		const unsigned int idx = i / sizeof(uint32_t);
+		const unsigned int offs = i % sizeof(uint32_t);
 		stubIOMap[idx] |= 1 << offs;
 	}
 	

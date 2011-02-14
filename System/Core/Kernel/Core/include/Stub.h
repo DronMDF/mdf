@@ -78,7 +78,7 @@ int StubInfoValue(void *info, size_t *info_size, const void *data, size_t data_s
 
 void StubCPUIdle();
 
-int StubIOReserve(int first, int last);
+int StubIOReserve(unsigned int first, unsigned int last);
 
 #ifdef __cplusplus
 } // extern "C"
