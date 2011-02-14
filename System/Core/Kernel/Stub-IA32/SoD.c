@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2000-2010 Андрей Валяев <dron@infosec.ru>
+// Copyright (c) 2000-2011 Андрей Валяев <dron@securitycode.ru>
 // This code is licenced under the GPL3 (http://www.gnu.org/licenses/#GPL)
 //
 
@@ -663,7 +663,7 @@ void StubSoD_Imm (
 	//CorePrint ("    ss:esp = 0x%04x:0x%08x\n", ss & 0xffff, esp);
 	StubSoDCallStack ((laddr_t *)esp, eip, cs);
 
-	CorePrint ("\n  Mailto: Andrey Valyaev <dron@infosec.ru>");
+	CorePrint ("\n  Mailto: Andrey Valyaev <dron@securitycode.ru>");
 
 	while (true) {
 		CorePrint ("\n  ESC - reboot, D - debug, R - registers.");
