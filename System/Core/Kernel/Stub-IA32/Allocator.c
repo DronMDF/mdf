@@ -12,11 +12,16 @@
 
 // Третий уровень (каталоги)
 
-AllocDir *StubAllocatorDirectoryAlloc(void *(*getDir)())
+void StubAllocatorInitDirectory(AllocDir *dir)
+{
+	StubMemoryClear(dir, sizeof(AllocDir));
+	dir->avail = sizeof(dir->pages) / sizeof(dir->pages[0]) - 1;
+}
+
+AllocDir *StubAllocatorAllocDirectory(void *(*getDir)())
 {
 	AllocDir *dir = getDir();
-	StubMemoryClear(dir, sizeof(AllocDir));
-	dir->avail = sizeof(dir->pages) / sizeof(dir->pages[0]);
+	StubAllocatorInitDirectory(dir);
 	return dir;
 }
 
@@ -128,6 +133,13 @@ AllocPage *queues[10];
 void StubAllocatorInit(void *block)
 {
 	// Инициализацию можно безусловно зарядить во втором каталоге (4М)
+	StubAllocatorInitDirectory(block);
+	// Сразу инициализируем страницу, которая используется для индексов
+	void *pageptr = (char *)block + PAGE_SIZE;
+//	AllocPage *page = StubAllocatorInitBlock(pageptr);
+
+	// TODO: хардкодед размер очереди
+//	funcs->queues[2] = page;
 }
 
 void *StubAlloc(size_t size)
@@ -142,9 +154,25 @@ void *StubAlloc(size_t size)
 
 void StubFree(void *ptr)
 {
-	// По адресу блока определяем адрес каталога, 
+	// По адресу блока определяем адрес каталога,
+	AllocDir *dir = (AllocDir *)((uint32_t)ptr & 0xff000000U);
 	// по смещению страницы блока в каталоге определяем страницу
-	// по смещению в странице определяем бит в мапе и зануляем его
+	unsigned int pageIdx = ((uint32_t)ptr & 0x00fff000U) >> 12;
+	AllocPage *page = dir->pages[pageIdx];
 	
-	// то есть освобождение идет от каталога, вообще не затрагивая очереди
+	// по смещению в странице определяем бит в мапе и зануляем его
+	offset_t blockOffset = (uint32_t)ptr & 0x00000fffU;
+	STUB_ASSERT(blockOffset % page->block_size != 0, "Invalid block ptr");
+
+	unsigned int blockIdx = blockOffset / page->block_size;
+	uint32_t *map = page->map;	// На будующее можно разрулить доступ
+
+	// освобождение идет от каталога, вообще не затрагивая очереди
+	uint32_t mapValue, newValue;
+	do {
+		mapValue = map[blockIdx / 32];
+		newValue = mapValue & ~(1 << (blockIdx % 32));
+	} while (!CAS(&(map[blockIdx / 32]), mapValue, newValue));
+
+	// TODO: страницу можно куда нибудь подвинуть в очереди.
 }

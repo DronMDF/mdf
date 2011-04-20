@@ -8,7 +8,7 @@
 extern "C" {
 #include "../Allocator.h"
 
-AllocDir *StubAllocatorDirectoryAlloc(void *(*newDir)());
+AllocDir *StubAllocatorAllocDirectory(void *(*newDir)());
 
 // Уровень страниц
 void *StubAllocatorPageGetBlock(AllocPage *page);
@@ -59,10 +59,10 @@ void *testGetDir()
 
 BOOST_AUTO_TEST_CASE(testAllocDirectory)
 {
-	AllocDir *dir = StubAllocatorDirectoryAlloc(testGetDir);
+	AllocDir *dir = StubAllocatorAllocDirectory(testGetDir);
 	BOOST_REQUIRE_EQUAL(dir, &testDirectory);
 
-	const size_t pages_per_dir = sizeof(dir->pages) / sizeof(dir->pages[0]);
+	const size_t pages_per_dir = sizeof(dir->pages) / sizeof(dir->pages[0]) - 1;
 	BOOST_REQUIRE_EQUAL(dir->avail, pages_per_dir);
 	for (size_t i = 0; i < pages_per_dir; i++) {
 		BOOST_REQUIRE(dir->pages[i] == 0);
